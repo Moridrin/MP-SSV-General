@@ -10,6 +10,7 @@
 * License URI: http://www.wtfpl.net/txt/copying/
 */
 
+include_once "functions.php";
 include_once "options/options.php";
 
 function mp_ssv_unregister_mp_ssv_general(){
