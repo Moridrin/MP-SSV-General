@@ -12,6 +12,7 @@
 
 include_once "functions.php";
 include_once "options/options.php";
+include_once "models/FrontendMember.php";
 
 function mp_ssv_unregister_mp_ssv_general(){
 	if (!is_plugin_active('MP-SSV-Frontend-Members/mp-ssv-frontend-members.php')) {
@@ -19,4 +20,3 @@ function mp_ssv_unregister_mp_ssv_general(){
 	}
 }
 register_deactivation_hook( __FILE__, 'mp_ssv_unregister_mp_ssv_general' );
-?>
