@@ -17,6 +17,21 @@ class FrontendMember extends \WP_User
 		parent::__construct($user);
 	}
 
+	public static function get_by_id($id)
+	{
+		return new FrontendMember(get_user_by('id', $id));
+	}
+
+	public static function registerFromPOST()
+	{
+		$parent_id = wp_create_user($_POST['username'], $_POST['password'], $_POST['email']);
+		var_dump($parent_id);
+		unset($_POST['username']);
+		unset($_POST['password']);
+		unset($_POST['email']);
+		return new FrontendMember(get_user_by('ID', $parent_id));
+	}
+
 	/**
 	 * @return bool returns true if this is the current user.
 	 */
