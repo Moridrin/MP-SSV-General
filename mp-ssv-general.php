@@ -10,9 +10,9 @@
 * License URI: http://www.wtfpl.net/txt/copying/
 */
 
-include_once "functions.php";
-include_once "options/options.php";
-include_once "models/FrontendMember.php";
+require_once "functions.php";
+require_once "options/options.php";
+require_once "models/FrontendMember.php";
 
 function mp_ssv_unregister_mp_ssv_general(){
 	if (!is_plugin_active('MP-SSV-Frontend-Members/mp-ssv-frontend-members.php')) {
