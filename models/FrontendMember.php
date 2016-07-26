@@ -45,37 +45,6 @@ class FrontendMember extends \WP_User
 	}
 
 	/**
-	 * This function returns the metadata associated with the given key (or an alias of that key).
-	 * The aliases are:
-	 *  - email, email_address, member_email => user_email
-	 *  - name => display_name
-	 *  - login, username, user_name => user_login
-	 * If the key contains "_role" this function will return if the FrontendMember is part of that role.
-	 *
-	 * @param string $meta_key defines which metadata should be returned.
-	 * @param bool   $single   defines if it should return a single value or an array of values. Default it will return
-	 *                         a single value.
-	 *
-	 * @return string the value associated with the key.
-	 */
-	function getMeta($meta_key, $single = true)
-	{
-		if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
-			return $this->user_email;
-		} else if ($meta_key == "name" || $meta_key == "display_name") {
-			return $this->display_name;
-		} else if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
-			return $this->user_login;
-		} else if (strpos($meta_key, "_role_select") !== false) {
-			return get_user_meta($this->ID, $meta_key, $single);
-		} else if (strpos($meta_key, "_role") !== false) {
-			return in_array(str_replace("_role", "", $meta_key), $this->roles);
-		} else {
-			return stripslashes(get_user_meta($this->ID, $meta_key, $single));
-		}
-	}
-
-	/**
 	 * This function sets the metadata defined by the key (or an alias of that key).
 	 * The aliases are:
 	 *  - email, email_address, member_email => user_email
@@ -151,6 +120,37 @@ class FrontendMember extends \WP_User
 			update_user_meta($this->ID, $meta_key, $value);
 
 			return true;
+        }
+    }
+
+    /**
+     * This function returns the metadata associated with the given key (or an alias of that key).
+     * The aliases are:
+     *  - email, email_address, member_email => user_email
+     *  - name => display_name
+     *  - login, username, user_name => user_login
+     * If the key contains "_role" this function will return if the FrontendMember is part of that role.
+     *
+     * @param string $meta_key defines which metadata should be returned.
+     * @param bool   $single   defines if it should return a single value or an array of values. Default it will return
+     *                         a single value.
+     *
+     * @return string the value associated with the key.
+     */
+    function getMeta($meta_key, $single = true)
+    {
+        if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
+            return $this->user_email;
+        } else if ($meta_key == "name" || $meta_key == "display_name") {
+            return $this->display_name;
+        } else if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
+            return $this->user_login;
+        } else if (strpos($meta_key, "_role_select") !== false) {
+            return get_user_meta($this->ID, $meta_key, $single);
+        } else if (strpos($meta_key, "_role") !== false) {
+            return in_array(str_replace("_role", "", $meta_key), $this->roles);
+        } else {
+            return stripslashes(get_user_meta($this->ID, $meta_key, $single));
 		}
 	}
 }
