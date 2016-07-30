@@ -15,10 +15,10 @@ function mp_ssv_redirect($location)
 /**
  * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
  *
- * @param object $variable any variable that you want to be printed.
- * @param bool   $die      set true if you want to call die() after the print. $die is ignored if $return is true.
- * @param bool   $return   set true if you want to return the print as string.
- * @param bool   $newline  set false if you don't want to print a newline at the end of the print.
+ * @param mixed $variable any variable that you want to be printed.
+ * @param bool  $die      set true if you want to call die() after the print. $die is ignored if $return is true.
+ * @param bool  $return   set true if you want to return the print as string.
+ * @param bool  $newline  set false if you don't want to print a newline at the end of the print.
  *
  * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
  */
@@ -102,7 +102,7 @@ function mp_ssv_get_text_input($title, $id, $value, $type = "text", $args = arra
         $object_name = $id;
     }
     ?>
-    <input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>"
+    <input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
            value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
         echo $arg;
     } ?>/>
@@ -110,9 +110,8 @@ function mp_ssv_get_text_input($title, $id, $value, $type = "text", $args = arra
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $allow_custom = false,
-    $input_type_custom = null
-) {
+function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null, $title_on_newline = true)
+{
     ob_start();
     if ($allow_custom) {
         $options[] = "Custom";
@@ -121,7 +120,12 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
     $object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
     ?>
     <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
-    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) {
+    <?php
+    if ($title_on_newline) {
+        echo '<br/>';
+    }
+    ?>
+    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) {
         echo $arg;
     } ?>>
         <?php foreach ($options as $option) { ?>
@@ -134,12 +138,12 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
         <?php } ?>
     </select>
     <?php if ($allow_custom && $selected == "custom") { ?>
-        <div>
-            <!--suppress HtmlFormInputWithoutLabel -->
-            <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>"
-                   value="<?php echo $input_type_custom; ?>"/>
-        </div>
-    <?php }
+    <div>
+        <!--suppress HtmlFormInputWithoutLabel -->
+        <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" style="width: 100%;"
+               value="<?php echo $input_type_custom; ?>"/>
+    </div>
+<?php }
 
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -184,7 +188,7 @@ function mp_ssv_get_option($parent_id, $option, $args = array())
         ?>
         <li>
             <!--suppress HtmlFormInputWithoutLabel -->
-            <input type="text" id="<?php echo $object_name; ?>_option" name="<?php echo $object_name; ?>_option"
+            <input type="text" id="<?php echo $object_name; ?>_option" name="<?php echo $object_name; ?>_option" style="width: 100%;"
                    value="<?php echo $option["value"]; ?>" <?php foreach ($args as $arg) : echo $arg; endforeach; ?>/>
         </li>
         <?php
@@ -217,7 +221,7 @@ function mp_ssv_get_role_select($id, $title, $value, $with_title = true, $args =
         <?php
     }
     ?>
-    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" <?php foreach ($args as $arg) :
+    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) :
         echo $arg; endforeach; ?>>
         <option value=""></option><?php echo $roles_options; ?>
     </select>
