@@ -1,29 +1,9 @@
 <?php
-function mp_ssv_get_local_time_string($time_string)
-{
-    global $wpdb;
-    $time = DateTime::createFromFormat('H:i', $time_string);
-    $table_name = $wpdb->prefix . "mp_ssv_event_timezone";
-    $mp_ssv_event_time_zone = get_option('mp_ssv_event_time_zone');
-    $result = $wpdb->get_row("SELECT * FROM $table_name WHERE `id` = $mp_ssv_event_time_zone");
-    $gmt_adjustment = $result->gmt_adjustment;
-    if ($gmt_adjustment[0] == '+') {
-        $time->sub(
-            new DateInterval(
-                'PT' . $gmt_adjustment[1] . $gmt_adjustment[2] . 'H' . $gmt_adjustment[4] . $gmt_adjustment[5] . 'M'
-            )
-        );
-    } else {
-        $time->add(
-            new DateInterval(
-                'PT' . $gmt_adjustment[1] . $gmt_adjustment[2] . 'H' . $gmt_adjustment[4] . $gmt_adjustment[5] . 'M'
-            )
-        );
-    }
-
-    return $time->format('H:i');
-}
-
+/**
+ * This function can be called from anywhere and will redirect the page to the given location.
+ *
+ * @param string $location is the url where the page should be redirected to.
+ */
 function mp_ssv_redirect($location)
 {
     $redirect_script = '<script type="text/javascript">';
@@ -32,12 +12,39 @@ function mp_ssv_redirect($location)
     echo $redirect_script;
 }
 
-function mp_ssv_print($variable, $die = false)
+/**
+ * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
+ *
+ * @param object $variable any variable that you want to be printed.
+ * @param bool   $die      set true if you want to call die() after the print. $die is ignored if $return is true.
+ * @param bool   $return   set true if you want to return the print as string.
+ * @param bool   $newline  set false if you don't want to print a newline at the end of the print.
+ *
+ * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
+ */
+function mp_ssv_print($variable, $die = false, $return = false, $newline = true)
 {
-    highlight_string('<?php ' . var_export($variable, true) . ' ?>');
+    $print = highlight_string("<?php " . var_export($variable, true), true);
+    $print = trim($print);
+    $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
+    $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
+    $print = trim($print);
+    $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
+    $print = trim($print);
+    $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
+    if ($return) {
+        return $print;
+    } else {
+        echo $print;
+        if ($newline) {
+            echo '<br/>';
+        }
+    }
+
     if ($die) {
         die();
     }
+    return null;
 }
 
 function mp_ssv_get_tr($id, $content, $visible = true)
