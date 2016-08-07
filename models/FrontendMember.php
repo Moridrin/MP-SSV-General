@@ -45,6 +45,14 @@ class FrontendMember extends \WP_User
     }
 
     /**
+     * @return bool true if this user has the board role (and can edit other member profiles).
+     */
+    public function isBoard()
+    {
+        return in_array(get_option('mp_ssv_frontend_members_board_role'), $this->roles);
+    }
+
+    /**
      * This function sets the metadata defined by the key (or an alias of that key).
      * The aliases are:
      *  - email, email_address, member_email => user_email
