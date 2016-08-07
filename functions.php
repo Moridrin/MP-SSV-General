@@ -148,16 +148,20 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_checkbox($title, $id, $value, $args = array())
+function mp_ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line = false)
 {
     ob_start();
     $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
+    if ($on_new_line) {
+        ?><label for="<?php echo $object_name; ?>"><?php echo $title; ?></label><?php
+    }
     ?>
     <br/><input type="checkbox" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>"
                 value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?><?php foreach ($args as $arg):
-    echo $arg; endforeach; ?>/>
-    <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
-    <?php
+    echo $arg; endforeach; ?>/><?php
+    if (!$on_new_line) {
+        ?><label for="<?php echo $object_name; ?>"><?php echo $title; ?></label><?php
+    }
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
