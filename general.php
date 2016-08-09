@@ -6,5 +6,4 @@ if (!function_exists('mp_ssv_initialize_general')) {
         require_once "options/options.php";
         require_once "models/FrontendMember.php";
     }
-    //Test
 }
