@@ -141,7 +141,7 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
     <div>
         <!--suppress HtmlFormInputWithoutLabel -->
         <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" style="width: 100%;"
-               value="<?php echo $input_type_custom; ?>"/>
+               value="<?php echo $input_type_custom; ?>" required/>
     </div>
 <?php }
 
