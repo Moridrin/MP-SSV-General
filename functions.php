@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * This function can be called from anywhere and will redirect the page to the given location.
  *

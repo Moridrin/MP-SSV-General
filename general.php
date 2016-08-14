@@ -1,4 +1,7 @@
 <?php
+if (!defined('ABSPATH')) {
+    exit;
+}
 if (!function_exists('mp_ssv_initialize_general')) {
     function mp_ssv_initialize_general()
     {
