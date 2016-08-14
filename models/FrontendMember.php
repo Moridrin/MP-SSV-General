@@ -24,7 +24,11 @@ class FrontendMember extends \WP_User
 
     public static function registerFromPOST()
     {
-        $parent_id = wp_create_user($_POST['username'], $_POST['password'], $_POST['email']);
+        $parent_id = wp_create_user(
+            sanitize_text_field($_POST['username']),
+            sanitize_text_field($_POST['password']),
+            sanitize_text_field($_POST['email'])
+        );
         unset($_POST['username']);
         unset($_POST['password']);
         unset($_POST['email']);
@@ -67,14 +71,15 @@ class FrontendMember extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
+        $value = sanitize_text_field($value);
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
-            wp_update_user(array('ID' => $this->ID, 'user_email' => $value));
+            wp_update_user(array('ID' => $this->ID, 'user_email' => sanitize_text_field($value)));
             update_user_meta($this->ID, 'user_email', $value);
             $this->user_email = $value;
 
             return true;
         } elseif ($meta_key == "name" || $meta_key == "display_name") {
-            wp_update_user(array('ID' => $this->ID, 'display_name' => $value));
+            wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($value)));
             update_user_meta($this->ID, 'display_name', $value);
             $this->display_name = $value;
 

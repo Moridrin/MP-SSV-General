@@ -95,16 +95,16 @@ function mp_ssv_get_text_input($title, $id, $value, $type = "text", $args = arra
     if ($title != "") {
         $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
         ?>
-        <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
+        <label for="<?php echo esc_html($object_name); ?>"><?php echo esc_html($title); ?></label>
         <br/>
         <?php
     } else {
         $object_name = $id;
     }
     ?>
-    <input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
-           value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
-        echo $arg;
+    <input type="<?php echo esc_html($type); ?>" id="<?php echo esc_html($object_name); ?>" name="<?php echo esc_html($object_name); ?>" style="width: 100%;"
+           value="<?php echo esc_html($value); ?>" <?php foreach ($args as $arg) {
+        echo esc_html($arg);
     } ?>/>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
@@ -119,29 +119,26 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
     $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
     $object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
     ?>
-    <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
+    <label for="<?php echo esc_html($object_name); ?>"><?php echo esc_html($title); ?></label>
     <?php
     if ($title_on_newline) {
         echo '<br/>';
     }
     ?>
-    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) {
-        echo $arg;
+    <select id="<?php echo esc_html($object_name); ?>" name="<?php echo esc_html($object_name); ?>" style="width: 100%;" <?php foreach ($args as $arg) {
+        echo esc_html($arg);
     } ?>>
         <?php foreach ($options as $option) { ?>
-            <option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(
-                    str_replace(" ", "_", $option)
-                )
-            ) {
+            <option value="<?php echo esc_html(strtolower(str_replace(" ", "_", $option))); ?>" <?php if ($selected == esc_html(strtolower(str_replace(" ", "_", $option)))) {
                 echo "selected";
-            } ?>><?php echo $option; ?></option>
+            } ?>><?php echo esc_html($option); ?></option>
         <?php } ?>
     </select>
     <?php if ($allow_custom && $selected == "custom") { ?>
     <div>
         <!--suppress HtmlFormInputWithoutLabel -->
-        <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" style="width: 100%;"
-               value="<?php echo $input_type_custom; ?>" required/>
+        <input type="text" id="<?php echo esc_html($object_custom_name); ?>" name="<?php echo esc_html($object_custom_name); ?>" style="width: 100%;"
+               value="<?php echo esc_html($input_type_custom); ?>" required/>
     </div>
 <?php }
 
@@ -153,14 +150,14 @@ function mp_ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line 
     ob_start();
     $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
     if ($on_new_line) {
-        ?><label for="<?php echo $object_name; ?>"><?php echo $title; ?></label><?php
+        ?><label for="<?php echo esc_html($object_name); ?>"><?php echo esc_html($title); ?></label><?php
     }
     ?>
-    <br/><input type="checkbox" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>"
+    <br/><input type="checkbox" id="<?php echo esc_html($object_name); ?>" name="<?php echo esc_html($object_name); ?>"
                 value="yes" <?php if ($value == "yes") : echo "checked"; endif; ?><?php foreach ($args as $arg):
-    echo $arg; endforeach; ?>/><?php
+    echo esc_html($arg); endforeach; ?>/><?php
     if (!$on_new_line) {
-        ?><label for="<?php echo $object_name; ?>"><?php echo $title; ?></label><?php
+        ?><label for="<?php echo esc_html($object_name); ?>"><?php echo esc_html($title); ?></label><?php
     }
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -169,12 +166,12 @@ function mp_ssv_get_options($parent_id, $options, $type, $args = array())
 {
     ob_start();
     ?>
-    <ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">Options<br/><?php foreach ($options as $option) :
+    <ul id="<?php echo esc_html($parent_id); ?>_options" style="margin: 0;">Options<br/><?php foreach ($options as $option) :
             echo mp_ssv_get_option($parent_id, $option, $args); endforeach; ?>
         <li>
             <!--suppress JSUnresolvedFunction -->
-            <button type="button" id="<?php echo $parent_id; ?>_add_option"
-                    onclick="add_<?php echo $type; ?>_option(<?php echo $parent_id; ?>)">Add Option
+            <button type="button" id="<?php echo esc_html($parent_id); ?>_add_option"
+                    onclick="add_<?php echo esc_html($type); ?>_option(<?php echo esc_html($parent_id); ?>)">Add Option
             </button>
         </li>
     </ul>
@@ -187,13 +184,13 @@ function mp_ssv_get_option($parent_id, $option, $args = array())
     ob_start();
     $object_name = $parent_id . "_option" . $option["id"];
     if ($option["type"] == "role") {
-        echo "<li>" . mp_ssv_get_role_select($object_name, "option", $option["value"], false) . "</li>";
+        echo "<li>" . esc_html(mp_ssv_get_role_select($object_name, "option", $option["value"], false)) . "</li>";
     } else {
         ?>
         <li>
             <!--suppress HtmlFormInputWithoutLabel -->
-            <input type="text" id="<?php echo $object_name; ?>_option" name="<?php echo $object_name; ?>_option" style="width: 100%;"
-                   value="<?php echo $option["value"]; ?>" <?php foreach ($args as $arg) : echo $arg; endforeach; ?>/>
+            <input type="text" id="<?php echo esc_html($object_name); ?>_option" name="<?php echo esc_html($object_name); ?>_option" style="width: 100%;"
+                   value="<?php echo esc_html($option["value"]); ?>" <?php foreach ($args as $arg) : echo esc_html($arg); endforeach; ?>/>
         </li>
         <?php
     }
@@ -205,8 +202,8 @@ function mp_ssv_get_hidden($id, $name, $value)
 {
     ob_start();
     $object_name = $id . "_" . $name;
-    ?><input type="hidden" id="<?php echo $object_name; ?>"
-             name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"<?php
+    ?><input type="hidden" id="<?php echo esc_html($object_name); ?>"
+             name="<?php echo esc_html($object_name); ?>" value="<?php echo esc_html($value); ?>"<?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
@@ -221,13 +218,13 @@ function mp_ssv_get_role_select($id, $title, $value, $with_title = true, $args =
     ob_start();
     if ($with_title) {
         ?>
-        <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label><br/>
+        <label for="<?php echo esc_html($object_name); ?>"><?php echo esc_html($title); ?></label><br/>
         <?php
     }
     ?>
-    <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) :
-        echo $arg; endforeach; ?>>
-        <option value=""></option><?php echo $roles_options; ?>
+    <select id="<?php echo esc_html($object_name); ?>" name="<?php echo esc_html($object_name); ?>" style="width: 100%;" <?php foreach ($args as $arg) :
+        echo esc_html($arg); endforeach; ?>>
+        <option value=""></option><?php echo esc_html($roles_options); ?>
     </select>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
