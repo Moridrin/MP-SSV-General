@@ -134,7 +134,7 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
         <?php foreach ($options as $option) { ?>
             <option value="<?php echo esc_html(strtolower(str_replace(" ", "_", $option))); ?>" <?php if ($selected == esc_html(strtolower(str_replace(" ", "_", $option)))) {
                 echo "selected";
-            } ?>><?php echo esc_html($option); ?></option>
+            } ?>><?php echo $option; ?></option>
         <?php } ?>
     </select>
     <?php if ($allow_custom && $selected == "custom") { ?>
