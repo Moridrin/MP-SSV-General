@@ -73,69 +73,61 @@ class FrontendMember extends \WP_User
             $this->user_email = $value;
 
             return true;
-        } else {
-            if ($meta_key == "name" || $meta_key == "display_name") {
-                wp_update_user(array('ID' => $this->ID, 'display_name' => $value));
-                update_user_meta($this->ID, 'display_name', $value);
-                $this->display_name = $value;
+        } elseif ($meta_key == "name" || $meta_key == "display_name") {
+            wp_update_user(array('ID' => $this->ID, 'display_name' => $value));
+            update_user_meta($this->ID, 'display_name', $value);
+            $this->display_name = $value;
 
+            return true;
+        } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
+            return false; //cannot change user_login
+        } elseif (strpos($meta_key, "_role_select") !== false) {
+            $old_role = $this->getMeta($meta_key, true);
+            if ($old_role == $value) {
                 return true;
-            } else {
-                if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
-                    return false; //cannot change user_login
-                } else {
-                    if (strpos($meta_key, "_role_select") !== false) {
-                        $old_role = $this->getMeta($meta_key, true);
-                        if ($old_role == $value) {
-                            return true;
-                        }
-                        parent::remove_role($old_role);
-                        parent::add_role($value);
-
-                        update_user_meta($this->ID, $meta_key, $value);
-                        $to = 'mp.berkvens@gmail.com';
-                        $subject = "Member Role Changed";
-                        $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
-                        $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
-                        add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
-                        if (!isset($_POST['register'])) {
-                            wp_mail($to, $subject, $message, $headers);
-                        }
-
-                        return true;
-                    } else {
-                        if (strpos($meta_key, "_role") !== false) {
-                            $role = str_replace("_role", "", $meta_key);
-                            $old_value = $this->getMeta($role, true);
-                            $to = 'mp.berkvens@gmail.com';
-                            if ($old_value == $value) {
-                                return true;
-                            }
-                            if ($value == "yes") {
-                                parent::add_role($role);
-                                $subject = "Member Joined " . $role;
-                                $message = 'Hello,<br/><br/>' . $this->display_name . ' has joined ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
-                            } else {
-                                parent::remove_role($role);
-                                $subject = "Member Left " . $role;
-                                $message = 'Hello,<br/><br/>' . $this->display_name . ' has left ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
-                            }
-                            update_user_meta($this->ID, $role, $value);
-                            $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
-                            add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
-                            if (!isset($_POST['register'])) {
-                                wp_mail($to, $subject, $message, $headers);
-                            }
-
-                            return true;
-                        } else {
-                            update_user_meta($this->ID, $meta_key, $value);
-
-                            return true;
-                        }
-                    }
-                }
             }
+            parent::remove_role($old_role);
+            parent::add_role($value);
+
+            update_user_meta($this->ID, $meta_key, $value);
+            $to = 'mp.berkvens@gmail.com';
+            $subject = "Member Role Changed";
+            $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+            $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
+            add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
+            if (!isset($_POST['register'])) {
+                wp_mail($to, $subject, $message, $headers);
+            }
+
+            return true;
+        } elseif (strpos($meta_key, "_role") !== false) {
+            $role = str_replace("_role", "", $meta_key);
+            $old_value = $this->getMeta($role, true);
+            $to = 'mp.berkvens@gmail.com';
+            if ($old_value == $value) {
+                return true;
+            }
+            if ($value == "yes") {
+                parent::add_role($role);
+                $subject = "Member Joined " . $role;
+                $message = 'Hello,<br/><br/>' . $this->display_name . ' has joined ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+            } else {
+                parent::remove_role($role);
+                $subject = "Member Left " . $role;
+                $message = 'Hello,<br/><br/>' . $this->display_name . ' has left ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+            }
+            update_user_meta($this->ID, $role, $value);
+            $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
+            add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
+            if (!isset($_POST['register'])) {
+                wp_mail($to, $subject, $message, $headers);
+            }
+
+            return true;
+        } else {
+            update_user_meta($this->ID, $meta_key, $value);
+
+            return true;
         }
     }
 
