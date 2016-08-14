@@ -97,7 +97,8 @@ class FrontendMember extends \WP_User
             update_user_meta($this->ID, $meta_key, $value);
             $to = 'mp.berkvens@gmail.com';
             $subject = "Member Role Changed";
-            $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+            $url = get_site_url() . '/profile/?user_id=' . $this->ID;
+            $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
             $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
             add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
             if (!isset($_POST['register'])) {
@@ -115,11 +116,13 @@ class FrontendMember extends \WP_User
             if ($value == "yes") {
                 parent::add_role($role);
                 $subject = "Member Joined " . $role;
-                $message = 'Hello,<br/><br/>' . $this->display_name . ' has joined ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+                $url = get_site_url() . '/profile/?user_id=' . $this->ID;
+                $message = 'Hello,<br/><br/>' . $this->display_name . ' has joined ' . $role . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
             } else {
                 parent::remove_role($role);
                 $subject = "Member Left " . $role;
-                $message = 'Hello,<br/><br/>' . $this->display_name . ' has left ' . $role . '.<br/><a href="' . get_site_url() . '/profile/?user_id=' . $this->ID . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+                $url = get_site_url() . '/profile/?user_id=' . $this->ID;
+                $message = 'Hello,<br/><br/>' . $this->display_name . ' has left ' . $role . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
             }
             update_user_meta($this->ID, $role, $value);
             $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
@@ -169,7 +172,7 @@ class FrontendMember extends \WP_User
 
     function getProfileLink()
     {
-        return '<a href="' . $this->getProfileURL() . '">' . $this->display_name . '</a>';
+        return '<a href="' . esc_url($this->getProfileURL()) . '">' . $this->display_name . '</a>';
     }
 
     function getProfileURL()
