@@ -56,7 +56,7 @@ class FrontendMember extends \WP_User
      */
     public function isBoard()
     {
-        return in_array(get_option('mp_ssv_frontend_members_board_role'), $this->roles);
+        return in_array(get_option('ssv_frontend_members_board_role'), $this->roles);
     }
 
     /**

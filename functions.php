@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
  *
  * @param string $location is the url where the page should be redirected to.
  */
-function mp_ssv_redirect($location)
+function ssv_redirect($location)
 {
     $redirect_script = '<script type="text/javascript">';
     $redirect_script .= 'window.location = "' . $location . '"';
@@ -25,7 +25,7 @@ function mp_ssv_redirect($location)
  *
  * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
  */
-function mp_ssv_print($variable, $die = false, $return = false, $newline = true)
+function ssv_print($variable, $die = false, $return = false, $newline = true)
 {
     $print = highlight_string("<?php " . var_export($variable, true), true);
     $print = trim($print);
@@ -50,7 +50,7 @@ function mp_ssv_print($variable, $die = false, $return = false, $newline = true)
     return null;
 }
 
-function mp_ssv_get_tr($id, $content, $visible = true)
+function ssv_get_tr($id, $content, $visible = true)
 {
     ob_start();
     if ($visible) {
@@ -75,7 +75,7 @@ function mp_ssv_get_tr($id, $content, $visible = true)
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_td($content)
+function ssv_get_td($content)
 {
     ob_start();
     ?>
@@ -84,7 +84,7 @@ function mp_ssv_get_td($content)
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_draggable_icon()
+function ssv_get_draggable_icon()
 {
     ob_start();
     ?><img style="padding-right: 15px; margin: 10px 0;"
@@ -92,7 +92,7 @@ function mp_ssv_get_draggable_icon()
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_text_input($title, $id, $value, $type = "text", $args = array(), $esc_html = true)
+function ssv_get_text_input($title, $id, $value, $type = "text", $args = array(), $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
     $id = $esc_html ? esc_html($id) : $id;
@@ -117,7 +117,7 @@ function mp_ssv_get_text_input($title, $id, $value, $type = "text", $args = arra
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null, $title_on_newline = true, $esc_html = true)
+function ssv_get_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null, $title_on_newline = true, $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
     $id = $esc_html ? esc_html($id) : $id;
@@ -154,7 +154,7 @@ function mp_ssv_get_select($title, $id, $selected, $options, $args = array(), $a
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line = false, $esc_html = true)
+function ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line = false, $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
     $id = $esc_html ? esc_html($id) : $id;
@@ -174,7 +174,7 @@ function mp_ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line 
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_options($parent_id, $options, $type, $args = array(), $esc_html = true)
+function ssv_get_options($parent_id, $options, $type, $args = array(), $esc_html = true)
 {
     $parent_id = $esc_html ? esc_html($parent_id) : $parent_id;
     $type = $esc_html ? esc_html($type) : $type;
@@ -183,7 +183,7 @@ function mp_ssv_get_options($parent_id, $options, $type, $args = array(), $esc_h
     <ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">
         Options<br/>
         <?php foreach ($options as $option) :
-            echo mp_ssv_get_option($parent_id, $option, $args, $esc_html);
+            echo ssv_get_option($parent_id, $option, $args, $esc_html);
         endforeach; ?>
         <li>
             <button type="button" id="<?php echo $parent_id; ?>_add_option"
@@ -195,14 +195,14 @@ function mp_ssv_get_options($parent_id, $options, $type, $args = array(), $esc_h
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_option($parent_id, $option, $args = array(), $esc_html = true)
+function ssv_get_option($parent_id, $option, $args = array(), $esc_html = true)
 {
     $parent_id = $esc_html ? esc_html($parent_id) : $parent_id;
     ob_start();
     $object_name = $parent_id . "_option" . $option["id"];
     $object_name = $esc_html ? esc_html($object_name) : $object_name;
     if ($option["type"] == "role") {
-        echo "<li>" . mp_ssv_get_role_select($object_name, "option", $option["value"], false, array(), $esc_html) . "</li>";
+        echo "<li>" . ssv_get_role_select($object_name, "option", $option["value"], false, array(), $esc_html) . "</li>";
     } else {
         ?>
         <li>
@@ -216,7 +216,7 @@ function mp_ssv_get_option($parent_id, $option, $args = array(), $esc_html = tru
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_hidden($id, $name, $value, $esc_html = true)
+function ssv_get_hidden($id, $name, $value, $esc_html = true)
 {
     $name = $esc_html ? esc_html($name) : $name;
     $value = $esc_html ? esc_html($value) : $value;
@@ -228,7 +228,7 @@ function mp_ssv_get_hidden($id, $name, $value, $esc_html = true)
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_get_role_select($id, $title, $value, $with_title = true, $args = array(), $esc_html = true)
+function ssv_get_role_select($id, $title, $value, $with_title = true, $args = array(), $esc_html = true)
 {
     $id = $esc_html ? esc_html($id) : $id;
     $title = $esc_html ? esc_html($title) : $title;
@@ -255,12 +255,12 @@ function mp_ssv_get_role_select($id, $title, $value, $with_title = true, $args =
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function mp_ssv_starts_with($haystack, $needle)
+function ssv_starts_with($haystack, $needle)
 {
     return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== false;
 }
 
-function mp_ssv_ends_with($haystack, $needle)
+function ssv_ends_with($haystack, $needle)
 {
     return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
 }
