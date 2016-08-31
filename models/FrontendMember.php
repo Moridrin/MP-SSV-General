@@ -103,7 +103,7 @@ class FrontendMember extends \WP_User
             parent::add_role($value);
 
             update_user_meta($this->ID, $meta_key, $value);
-            $to = 'mp.berkvens@gmail.com';
+            $to = get_option('ssv_member_admin');
             $subject = "Member Role Changed";
             $url = get_site_url() . '/profile/?user_id=' . $this->ID;
             $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
@@ -117,7 +117,7 @@ class FrontendMember extends \WP_User
         } elseif (strpos($meta_key, "_role") !== false) {
             $role = str_replace("_role", "", $meta_key);
             $old_value = $this->getMeta($role, true);
-            $to = 'mp.berkvens@gmail.com';
+            $to = get_option('ssv_member_admin');
             if ($old_value == $value) {
                 return true;
             }
