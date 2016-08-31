@@ -70,7 +70,7 @@ class FrontendMember extends \WP_User
      * @param string $meta_key the key that defines which metadata to set.
      * @param string $value    the value to set.
      *
-     * @return bool is only false if the key is user_login (or an alias).
+     * @return bool|Message true if success, else it provides an object consisting of a message and a type (notification or error).
      */
     function updateMeta($meta_key, $value)
     {
@@ -79,16 +79,21 @@ class FrontendMember extends \WP_User
             wp_update_user(array('ID' => $this->ID, 'user_email' => sanitize_text_field($value)));
             update_user_meta($this->ID, 'user_email', $value);
             $this->user_email = $value;
-
             return true;
         } elseif ($meta_key == "name" || $meta_key == "display_name") {
             wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($value)));
             update_user_meta($this->ID, 'display_name', $value);
             $this->display_name = $value;
-
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
-            return false; //cannot change user_login
+            return new Message('Cannot change the user-login. Please consider setting the field display to \'disabled\'', Message::NOTIFICATION_MESSAGE); //cannot change user_login
+        } elseif ($meta_key == "iban" || $meta_key == "IBAN") {
+            if (!ssv_is_valid_iban($value)) {
+                return new Message('The IBAN is invalid!', Message::ERROR_MESSAGE);
+            } else {
+                update_user_meta($this->ID, $meta_key, $value);
+                return true;
+            }
         } elseif (strpos($meta_key, "_role_select") !== false) {
             $old_role = $this->getMeta($meta_key, true);
             if ($old_role == $value) {
