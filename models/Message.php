@@ -30,4 +30,16 @@ class Message
     {
         return $this->message;
     }
+
+    public function htmlPrint()
+    {
+        ob_start();
+        $class = $this->type == Message::NOTIFICATION_MESSAGE ? '' : 'notification-error';
+        ?>
+        <div class="mui-panel notification <?php echo $class; ?>">
+            <?php echo $this->message; ?>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
 }
