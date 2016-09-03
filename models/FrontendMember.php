@@ -65,6 +65,16 @@ class FrontendMember extends \WP_User
     }
 
     /**
+     * @param string $password The plaintext new user password
+     *
+     * @return bool false, if the $password does not match the member's password
+     */
+    public function checkPassword($password)
+    {
+        return wp_check_password($password, $this->data->user_pass, $this->ID);
+    }
+
+    /**
      * This function sets the metadata defined by the key (or an alias of that key).
      * The aliases are:
      *  - email, email_address, member_email => user_email
