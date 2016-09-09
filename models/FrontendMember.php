@@ -97,8 +97,15 @@ class FrontendMember extends \WP_User
             return true;
         } elseif ($meta_key == "name" || $meta_key == "display_name") {
             wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($value)));
-            update_user_meta($this->ID, 'display_name', $value);
+            update_user_meta($this->ID, 'display_name', sanitize_text_field($value));
             $this->display_name = $value;
+            return true;
+        } elseif ($meta_key == "first_name" || $meta_key == "last_name") {
+            update_user_meta($this->ID, $meta_key, sanitize_text_field($value));
+            $display_name = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
+            wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($display_name)));
+            update_user_meta($this->ID, 'display_name', sanitize_text_field($display_name));
+            $this->display_name = $display_name;
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return new Message('Cannot change the user-login. Please consider setting the field display to \'disabled\'', Message::NOTIFICATION_MESSAGE); //cannot change user_login
