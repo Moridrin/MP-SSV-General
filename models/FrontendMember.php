@@ -22,6 +22,9 @@ class FrontendMember extends \WP_User
 
     public static function get_by_id($id)
     {
+        if ($id == null) {
+            return null;
+        }
         return new FrontendMember(get_user_by('id', $id));
     }
 
