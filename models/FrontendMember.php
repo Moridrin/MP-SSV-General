@@ -95,6 +95,7 @@ class FrontendMember extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
+        $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
         $value = sanitize_text_field($value);
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
             wp_update_user(array('ID' => $this->ID, 'user_email' => sanitize_text_field($value)));
@@ -122,22 +123,24 @@ class FrontendMember extends \WP_User
                 update_user_meta($this->ID, $meta_key, $value);
                 return true;
             }
-        } elseif (strpos($meta_key, "_role_select") !== false) {
+        } elseif (strpos($meta_key, "_role_select") !== false && $currentUserIsBoardMember) {
             $old_role = $this->getMeta($meta_key, true);
             if ($old_role == $value) {
                 return true;
             }
-            parent::remove_role($old_role);
-            parent::add_role($value);
+            if ($currentUserIsBoardMember) {
+                parent::remove_role($old_role);
+                parent::add_role($value);
+            }
 
             update_user_meta($this->ID, $meta_key, $value);
             $to = get_option('ssv_frontend_members_member_admin');
             $subject = "Member Role Changed";
             $url = get_site_url() . '/profile/?user_id=' . $this->ID;
-            $message = 'Hello,<br/><br/>' . $this->display_name . ' has changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
-            $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
+            $message = 'Hello,<br/><br/>' . $this->display_name . ' wants to changed his role from ' . $old_role . ' to ' . $value . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+            $headers = "From: " . get_option('ssv_frontend_members_member_admin') . "\r\n";
             add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
-            if (!isset($_POST['register'])) {
+            if (!isset($_POST['register']) && !$currentUserIsBoardMember) {
                 wp_mail($to, $subject, $message, $headers);
             }
 
@@ -150,10 +153,12 @@ class FrontendMember extends \WP_User
                 return true;
             }
             if ($value == "yes") {
-                parent::add_role($role);
+                if ($currentUserIsBoardMember) {
+                    parent::add_role($role);
+                }
                 $subject = "Member Joined " . $role;
                 $url = get_site_url() . '/profile/?user_id=' . $this->ID;
-                $message = 'Hello,<br/><br/>' . $this->display_name . ' has joined ' . $role . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
+                $message = 'Hello,<br/><br/>' . $this->display_name . ' wants to join ' . $role . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
             } else {
                 parent::remove_role($role);
                 $subject = "Member Left " . $role;
@@ -161,9 +166,9 @@ class FrontendMember extends \WP_User
                 $message = 'Hello,<br/><br/>' . $this->display_name . ' has left ' . $role . '.<br/><a href="' . esc_url($url) . '" target="_blank">View User</a><br/><br/>Greetings, Jeroen Berkvens.';
             }
             update_user_meta($this->ID, $role, $value);
-            $headers = "From: webmaster@AllTerrain.nl" . "\r\n";
+            $headers = "From: " . get_option('ssv_frontend_members_member_admin') . "\r\n";
             add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
-            if (!isset($_POST['register'])) {
+            if (!isset($_POST['register']) && !$currentUserIsBoardMember) {
                 wp_mail($to, $subject, $message, $headers);
             }
 
