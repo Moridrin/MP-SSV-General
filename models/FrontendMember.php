@@ -30,6 +30,9 @@ class FrontendMember extends \WP_User
 
     public static function get_current_user()
     {
+        if (!is_user_logged_in()) {
+            return null;
+        }
         return new FrontendMember(wp_get_current_user());
     }
 
