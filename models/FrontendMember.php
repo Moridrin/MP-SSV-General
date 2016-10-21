@@ -20,6 +20,13 @@ class FrontendMember extends \WP_User
         parent::__construct($user);
     }
 
+    /**
+     * This function searches for a FrontendMember by its ID.
+     *
+     * @param int $id is the ID used to find the FrontendMember
+     *
+     * @return FrontendMember|null returns the FrontendMember it found or null if it can't find one.
+     */
     public static function get_by_id($id)
     {
         if ($id == null) {
