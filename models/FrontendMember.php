@@ -102,7 +102,7 @@ class FrontendMember extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
-        $currentUserIsBoardMember = FrontendMember::get_current_user()->isBoard();
+        $currentUserIsBoardMember = FrontendMember::get_current_user() == null ?: FrontendMember::get_current_user()->isBoard();
         $value                    = sanitize_text_field($value);
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
             wp_update_user(array('ID' => $this->ID, 'user_email' => sanitize_text_field($value)));
