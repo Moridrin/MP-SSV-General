@@ -218,9 +218,9 @@ class FrontendMember extends \WP_User
         }
     }
 
-    function getProfileLink()
+    function getProfileLink($target = '')
     {
-        return '<a href="' . esc_url($this->getProfileURL()) . '">' . $this->display_name . '</a>';
+        return '<a href="' . esc_url($this->getProfileURL()) . '" target="' . $target . '">' . $this->display_name . '</a>';
     }
 
     function getProfileURL()
