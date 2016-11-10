@@ -221,10 +221,7 @@ function ssv_get_hidden($id, $name, $value, $esc_html = true)
     $name  = $esc_html ? esc_html($name) : $name;
     $value = $esc_html ? esc_html($value) : $value;
     ob_start();
-    $object_name = $id . "_" . $name;
-    $object_name = $esc_html ? esc_html($object_name) : $object_name;
-    ?><input type="hidden" id="<?php echo $object_name; ?>"
-             name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"<?php
+    ?><input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>"><?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
