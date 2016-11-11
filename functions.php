@@ -87,8 +87,7 @@ function ssv_get_td($content, $colspan = 1)
 function ssv_get_draggable_icon()
 {
     ob_start();
-    ?><img style="padding-right: 15px; margin: 10px 0;"
-           src="<?php echo plugins_url('images/icon-menu.svg', __FILE__); ?>"/><?php
+    ?><img src="<?php echo plugins_url('images/icon-menu.svg', __FILE__); ?>" style="padding-right: 15px; margin: 10px 0;"/><?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
@@ -243,10 +242,11 @@ function ssv_get_option($parent_id, $option, $args = array(), $esc_html = true)
 
 function ssv_get_hidden($id, $name, $value, $esc_html = true)
 {
-    $name  = $esc_html ? esc_html($name) : $name;
-    $value = $esc_html ? esc_html($value) : $value;
+    $name        = $esc_html ? esc_html($name) : $name;
+    $value       = $esc_html ? esc_html($value) : $value;
+    $object_name = $id . "_" . strtolower(str_replace(" ", "_", $name));
     ob_start();
-    ?><input type="hidden" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $value; ?>"><?php
+    ?><input type="hidden" id="<?php echo $id; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"><?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
