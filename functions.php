@@ -75,11 +75,11 @@ function ssv_get_tr($id, $content, $visible = true)
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function ssv_get_td($content)
+function ssv_get_td($content, $colspan = 1)
 {
     ob_start();
     ?>
-    <td style="vertical-align: middle; cursor: move;"><?php echo $content; ?></td>
+    <td style="vertical-align: middle; cursor: move;" colspan="<?php echo $colspan; ?>"><?php echo $content; ?></td>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -111,8 +111,33 @@ function ssv_get_text_input($title, $id, $value, $type = "text", $args = array()
     ?>
     <input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
            value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
-        echo $arg;
+        echo $arg . ' ';
     } ?>/>
+    <?php
+    return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+}
+
+function ssv_get_text_area($title, $id, $value, $type = "text", $args = array(), $esc_html = true)
+{
+    $title = $esc_html ? esc_html($title) : $title;
+    $id    = $esc_html ? esc_html($id) : $id;
+    $value = $esc_html ? esc_html($value) : $value;
+    $type  = $esc_html ? esc_html($type) : $type;
+    ob_start();
+    if ($title != "") {
+        $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
+        ?>
+        <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
+        <br/>
+        <?php
+    } else {
+        $object_name = $id;
+    }
+    ?>
+    <textarea type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
+           <?php foreach ($args as $arg) {
+        echo $arg . ' ';
+    } ?>><?php echo $value; ?></textarea>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -135,7 +160,7 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
     }
     ?>
     <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) {
-        echo $arg;
+        echo $arg . ' ';
     } ?>>
         <?php foreach ($options as $option) { ?>
             <option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(str_replace(" ", "_", $option))) {
