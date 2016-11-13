@@ -75,11 +75,11 @@ function ssv_get_tr($id, $content, $visible = true)
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
-function ssv_get_td($content)
+function ssv_get_td($content, $colspan = 1)
 {
     ob_start();
     ?>
-    <td style="vertical-align: middle; cursor: move;"><?php echo $content; ?></td>
+    <td style="vertical-align: middle; cursor: move;" colspan="<?php echo $colspan; ?>"><?php echo $content; ?></td>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -87,17 +87,16 @@ function ssv_get_td($content)
 function ssv_get_draggable_icon()
 {
     ob_start();
-    ?><img style="padding-right: 15px; margin: 10px 0;"
-           src="<?php echo plugins_url('images/icon-menu.svg', __FILE__); ?>"/><?php
+    ?><img src="<?php echo plugins_url('images/icon-menu.svg', __FILE__); ?>" style="padding-right: 15px; margin: 10px 0;"/><?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function ssv_get_text_input($title, $id, $value, $type = "text", $args = array(), $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
-    $id = $esc_html ? esc_html($id) : $id;
+    $id    = $esc_html ? esc_html($id) : $id;
     $value = $esc_html ? esc_html($value) : $value;
-    $type = $esc_html ? esc_html($type) : $type;
+    $type  = $esc_html ? esc_html($type) : $type;
     ob_start();
     if ($title != "") {
         $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
@@ -111,8 +110,33 @@ function ssv_get_text_input($title, $id, $value, $type = "text", $args = array()
     ?>
     <input type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
            value="<?php echo $value; ?>" <?php foreach ($args as $arg) {
-        echo $arg;
+        echo $arg . ' ';
     } ?>/>
+    <?php
+    return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
+}
+
+function ssv_get_text_area($title, $id, $value, $type = "text", $args = array(), $esc_html = true)
+{
+    $title = $esc_html ? esc_html($title) : $title;
+    $id    = $esc_html ? esc_html($id) : $id;
+    $value = $esc_html ? esc_html($value) : $value;
+    $type  = $esc_html ? esc_html($type) : $type;
+    ob_start();
+    if ($title != "") {
+        $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
+        ?>
+        <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
+        <br/>
+        <?php
+    } else {
+        $object_name = $id;
+    }
+    ?>
+    <textarea type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
+           <?php foreach ($args as $arg) {
+        echo $arg . ' ';
+    } ?>><?php echo $value; ?></textarea>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -120,12 +144,12 @@ function ssv_get_text_input($title, $id, $value, $type = "text", $args = array()
 function ssv_get_select($title, $id, $selected, $options, $args = array(), $allow_custom = false, $input_type_custom = null, $title_on_newline = true, $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
-    $id = $esc_html ? esc_html($id) : $id;
+    $id    = $esc_html ? esc_html($id) : $id;
     ob_start();
     if ($allow_custom) {
         $options[] = "Custom";
     }
-    $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
+    $object_name        = $id . "_" . strtolower(str_replace(" ", "_", $title));
     $object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
     ?>
     <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
@@ -135,7 +159,7 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
     }
     ?>
     <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) {
-        echo $arg;
+        echo $arg . ' ';
     } ?>>
         <?php foreach ($options as $option) { ?>
             <option value="<?php echo strtolower(str_replace(" ", "_", $option)); ?>" <?php if ($selected == strtolower(str_replace(" ", "_", $option))) {
@@ -157,7 +181,7 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
 function ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line = false, $esc_html = true)
 {
     $title = $esc_html ? esc_html($title) : $title;
-    $id = $esc_html ? esc_html($id) : $id;
+    $id    = $esc_html ? esc_html($id) : $id;
     $value = $esc_html ? esc_html($value) : $value;
     ob_start();
     $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
@@ -177,7 +201,7 @@ function ssv_get_checkbox($title, $id, $value, $args = array(), $on_new_line = f
 function ssv_get_options($parent_id, $options, $type, $args = array(), $esc_html = true)
 {
     $parent_id = $esc_html ? esc_html($parent_id) : $parent_id;
-    $type = $esc_html ? esc_html($type) : $type;
+    $type      = $esc_html ? esc_html($type) : $type;
     ob_start();
     ?>
     <ul id="<?php echo $parent_id; ?>_options" style="margin: 0;">
@@ -218,21 +242,19 @@ function ssv_get_option($parent_id, $option, $args = array(), $esc_html = true)
 
 function ssv_get_hidden($id, $name, $value, $esc_html = true)
 {
-    $name = $esc_html ? esc_html($name) : $name;
-    $value = $esc_html ? esc_html($value) : $value;
+    $name        = $esc_html ? esc_html($name) : $name;
+    $value       = $esc_html ? esc_html($value) : $value;
+    $object_name = $id == null ? $name : $id . "_" . strtolower(str_replace(" ", "_", $name));
     ob_start();
-    $object_name = $id . "_" . $name;
-    $object_name = $esc_html ? esc_html($object_name) : $object_name;
-    ?><input type="hidden" id="<?php echo $object_name; ?>"
-             name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"<?php
+    ?><input type="hidden" id="<?php echo $id; ?>" name="<?php echo $object_name; ?>" value="<?php echo $value; ?>"><?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
 
 function ssv_get_role_select($id, $title, $value, $with_title = true, $args = array(), $esc_html = true)
 {
-    $id = $esc_html ? esc_html($id) : $id;
-    $title = $esc_html ? esc_html($title) : $title;
-    $value = $esc_html ? esc_html($value) : $value;
+    $id          = $esc_html ? esc_html($id) : $id;
+    $title       = $esc_html ? esc_html($title) : $title;
+    $value       = $esc_html ? esc_html($value) : $value;
     $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
     $object_name = $esc_html ? esc_html($object_name) : $object_name;
     ob_start();
@@ -295,6 +317,22 @@ function ssv_is_valid_iban($iban)
         }
     } catch (Exception $ex) {
         return false;
+    }
+}
+
+if (!function_exists('bcmod')) {
+    function bcmod($x, $y)
+    {
+        $take = 5;
+        $mod  = '';
+
+        do {
+            $a   = (int)$mod . substr($x, 0, $take);
+            $x   = substr($x, $take);
+            $mod = $a % $y;
+        } while (strlen($x));
+
+        return (int)$mod;
     }
 }
 
