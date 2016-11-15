@@ -134,9 +134,9 @@ function ssv_get_text_area($title, $id, $value, $type = "text", $args = array(),
     }
     ?>
     <textarea type="<?php echo $type; ?>" id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;"
-           <?php foreach ($args as $arg) {
-        echo $arg . ' ';
-    } ?>><?php echo $value; ?></textarea>
+        <?php foreach ($args as $arg) {
+            echo $arg . ' ';
+        } ?>><?php echo $value; ?></textarea>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
@@ -149,11 +149,15 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
     if ($allow_custom) {
         $options[] = "Custom";
     }
-    $object_name        = $id . "_" . strtolower(str_replace(" ", "_", $title));
-    $object_custom_name = $id . "_" . strtolower(str_replace(" ", "_", $title)) . "_custom";
-    ?>
-    <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
-    <?php
+    $object_name        = strtolower(str_replace(" ", "_", $title));
+    $object_custom_name = strtolower(str_replace(" ", "_", $title)) . "_custom";
+    if ($id != null) {
+        $object_name        = $id . '_' . $object_name;
+        $object_custom_name = $id . "_" . $object_custom_name;
+    }
+    if ($id != null): ?>
+        <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
+    <?php endif;
     if ($title_on_newline) {
         echo '<br/>';
     }
@@ -167,13 +171,13 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
             } ?>><?php echo $esc_html ? esc_html($option) : $option; ?></option>
         <?php } ?>
     </select>
-    <?php if ($allow_custom && $selected == "custom") { ?>
+    <?php if ($allow_custom && $selected == "custom"): ?>
     <div>
         <!--suppress HtmlFormInputWithoutLabel -->
         <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" style="width: 100%;"
                value="<?php echo $input_type_custom; ?>" required/>
     </div>
-<?php }
+<?php endif;
 
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
