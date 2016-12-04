@@ -45,14 +45,17 @@ class FrontendMember extends \WP_User
 
     public static function registerFromPOST()
     {
+        if (!isset($_POST['username']) || !isset($_POST['password']) || !isset($_POST['email'])) {
+            return new Message('You cannot register withot Username, Password and Email.', Message::ERROR_MESSAGE);
+        }
         $parent_id = wp_create_user(
             sanitize_text_field($_POST['username']),
             sanitize_text_field($_POST['password']),
             sanitize_text_field($_POST['email'])
         );
-        unset($_POST['username']);
+//        unset($_POST['username']);
         unset($_POST['password']);
-        unset($_POST['email']);
+//        unset($_POST['email']);
 
         return new FrontendMember(get_user_by('ID', $parent_id));
     }
