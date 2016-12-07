@@ -230,4 +230,12 @@ class FrontendMember extends \WP_User
     {
         return get_site_url() . '/profile/?user_id=' . $this->ID;
     }
+
+    function goesToEvent($eventID)
+    {
+        if (SSV_EVENTS_PATH === null) {
+            return false;
+        }
+        return Event::get_by_id($eventID)->isRegistered($this);
+    }
 }
