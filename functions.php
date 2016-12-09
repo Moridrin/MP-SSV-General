@@ -20,34 +20,53 @@ function ssv_redirect($location)
  *
  * @param mixed $variable any variable that you want to be printed.
  * @param bool  $die      set true if you want to call die() after the print. $die is ignored if $return is true.
- * @param bool  $return   set true if you want to return the print as string.
- * @param bool  $newline  set false if you don't want to print a newline at the end of the print.
  *
  * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
  */
-function ssv_print($variable, $die = false, $return = false, $newline = true)
+function ssv_print($variable, $die = false)
 {
-    $print = highlight_string("<?php " . var_export($variable, true), true);
-    $print = trim($print);
-    $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
-    $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
-    $print = trim($print);
-    $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
-    $print = trim($print);
-    $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
-    if ($return) {
-        return $print;
+    if (strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
+        ob_start();
+        echo $variable . ';';
+        $query = ob_get_clean();
+        include_once('lib/SqlFormatter.php');
+        $print = SqlFormatter::highlight($query);
+        $print = trim(preg_replace('/\s+/', ' ', $print));
     } else {
-        echo $print;
-        if ($newline) {
-            echo '<br/>';
-        }
+        $print = highlight_string("<?php " . var_export($variable, true), true);
+        $print = trim($print);
+        $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
+        $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
+        $print = trim($print);
+        $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
+        $print = trim($print);
+        $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
+        $print .= ';';
     }
+    echo $print;
+    echo '<br/>';
 
     if ($die) {
         die();
     }
     return null;
+}
+
+/**
+ * This function checks if the given $variable is recursive.
+ *
+ * @param mixed $variable is the variable to be checked.
+ *
+ * @return bool true if the $variable contains circular reference.
+ */
+function hasCircularReference($variable)
+{
+    $dump = print_r($variable, true);
+    if (strpos($dump, '*RECURSION*') !== false) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function ssv_get_tr($id, $content, $visible = true)
