@@ -315,6 +315,11 @@ function mp_replace_at_pos($haystack, $needle, $replacement, $position)
     return substr_replace($haystack, $replacement, $position, strlen($needle));
 }
 
+function mp_ssv_get_current_base_url()
+{
+    return (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+}
+
 function ssv_is_valid_iban($iban)
 {
     $iban      = strtolower(str_replace(' ', '', $iban));
@@ -348,20 +353,16 @@ function ssv_is_valid_iban($iban)
     }
 }
 
-if (!function_exists('bcmod')) {
-    function bcmod($x, $y)
-    {
-        $take = 5;
-        $mod  = '';
+function bcmod($x, $y)
+{
+    $take = 5;
+    $mod  = '';
 
-        do {
-            $a   = (int)$mod . substr($x, 0, $take);
-            $x   = substr($x, $take);
-            $mod = $a % $y;
-        } while (strlen($x));
+    do {
+        $a   = (int)$mod . substr($x, 0, $take);
+        $x   = substr($x, $take);
+        $mod = $a % $y;
+    } while (strlen($x));
 
-        return (int)$mod;
-    }
+    return (int)$mod;
 }
-
-?>

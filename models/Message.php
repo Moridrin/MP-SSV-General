@@ -31,12 +31,12 @@ class Message
         return $this->message;
     }
 
-    public function htmlPrint()
+    public function getHTML()
     {
         ob_start();
-        $class = $this->type == Message::NOTIFICATION_MESSAGE ? '' : 'notification-error';
+        $class = $this->type == Message::NOTIFICATION_MESSAGE ? 'primary' : 'red';
         ?>
-        <div class="mui-panel notification <?php echo $class; ?>">
+        <div class="card-panel <?php echo $class; ?>">
             <?php echo $this->message; ?>
         </div>
         <?php
