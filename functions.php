@@ -25,7 +25,7 @@ function ssv_redirect($location)
  */
 function ssv_print($variable, $die = false)
 {
-    if (strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
+    if (is_string($variable) && strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
         ob_start();
         echo $variable . ';';
         $query = ob_get_clean();
