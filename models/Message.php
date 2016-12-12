@@ -31,7 +31,7 @@ class Message
         return $this->message;
     }
 
-    public function getHTML()
+    public function getHTML($var = null)
     {
         ob_start();
         $class = $this->type == Message::NOTIFICATION_MESSAGE ? 'primary' : 'red';
