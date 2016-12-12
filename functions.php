@@ -233,6 +233,7 @@ function ssv_get_options($parent_id, $options, $type, $args = array(), $esc_html
             echo ssv_get_option($parent_id, $option, $args, $esc_html);
         endforeach; ?>
         <li>
+            <!--suppress JSUnresolvedFunction -->
             <button type="button" id="<?php echo $parent_id; ?>_add_option"
                     onclick="add_<?php echo $type; ?>_option(<?php echo $parent_id; ?>)">Add Option
             </button>
