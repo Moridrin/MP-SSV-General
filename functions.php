@@ -174,7 +174,7 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
         $object_name        = $id . '_' . $object_name;
         $object_custom_name = $id . "_" . $object_custom_name;
     }
-    if ($id != null): ?>
+    if ($id != null && !empty($title)): ?>
         <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
     <?php endif;
     if ($title_on_newline) {
@@ -195,6 +195,14 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
         <!--suppress HtmlFormInputWithoutLabel -->
         <input type="text" id="<?php echo $object_custom_name; ?>" name="<?php echo $object_custom_name; ?>" style="width: 100%;"
                value="<?php echo $input_type_custom; ?>" required/>
+    </div>
+<?php elseif ($allow_custom && $selected == "date"): ?>
+    <div>
+        <select id="<?= $object_custom_name; ?>" name="<?= $object_custom_name; ?>" style="width: 100%;" title="Date Time Type">
+            <option value="datetime" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>DateTime</option>
+            <option value="date" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>Date</option>
+            <option value="time" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>Time</option>
+        </select>
     </div>
 <?php endif;
 
