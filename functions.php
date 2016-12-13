@@ -200,8 +200,8 @@ function ssv_get_select($title, $id, $selected, $options, $args = array(), $allo
     <div>
         <select id="<?= $object_custom_name; ?>" name="<?= $object_custom_name; ?>" style="width: 100%;" title="Date Time Type">
             <option value="datetime" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>DateTime</option>
-            <option value="date" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>Date</option>
-            <option value="time" <?= $input_type_custom == 'datetime' ? 'selected' : '' ?>>Time</option>
+            <option value="date" <?= $input_type_custom == 'date' ? 'selected' : '' ?>>Date</option>
+            <option value="time" <?= $input_type_custom == 'time' ? 'selected' : '' ?>>Time</option>
         </select>
     </div>
 <?php endif;
