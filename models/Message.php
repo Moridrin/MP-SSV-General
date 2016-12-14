@@ -36,7 +36,7 @@ class Message
         ob_start();
         $class = $this->type == Message::NOTIFICATION_MESSAGE ? 'primary' : 'red';
         ?>
-        <div class="card-panel <?php echo $class; ?>">
+        <div class="col s12 card-panel <?php echo $class; ?>" style="padding: 10px;">
             <?php echo $this->message; ?>
         </div>
         <?php
