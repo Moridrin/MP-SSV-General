@@ -366,16 +366,18 @@ function ssv_is_valid_iban($iban)
     }
 }
 
-function bcmod($x, $y)
-{
-    $take = 5;
-    $mod  = '';
+if (!function_exists('bcmod')) {
+    function bcmod($x, $y)
+    {
+        $take = 5;
+        $mod  = '';
 
-    do {
-        $a   = (int)$mod . substr($x, 0, $take);
-        $x   = substr($x, $take);
-        $mod = $a % $y;
-    } while (strlen($x));
+        do {
+            $a   = (int)$mod . substr($x, 0, $take);
+            $x   = substr($x, $take);
+            $mod = $a % $y;
+        } while (strlen($x));
 
-    return (int)$mod;
+        return (int)$mod;
+    }
 }
