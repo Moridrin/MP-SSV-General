@@ -2,73 +2,26 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-/**
- * This function can be called from anywhere and will redirect the page to the given location.
- *
- * @param string $location is the url where the page should be redirected to.
- */
-function ssv_redirect($location)
+
+#region Functions that should be in PHP
+function replace_at_pos($haystack, $needle, $replacement, $position)
 {
-    $redirect_script = '<script type="text/javascript">';
-    $redirect_script .= 'window.location = "' . $location . '"';
-    $redirect_script .= '</script>';
-    echo $redirect_script;
+    return substr_replace($haystack, $replacement, $position, strlen($needle));
 }
 
-/**
- * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
- *
- * @param mixed $variable any variable that you want to be printed.
- * @param bool  $die      set true if you want to call die() after the print. $die is ignored if $return is true.
- *
- * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
- */
-function ssv_print($variable, $die = false)
+function starts_with($haystack, $needle)
 {
-    if (is_string($variable) && strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
-        ob_start();
-        echo $variable . ';';
-        $query = ob_get_clean();
-        include_once('lib/SqlFormatter.php');
-        $print = SqlFormatter::highlight($query);
-        $print = trim(preg_replace('/\s+/', ' ', $print));
-    } else {
-        $print = highlight_string("<?php " . var_export($variable, true), true);
-        $print = trim($print);
-        $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
-        $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
-        $print = trim($print);
-        $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
-        $print = trim($print);
-        $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
-        $print .= ';';
-    }
-    echo $print;
-    echo '<br/>';
-
-    if ($die) {
-        die();
-    }
-    return null;
+    return $needle === '' || strrpos($haystack, $needle, -strlen($haystack)) !== false;
 }
 
-/**
- * This function checks if the given $variable is recursive.
- *
- * @param mixed $variable is the variable to be checked.
- *
- * @return bool true if the $variable contains circular reference.
- */
-function hasCircularReference($variable)
+function ends_with($haystack, $needle)
 {
-    $dump = print_r($variable, true);
-    if (strpos($dump, '*RECURSION*') !== false) {
-        return true;
-    } else {
-        return false;
-    }
+    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
 }
+#endregion
 
+#region fields [disabled]
+/*
 function ssv_get_tr($id, $content, $visible = true)
 {
     ob_start();
@@ -308,76 +261,5 @@ function ssv_get_role_select($id, $title, $value, $with_title = true, $args = ar
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));
 }
-
-function ssv_starts_with($haystack, $needle)
-{
-    return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== false;
-}
-
-function ssv_ends_with($haystack, $needle)
-{
-    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
-}
-
-function mp_replace_at_pos($haystack, $needle, $replacement, $position)
-{
-    return substr_replace($haystack, $replacement, $position, strlen($needle));
-}
-
-function mp_ssv_get_current_base_url()
-{
-    return (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-}
-
-function ssv_is_valid_iban($iban)
-{
-    $iban      = strtolower(str_replace(' ', '', $iban));
-    $Countries = array('al' => 28, 'ad' => 24, 'at' => 20, 'az' => 28, 'bh' => 22, 'be' => 16, 'ba' => 20, 'br' => 29, 'bg' => 22, 'cr' => 21, 'hr' => 21, 'cy' => 28, 'cz' => 24, 'dk' => 18, 'do' => 28, 'ee' => 20, 'fo' => 18, 'fi' => 18, 'fr' => 27, 'ge' => 22, 'de' => 22, 'gi' => 23, 'gr' => 27, 'gl' => 18, 'gt' => 28, 'hu' => 28, 'is' => 26, 'ie' => 22, 'il' => 23, 'it' => 27, 'jo' => 30, 'kz' => 20, 'kw' => 30, 'lv' => 21, 'lb' => 28, 'li' => 21, 'lt' => 20, 'lu' => 20, 'mk' => 19, 'mt' => 31, 'mr' => 27, 'mu' => 30, 'mc' => 27, 'md' => 24, 'me' => 22, 'nl' => 18, 'no' => 15, 'pk' => 24, 'ps' => 29, 'pl' => 28, 'pt' => 25, 'qa' => 29, 'ro' => 24, 'sm' => 27, 'sa' => 24, 'rs' => 22, 'sk' => 24, 'si' => 19, 'es' => 24, 'se' => 24, 'ch' => 21, 'tn' => 24, 'tr' => 26, 'ae' => 23, 'gb' => 22, 'vg' => 24);
-    $Chars     = array('a' => 10, 'b' => 11, 'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15, 'g' => 16, 'h' => 17, 'i' => 18, 'j' => 19, 'k' => 20, 'l' => 21, 'm' => 22, 'n' => 23, 'o' => 24, 'p' => 25, 'q' => 26, 'r' => 27, 's' => 28, 't' => 29, 'u' => 30, 'v' => 31, 'w' => 32, 'x' => 33, 'y' => 34, 'z' => 35);
-
-    if (empty($iban)) {
-        return false;
-    }
-
-    try {
-        if (strlen($iban) == $Countries[substr($iban, 0, 2)]) {
-
-            $MovedChar      = substr($iban, 4) . substr($iban, 0, 4);
-            $MovedCharArray = str_split($MovedChar);
-            $NewString      = "";
-
-            foreach ($MovedCharArray AS $key => $value) {
-                if (!is_numeric($MovedCharArray[$key])) {
-                    $MovedCharArray[$key] = $Chars[$MovedCharArray[$key]];
-                }
-                $NewString .= $MovedCharArray[$key];
-            }
-
-            if (bcmod($NewString, '97') == 1) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    } catch (Exception $ex) {
-        return false;
-    }
-}
-
-if (!function_exists('bcmod')) {
-    function bcmod($x, $y)
-    {
-        $take = 5;
-        $mod  = '';
-
-        do {
-            $a   = (int)$mod . substr($x, 0, $take);
-            $x   = substr($x, $take);
-            $mod = $a % $y;
-        } while (strlen($x));
-
-        return (int)$mod;
-    }
-}
+*/
+#endregion
