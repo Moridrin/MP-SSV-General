@@ -17,14 +17,20 @@ add_action('admin_menu', 'ssv_add_ssv_menu', 9);
 function ssv_settings_page()
 {
     if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
-        update_option(SSV_General::OPTION_BOARD_ROLE, $_POST['board_role']);
+        if (isset($_POST['reset'])) {
+            SSV_General::resetOptions();
+        } else {
+            update_option(SSV_General::OPTION_BOARD_ROLE, $_POST['board_role']);
+        }
     }
     ?>
     <div class="wrap">
-        <h1>SSV General Options</h1>
+        <h1>SSV Plugins</h1>
     </div>
     <?php do_action(SSV_General::HOOK_GENERAL_OPTIONS_PAGE_CONTENT); ?>
-
+    <div class="wrap">
+        <h1>SSV General Options</h1>
+    </div>
     <form method="post" action="#">
         <table class="form-table">
 
@@ -39,8 +45,7 @@ function ssv_settings_page()
                 </td>
             </tr>
         </table>
-        <?php wp_nonce_field(SSV_General::OPTIONS_ADMIN_REFERER); ?>
-        <?php submit_button(); ?>
+        <?php SSV_General::formSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER); ?>
     </form>
     <?php
 }

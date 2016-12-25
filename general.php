@@ -2,8 +2,9 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-if (!function_exists('ssv_initialize_general')) {
+if (!class_exists('SSV_General')) {
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+
     class SSV_General
     {
         #region Constants
@@ -14,6 +15,21 @@ if (!function_exists('ssv_initialize_general')) {
 
         const OPTION_BOARD_ROLE = 'ssv_general__board_role';
         const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
+        #endregion
+
+        #region _init()
+        private static $initialized = false;
+
+        public static function _init()
+        {
+            if (!self::$initialized) {
+                require_once 'functions.php';
+                require_once 'options/options.php';
+                require_once 'models/SSV_User.php';
+                require_once 'models/Message.php';
+                self::$initialized = true;
+            }
+        }
         #endregion
 
         #region resetOptions()
@@ -101,6 +117,25 @@ if (!function_exists('ssv_initialize_general')) {
         }
         #endregion
 
+        #region formSecurityFields($adminReferer, $save, $reset)
+        /**
+         * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
+         * @param bool   $save
+         * @param bool   $reset
+         */
+        public static function formSecurityFields($adminReferer, $save = true, $reset = true)
+        {
+            ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
+            wp_nonce_field($adminReferer);
+            if ($save) {
+                submit_button();
+            }
+            if ($reset) {
+                ?><input type="submit" name="reset" id="reset" class="button button-primary" value="Reset to Default"><?php
+            }
+        }
+        #endregion
+
         #region var_export($variable, $die)
         /**
          * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
@@ -164,13 +199,5 @@ if (!function_exists('ssv_initialize_general')) {
         #endregion
     }
 
-    function ssv_initialize_general()
-    {
-        require_once 'functions.php';
-        require_once 'options/options.php';
-        require_once 'models/SSV_User.php';
-        require_once 'models/Message.php';
-    }
-
-    ssv_initialize_general();
+    SSV_General::_init();
 }
