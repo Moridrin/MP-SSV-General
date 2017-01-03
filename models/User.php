@@ -8,14 +8,14 @@ if (!defined('ABSPATH')) {
  * Date: 23-4-2016
  * Time: 14:48
  */
-class SSV_User extends \WP_User
+class User extends \WP_User
 {
     #region Get User
     #region construct
     /**
-     * SSV_User constructor.
+     * User constructor.
      *
-     * @param \WP_User $user the WP_User component used as base for the SSV_User
+     * @param \WP_User $user the WP_User component used as base for the User
      */
     function __construct($user)
     {
@@ -25,18 +25,20 @@ class SSV_User extends \WP_User
 
     #region By ID
     /**
-     * This function searches for a SSV_User by its ID.
+     * This function searches for a User by its ID.
+
      *
-     * @param int $id is the ID used to find the SSV_User
+*@param int $id is the ID used to find the SSV_User
+
      *
-     * @return SSV_User|null returns the SSV_User it found or null if it can't find one.
+*@return User|null returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
         if ($id == null) {
             return null;
         }
-        return new SSV_User(get_user_by('id', $id));
+        return new User(get_user_by('id', $id));
     }
     #endregion
 
@@ -46,7 +48,7 @@ class SSV_User extends \WP_User
         if (!is_user_logged_in()) {
             return null;
         }
-        return new SSV_User(wp_get_current_user());
+        return new User(wp_get_current_user());
     }
     #endregion
     #endregion
@@ -56,8 +58,9 @@ class SSV_User extends \WP_User
      * @param $username
      * @param $password
      * @param $email
+
      *
-     * @return Message|null|SSV_User
+*@return Message|null|User
      */
     public static function register($username, $password, $email)
     {
@@ -220,7 +223,7 @@ class SSV_User extends \WP_User
     public function getProfileURL()
     {
         $url = get_edit_user_link();
-        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, array('url' => $url));
+        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url);
         return $url;
     }
     #endregion

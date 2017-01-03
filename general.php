@@ -12,6 +12,7 @@ if (!class_exists('SSV_General')) {
 
         const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
         const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
+        const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
         const OPTION_BOARD_ROLE = 'ssv_general__board_role';
         const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
@@ -25,7 +26,7 @@ if (!class_exists('SSV_General')) {
             if (!self::$initialized) {
                 require_once 'functions.php';
                 require_once 'options/options.php';
-                require_once 'models/SSV_User.php';
+                require_once 'models/User.php';
                 require_once 'models/Message.php';
                 self::$initialized = true;
             }
@@ -58,9 +59,20 @@ if (!class_exists('SSV_General')) {
         #endregion
 
         #region isValidPOST($adminReferer)
+        /**
+         * @param $adminReferer
+         *
+         * @return bool true if the request is POST, it isn't a reset request and it has the correct admin referer.
+         */
         public static function isValidPOST($adminReferer)
         {
-            return $_SERVER['REQUEST_METHOD'] == 'POST' && check_admin_referer($adminReferer);
+            if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+                return false;
+            }
+            if (!check_admin_referer($adminReferer)) {
+                return false;
+            }
+            return true;
         }
         #endregion
 
@@ -120,17 +132,17 @@ if (!class_exists('SSV_General')) {
         #region formSecurityFields($adminReferer, $save, $reset)
         /**
          * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
-         * @param bool   $save
-         * @param bool   $reset
+         * @param bool   $saveButton
+         * @param bool   $resetButton
          */
-        public static function formSecurityFields($adminReferer, $save = true, $reset = true)
+        public static function formSecurityFields($adminReferer, $saveButton = true, $resetButton = true)
         {
             ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
             wp_nonce_field($adminReferer);
-            if ($save) {
+            if ($saveButton) {
                 submit_button();
             }
-            if ($reset) {
+            if ($resetButton) {
                 ?><input type="submit" name="reset" id="reset" class="button button-primary" value="Reset to Default"><?php
             }
         }
