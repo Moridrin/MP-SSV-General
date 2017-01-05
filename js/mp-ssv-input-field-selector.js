@@ -34,8 +34,10 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", fieldID + "_field_title");
     fieldTitle.setAttribute("name", fieldID + "_field_title");
+    fieldTitle.setAttribute("style", "width: 100%;");
     fieldTitle.setAttribute("required", "required");
     var fieldTitleLabel = document.createElement("label");
+    fieldTitleLabel.setAttribute("style", "white-space: nowrap;");
     fieldTitleLabel.setAttribute("for", fieldID + "_field_title");
     fieldTitleLabel.innerHTML = "Field Title";
     var fieldTitleTD = td.cloneNode(false);
@@ -46,7 +48,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
 
     // Field Type
     var fieldType = mp_ssv_create_select(fieldID, "_field_type", ["Tab", "Header", "Input", "Label"]);
+    fieldType.setAttribute("style", "width: 100%;");
     var fieldTypeLabel = document.createElement("label");
+    fieldTypeLabel.setAttribute("style", "white-space: nowrap;");
     fieldTypeLabel.setAttribute("for", fieldID + "_field_type");
     fieldTypeLabel.innerHTML = "Field Type";
     var fieldTypeTD = td.cloneNode(false);
@@ -57,7 +61,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
 
     // Input Type
     var inputType = mp_ssv_create_select(fieldID, "_input_type", ["Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Custom"]);
+    inputType.setAttribute("style", "width: 100%;");
     var inputTypeLabel = document.createElement("label");
+    inputTypeLabel.setAttribute("style", "white-space: nowrap;");
     inputTypeLabel.setAttribute("for", fieldID + "_input_type");
     inputTypeLabel.innerHTML = "Input Type";
     var inputTypeTD = td.cloneNode(false);
@@ -70,8 +76,10 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var name = document.createElement("input");
     name.setAttribute("id", fieldID + "_name");
     name.setAttribute("name", fieldID + "_name");
+    name.setAttribute("style", "width: 100%;");
     name.setAttribute("required", "required");
     var nameLabel = document.createElement("label");
+    nameLabel.setAttribute("style", "white-space: nowrap;");
     nameLabel.setAttribute("for", fieldID + "_name");
     nameLabel.innerHTML = "Name";
     var nameTD = td.cloneNode(false);
@@ -92,19 +100,22 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     requiredReset.setAttribute("name", fieldID + "_required");
     requiredReset.setAttribute("value", "false");
     var requiredLabel = document.createElement("label");
+    requiredLabel.setAttribute("style", "white-space: nowrap;");
     requiredLabel.setAttribute("for", fieldID + "_required");
     requiredLabel.innerHTML = "Required";
     var requiredTD = td.cloneNode(false);
-    requiredTD.setAttribute("style", "vertical-align: bottom; padding-bottom: 7px;");
+    requiredTD.appendChild(requiredLabel);
+    requiredTD.appendChild(br.cloneNode(false));
     requiredTD.appendChild(requiredReset);
     requiredTD.appendChild(required);
-    requiredTD.appendChild(requiredLabel);
     tr.appendChild(requiredTD);
     container.appendChild(tr);
 
     // Display
     var display = mp_ssv_create_select(fieldID, "_input_type", ["Normal", "ReadOnly", "Disabled"]);
+    display.setAttribute("style", "width: 100%;");
     var displayLabel = document.createElement("label");
+    displayLabel.setAttribute("style", "white-space: nowrap;");
     displayLabel.setAttribute("for", fieldID + "_input_type");
     displayLabel.innerHTML = "Input Type";
     var displayTD = td.cloneNode(false);
@@ -117,7 +128,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var defaultValue = document.createElement("input");
     defaultValue.setAttribute("id", fieldID + "_default_value");
     defaultValue.setAttribute("name", fieldID + "_default_value");
+    defaultValue.setAttribute("style", "width: 100%;");
     var defaultValueLabel = document.createElement("label");
+    defaultValueLabel.setAttribute("style", "white-space: nowrap;");
     defaultValueLabel.setAttribute("for", fieldID + "_default_value");
     defaultValueLabel.innerHTML = "Default Value";
     var defaultValueTD = td.cloneNode(false);
@@ -130,7 +143,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var placeholder = document.createElement("input");
     placeholder.setAttribute("id", fieldID + "_placeholder");
     placeholder.setAttribute("name", fieldID + "_placeholder");
+    placeholder.setAttribute("style", "width: 100%;");
     var placeholderLabel = document.createElement("label");
+    placeholderLabel.setAttribute("style", "white-space: nowrap;");
     placeholderLabel.setAttribute("for", fieldID + "_placeholder");
     placeholderLabel.innerHTML = "Placeholder";
     var placeholderTD = td.cloneNode(false);
@@ -143,7 +158,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var classField = document.createElement("input");
     classField.setAttribute("id", fieldID + "_class");
     classField.setAttribute("name", fieldID + "_class");
+    classField.setAttribute("style", "width: 100%;");
     var classLabel = document.createElement("label");
+    classLabel.setAttribute("style", "white-space: nowrap;");
     classLabel.setAttribute("for", fieldID + "_class");
     classLabel.innerHTML = "Class";
     var classTD = td.cloneNode(false);
@@ -156,7 +173,9 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var style = document.createElement("input");
     style.setAttribute("id", fieldID + "_style");
     style.setAttribute("name", fieldID + "_style");
+    style.setAttribute("style", "width: 100%;");
     var styleLabel = document.createElement("label");
+    styleLabel.setAttribute("style", "white-space: nowrap;");
     styleLabel.setAttribute("for", fieldID + "_style");
     styleLabel.innerHTML = "Style";
     var styleTD = td.cloneNode(false);
