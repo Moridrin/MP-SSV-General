@@ -5,7 +5,7 @@
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
-function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyle) {
+function mp_ssv_add_field(containerID, fieldID, namePrefix, $customFields, $trStyle, $tdStyle) {
     // var $ = jQuery.noConflict();
     var container = document.getElementById(containerID);
 
@@ -33,7 +33,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Field Title
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", fieldID + "_field_title");
-    fieldTitle.setAttribute("name", fieldID + "_field_title");
+    fieldTitle.setAttribute("name", namePrefix + "_" + fieldID + "_field_title");
     fieldTitle.setAttribute("style", "width: 100%;");
     fieldTitle.setAttribute("required", "required");
     var fieldTitleLabel = document.createElement("label");
@@ -47,7 +47,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     tr.appendChild(fieldTitleTD);
 
     // Field Type
-    var fieldType = mp_ssv_create_select(fieldID, "_field_type", ["Tab", "Header", "Input", "Label"]);
+    var fieldType = mp_ssv_create_select(namePrefix + "_" + fieldID + "_field_type", ["Tab", "Header", "Input", "Label"]);
     fieldType.setAttribute("style", "width: 100%;");
     var fieldTypeLabel = document.createElement("label");
     fieldTypeLabel.setAttribute("style", "white-space: nowrap;");
@@ -60,7 +60,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     tr.appendChild(fieldTypeTD);
 
     // Input Type
-    var inputType = mp_ssv_create_select(fieldID, "_input_type", ["Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Custom"]);
+    var inputType = mp_ssv_create_select(namePrefix + "_" + fieldID + "_input_type", ["Text", "Text Select", "Role Select", "Text Checkbox", "Role Checkbox", "Image", "Custom"]);
     inputType.setAttribute("style", "width: 100%;");
     var inputTypeLabel = document.createElement("label");
     inputTypeLabel.setAttribute("style", "white-space: nowrap;");
@@ -75,7 +75,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Name
     var name = document.createElement("input");
     name.setAttribute("id", fieldID + "_name");
-    name.setAttribute("name", fieldID + "_name");
+    name.setAttribute("name", namePrefix + "_" + fieldID + "_name");
     name.setAttribute("style", "width: 100%;");
     name.setAttribute("required", "required");
     var nameLabel = document.createElement("label");
@@ -92,12 +92,12 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     var required = document.createElement("input");
     required.setAttribute("type", "checkbox");
     required.setAttribute("id", fieldID + "_required");
-    required.setAttribute("name", fieldID + "_required");
+    required.setAttribute("name", namePrefix + "_" + fieldID + "_required");
     required.setAttribute("value", "true");
     var requiredReset = document.createElement("input");
     requiredReset.setAttribute("type", "hidden");
     requiredReset.setAttribute("id", fieldID + "_required");
-    requiredReset.setAttribute("name", fieldID + "_required");
+    requiredReset.setAttribute("name", namePrefix + "_" + fieldID + "_required");
     requiredReset.setAttribute("value", "false");
     var requiredLabel = document.createElement("label");
     requiredLabel.setAttribute("style", "white-space: nowrap;");
@@ -112,7 +112,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     container.appendChild(tr);
 
     // Display
-    var display = mp_ssv_create_select(fieldID, "_input_type", ["Normal", "ReadOnly", "Disabled"]);
+    var display = mp_ssv_create_select(namePrefix + "_" + fieldID + "_input_type", ["Normal", "ReadOnly", "Disabled"]);
     display.setAttribute("style", "width: 100%;");
     var displayLabel = document.createElement("label");
     displayLabel.setAttribute("style", "white-space: nowrap;");
@@ -127,7 +127,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Default Value
     var defaultValue = document.createElement("input");
     defaultValue.setAttribute("id", fieldID + "_default_value");
-    defaultValue.setAttribute("name", fieldID + "_default_value");
+    defaultValue.setAttribute("name", namePrefix + "_" + fieldID + "_default_value");
     defaultValue.setAttribute("style", "width: 100%;");
     var defaultValueLabel = document.createElement("label");
     defaultValueLabel.setAttribute("style", "white-space: nowrap;");
@@ -142,7 +142,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Placeholder
     var placeholder = document.createElement("input");
     placeholder.setAttribute("id", fieldID + "_placeholder");
-    placeholder.setAttribute("name", fieldID + "_placeholder");
+    placeholder.setAttribute("name", namePrefix + "_" + fieldID + "_placeholder");
     placeholder.setAttribute("style", "width: 100%;");
     var placeholderLabel = document.createElement("label");
     placeholderLabel.setAttribute("style", "white-space: nowrap;");
@@ -157,7 +157,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Class
     var classField = document.createElement("input");
     classField.setAttribute("id", fieldID + "_class");
-    classField.setAttribute("name", fieldID + "_class");
+    classField.setAttribute("name", namePrefix + "_" + fieldID + "_class");
     classField.setAttribute("style", "width: 100%;");
     var classLabel = document.createElement("label");
     classLabel.setAttribute("style", "white-space: nowrap;");
@@ -172,7 +172,7 @@ function mp_ssv_add_field(containerID, fieldID, $customFields, $trStyle, $tdStyl
     // Style
     var style = document.createElement("input");
     style.setAttribute("id", fieldID + "_style");
-    style.setAttribute("name", fieldID + "_style");
+    style.setAttribute("name", namePrefix + "_" + fieldID + "_style");
     style.setAttribute("style", "width: 100%;");
     var styleLabel = document.createElement("label");
     styleLabel.setAttribute("style", "white-space: nowrap;");
@@ -236,10 +236,10 @@ function clone(obj) {
     return copy;
 }
 
-function mp_ssv_create_select(fieldID, fieldName, options) {
+function mp_ssv_create_select(fieldName, options) {
     var select = document.createElement("select");
-    select.setAttribute("id", fieldID + fieldName);
-    select.setAttribute("name", fieldID + fieldName);
+    select.setAttribute("id", fieldName);
+    select.setAttribute("name", fieldName);
 
     for (i = 0; i < options.length; i++) {
         var option = document.createElement("option");

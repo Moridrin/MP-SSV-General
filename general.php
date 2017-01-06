@@ -3,6 +3,19 @@ if (!defined('ABSPATH')) {
     exit;
 }
 if (!class_exists('SSV_General')) {
+
+    #region Register Scripts
+    function mp_ssv_general_admin_scripts()
+    {
+        wp_enqueue_script('mp-ssv-input-field-selector', SSV_Events::URL . 'general/js/mp-ssv-input-field-selector.js', array('jquery'));
+        wp_enqueue_script('mp-ssv-sortable-tables', SSV_Events::URL . 'general/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
+    }
+
+    add_action('admin_enqueue_scripts', 'mp_ssv_general_admin_scripts');
+    #endregion
+
+    #region Class
+    global $wpdb;
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 
     class SSV_General
@@ -148,6 +161,49 @@ if (!class_exists('SSV_General')) {
         }
         #endregion
 
+        #region getCustomFieldsContainer($prefix)
+        /**
+         * @param string $prefix
+         */
+        public static function getCustomFieldsContainer($prefix)
+        {
+            ?>
+            <table id="custom-fields-placeholder" class="sortable"></table>
+            <button type="button" onclick="mp_ssv_add_new_field()">Add Field</button>
+            <script>
+                mp_ssv_sortable_table('custom-fields-placeholder');
+                i = 0;
+                function mp_ssv_add_new_field() {
+                    mp_ssv_add_field('custom-fields-placeholder', i, '<?= $prefix ?>');
+                    i++;
+                }
+            </script>
+            <?php
+        }
+        #endregion
+
+        #region getCustomFieldsFromPost($prefix)
+        /**
+         * @param string $prefix
+         *
+         * @return array of all the custom fields matching the $prefix.
+         */
+        public static function getCustomFieldsFromPost($prefix)
+        {
+            $customFields      = array();
+            $customFieldValues = array();
+            foreach ($_POST as $key => $value) {
+                if (strpos($key, $prefix) !== false) {
+                    $customFieldValues[str_replace($prefix, '', $key)] = $value;
+                    if (strpos($key, '_field_end') !== false) {
+                        $customFields[] = Field::fromJSON(json_encode($customFieldValues));
+                    }
+                }
+            }
+            return $customFields;
+        }
+        #endregion
+
         #region var_export($variable, $die)
         /**
          * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
@@ -210,6 +266,8 @@ if (!class_exists('SSV_General')) {
         }
         #endregion
     }
+
+    #endregion
 
     SSV_General::_init();
 }
