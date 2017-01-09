@@ -8,7 +8,7 @@
  */
 class InputField extends Field
 {
-    const FIELD_TYPE = 'input-field';
+    const FIELD_TYPE = 'input';
 
     public $inputType;
     public $name;
@@ -55,17 +55,17 @@ class InputField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        if ($values->fieldType != self::FIELD_TYPE) {
+        if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
         return new InputField(
             $values->id,
             $values->title,
-            $values->inputType,
+            $values->input_type,
             $values->name,
             $values->required,
             $values->display,
-            $values->defaultValue,
+            $values->default_value,
             $values->placeholder,
             $values->class,
             $values->style

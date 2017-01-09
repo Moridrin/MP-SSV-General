@@ -2,7 +2,9 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
 if (!class_exists('SSV_General')) {
+    require_once 'models/custom-fields/Field.php';
 
     #region Register Scripts
     function mp_ssv_general_admin_scripts()
@@ -174,7 +176,7 @@ if (!class_exists('SSV_General')) {
                 mp_ssv_sortable_table('custom-fields-placeholder');
                 i = 0;
                 function mp_ssv_add_new_field() {
-                    mp_ssv_add_field('custom-fields-placeholder', i, '<?= $prefix ?>');
+                    mp_ssv_add_new_text_input_field('custom-fields-placeholder', i, '<?= $prefix ?>');
                     i++;
                 }
             </script>
@@ -192,11 +194,16 @@ if (!class_exists('SSV_General')) {
         {
             $customFields      = array();
             $customFieldValues = array();
+            $id                = 15;
             foreach ($_POST as $key => $value) {
                 if (strpos($key, $prefix) !== false) {
-                    $customFieldValues[str_replace($prefix, '', $key)] = $value;
+                    if (strpos($key, '_field_start') !== false) {
+                        $customFieldValues = array();
+                        $id                = str_replace($prefix . '_', '', str_replace('_field_start', '', $key));
+                    }
+                    $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = $value;
                     if (strpos($key, '_field_end') !== false) {
-                        $customFields[] = Field::fromJSON(json_encode($customFieldValues));
+                        $customFields[$id] = Field::fromJSON(json_encode($customFieldValues));
                     }
                 }
             }

@@ -1,5 +1,7 @@
 <?php
 
+require_once 'InputField.php';
+
 /**
  * Created by PhpStorm.
  * User: moridrin
@@ -38,10 +40,19 @@ abstract class Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        switch ($values->fieldType) {
+        switch ($values->field_type) {
             case InputField::FIELD_TYPE:
                 return InputField::fromJSON($json);
         }
         throw new Exception('Unknown field type');
+    }
+
+    /**
+     * @return string the class as JSON object.
+     * @throws Exception if the method is not implemented by a sub class.
+     */
+    public function toJSON()
+    {
+        throw new Exception('This should be implemented in a sub class.');
     }
 }
