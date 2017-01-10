@@ -61,7 +61,8 @@ if (!class_exists('SSV_General')) {
         public static function resetOptions()
         {
             update_option(self::OPTION_BOARD_ROLE, 'administrator');
-            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($_POST['custom_field_fields'])));
+            $defaultSelected = array('display', 'default', 'placeholder');
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($defaultSelected)));
         }
         #endregion
 
