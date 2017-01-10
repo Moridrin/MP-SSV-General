@@ -10,14 +10,15 @@ class LabelField extends Field
 {
     const FIELD_TYPE = 'label-field';
 
+    /** @var string $text */
     public $text;
 
     /**
      * TabField constructor.
      *
-     * @param $id
-     * @param $title
-     * @param $text
+     * @param int    $id
+     * @param string $title
+     * @param string $text
      */
     protected function __construct($id, $title, $text)
     {
@@ -26,7 +27,7 @@ class LabelField extends Field
     }
 
     /**
-     * @param $json
+     * @param string $json
      *
      * @return LabelField
      * @throws Exception

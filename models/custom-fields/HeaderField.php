@@ -13,8 +13,8 @@ class HeaderField extends Field
     /**
      * HeaderField constructor.
      *
-     * @param $id
-     * @param $title
+     * @param int    $id
+     * @param string $title
      */
     protected function __construct($id, $title)
     {
@@ -22,7 +22,7 @@ class HeaderField extends Field
     }
 
     /**
-     * @param $json
+     * @param string $json
      *
      * @return HeaderField
      * @throws Exception

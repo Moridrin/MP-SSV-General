@@ -10,86 +10,46 @@ class InputField extends Field
 {
     const FIELD_TYPE = 'input';
 
+    /** @var string $inputType */
     public $inputType;
-    public $name;
-    public $required;
-    public $display;
-    public $defaultValue;
-    public $placeholder;
-    public $class;
-    public $style;
 
     /**
      * InputField constructor.
      *
-     * @param $id
-     * @param $title
-     * @param $inputType
-     * @param $name
-     * @param $required
-     * @param $display
-     * @param $defaultValue
-     * @param $placeholder
-     * @param $class
-     * @param $style
+     * @param int    $id
+     * @param string $title
+     * @param string $inputType
      */
-    protected function __construct($id, $title, $inputType, $name, $required, $display, $defaultValue, $placeholder, $class, $style)
+    protected function __construct($id, $title, $inputType)
     {
         parent::__construct($id, $title, self::FIELD_TYPE);
-        $this->inputType    = $inputType;
-        $this->name         = $name;
-        $this->required     = $required;
-        $this->display      = $display;
-        $this->defaultValue = $defaultValue;
-        $this->placeholder  = $placeholder;
-        $this->class        = $class;
-        $this->style        = $style;
+        $this->inputType = $inputType;
     }
 
     /**
-     * @param $json
+     * @param string $json
      *
      * @return InputField
-     * @throws Exception
      */
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        if ($values->field_type != self::FIELD_TYPE) {
-            throw new Exception('Incorrect field type');
+        switch ($values->input_type) {
+            case TextInputField::INPUT_TYPE:
+                return TextInputField::fromJSON($json);
+            case SelectInputField::INPUT_TYPE:
+                return SelectInputField::fromJSON($json);
+            default:
+                return CustomInputField::fromJSON($json);
         }
-        return new InputField(
-            $values->id,
-            $values->title,
-            $values->input_type,
-            $values->name,
-            $values->required,
-            $values->display,
-            $values->default_value,
-            $values->placeholder,
-            $values->class,
-            $values->style
-        );
     }
 
     /**
      * @return string the class as JSON object.
+     * @throws Exception if the method is not implemented by a sub class.
      */
     public function toJSON()
     {
-        $values = array(
-            'id' => $this->id,
-            'title' => $this->title,
-            'field_type' => $this->fieldType,
-            'input_type' => $this->inputType,
-            'name' => $this->name,
-            'required' => $this->required,
-            'display' => $this->display,
-            'default_value' => $this->defaultValue,
-            'placeholder' => $this->placeholder,
-            'class' => $this->class,
-            'style' => $this->style,
-        );
-        return json_encode($values);
+        throw new Exception('This should be implemented in a sub class.');
     }
 }

@@ -20,9 +20,9 @@ abstract class Field
     /**
      * Field constructor.
      *
-     * @param $id
-     * @param $title
-     * @param $fieldType
+     * @param int    $id
+     * @param string $title
+     * @param string $fieldType
      */
     protected function __construct($id, $title, $fieldType)
     {
@@ -32,7 +32,7 @@ abstract class Field
     }
 
     /**
-     * @param $json
+     * @param string $json
      *
      * @return Field
      * @throws Exception if the field type is unknown.
@@ -43,6 +43,12 @@ abstract class Field
         switch ($values->field_type) {
             case InputField::FIELD_TYPE:
                 return InputField::fromJSON($json);
+            case TabField::FIELD_TYPE:
+                return TabField::fromJSON($json);
+            case HeaderField::FIELD_TYPE:
+                return HeaderField::fromJSON($json);
+            case LabelField::FIELD_TYPE:
+                return LabelField::fromJSON($json);
         }
         throw new Exception('Unknown field type');
     }
