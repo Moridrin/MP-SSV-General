@@ -10,6 +10,11 @@ if (!class_exists('SSV_General')) {
     function mp_ssv_general_admin_scripts()
     {
         wp_enqueue_script('mp-ssv-input-field-selector', SSV_Events::URL . 'general/js/mp-ssv-input-field-selector.js', array('jquery'));
+        wp_localize_script(
+            'mp-ssv-input-field-selector',
+            'settings',
+            array('custom_field_fields' => get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS))
+        );
         wp_enqueue_script('mp-ssv-sortable-tables', SSV_Events::URL . 'general/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
     }
 
@@ -30,6 +35,7 @@ if (!class_exists('SSV_General')) {
         const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
         const OPTION_BOARD_ROLE = 'ssv_general__board_role';
+        const OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
         const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
         #endregion
 
@@ -55,6 +61,7 @@ if (!class_exists('SSV_General')) {
         public static function resetOptions()
         {
             update_option(self::OPTION_BOARD_ROLE, 'administrator');
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($_POST['custom_field_fields'])));
         }
         #endregion
 
@@ -171,8 +178,10 @@ if (!class_exists('SSV_General')) {
         public static function getCustomFieldsContainer($prefix, $start_index = 0)
         {
             ?>
-            <table id="custom-fields-placeholder" class="sortable"></table>
-            <button type="button" onclick="mp_ssv_add_new_field()">Add Field</button>
+            <div style="overflow-x: auto;">
+                <table id="custom-fields-placeholder" class="sortable"></table>
+                <button type="button" onclick="mp_ssv_add_new_field()">Add Field</button>
+            </div>
             <script>
                 i = <?= $start_index ?>;
                 mp_ssv_sortable_table('custom-fields-placeholder');

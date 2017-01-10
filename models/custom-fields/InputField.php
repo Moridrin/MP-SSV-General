@@ -1,5 +1,11 @@
 <?php
 
+require_once 'input-fields/TextInputField.php';
+require_once 'input-fields/CheckboxInputField.php';
+require_once 'input-fields/SelectInputField.php';
+require_once 'input-fields/ImageInputField.php';
+require_once 'input-fields/CustomInputField.php';
+
 /**
  * Created by PhpStorm.
  * User: moridrin

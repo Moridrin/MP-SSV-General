@@ -20,7 +20,8 @@ function ssv_settings_page()
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            update_option(SSV_General::OPTION_BOARD_ROLE, $_POST['board_role']);
+            update_option(SSV_General::OPTION_BOARD_ROLE, sanitize_text_field($_POST['board_role']));
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($_POST['custom_field_fields'])));
         }
     }
     ?>
@@ -41,6 +42,35 @@ function ssv_settings_page()
                 <td>
                     <select id="board_role" name="board_role">
                         <?php wp_dropdown_roles(get_option(SSV_General::OPTION_BOARD_ROLE)); ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">
+                    <label for="custom_field_fields">Custom Field Fields</label>
+                </th>
+                <td>
+                    <?php
+                    $selected = json_decode(get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS));
+                    $selected = $selected ?: array();
+                    $fields   = array(
+                        'display',
+                        'default',
+                        'placeholder',
+                        'class',
+                        'style',
+                    );
+                    ?>
+                    <select id="custom_field_fields" size="<?= count($fields) ?>" name="custom_field_fields[]" multiple>
+                        <?php
+                        foreach ($fields as $field) {
+                            ?>
+                            <option value="<?= $field ?>" <?= in_array($field, $selected) ? 'selected' : '' ?>>
+                                <?= $field ?>
+                            </option>
+                            <?php
+                        }
+                        ?>
                     </select>
                 </td>
             </tr>

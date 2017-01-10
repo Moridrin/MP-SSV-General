@@ -2,6 +2,7 @@
  * Created by moridrin on 4-1-17.
  */
 
+var custom_field_fields = settings.custom_field_fields;
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
@@ -63,11 +64,16 @@ function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, value
     tr.appendChild(getInputType(fieldID, namePrefix, inputType));
     tr.appendChild(getName(fieldID, namePrefix, name));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
-    tr.appendChild(getDisplay(fieldID, namePrefix, display));
-    tr.appendChild(getDefaultValue(fieldID, namePrefix, defaultValue));
-    tr.appendChild(getPlaceholder(fieldID, namePrefix, placeholder));
-    tr.appendChild(getClass(fieldID, namePrefix, classValue));
-    tr.appendChild(getStyle(fieldID, namePrefix, style));
+    var showDisplay = custom_field_fields.indexOf('display') !== -1;
+    tr.appendChild(getDisplay(fieldID, namePrefix, display, showDisplay));
+    var showDefault = custom_field_fields.indexOf('default') !== -1;
+    tr.appendChild(getDefaultValue(fieldID, namePrefix, defaultValue, showDefault));
+    var showPlaceholder = custom_field_fields.indexOf('placeholder') !== -1;
+    tr.appendChild(getPlaceholder(fieldID, namePrefix, placeholder, showPlaceholder));
+    var showClass = custom_field_fields.indexOf('class') !== -1;
+    tr.appendChild(getClass(fieldID, namePrefix, classValue, showClass));
+    var showStyle = custom_field_fields.indexOf('style') !== -1;
+    tr.appendChild(getStyle(fieldID, namePrefix, style, showStyle));
     tr.appendChild(getEnd(fieldID, namePrefix));
 
     container.appendChild(tr);
@@ -200,80 +206,111 @@ function getRequired(fieldID, namePrefix, value) {
     requiredTD.appendChild(required);
     return requiredTD;
 }
-function getDisplay(fieldID, namePrefix, value) {
-    var display = mp_ssv_create_select(namePrefix + "_" + fieldID + "_display", ["Normal", "ReadOnly", "Disabled"], value);
-    display.setAttribute("style", "width: 100%;");
-    var displayLabel = document.createElement("label");
-    displayLabel.setAttribute("style", "white-space: nowrap;");
-    displayLabel.setAttribute("for", fieldID + "_display");
-    displayLabel.innerHTML = "Display";
+function getDisplay(fieldID, namePrefix, value, show) {
+    var display;
+    if (show) {
+        display = mp_ssv_create_select(namePrefix + "_" + fieldID + "_display", ["Normal", "ReadOnly", "Disabled"], value);
+        display.setAttribute("style", "width: 100%;");
+    } else {
+        display = document.createElement("input");
+        display.setAttribute("type", "hidden");
+        display.setAttribute("id", fieldID + "_field_start");
+        display.setAttribute("name", namePrefix + "_" + fieldID + "_field_start");
+        display.setAttribute("value", value);
+    }
     var displayTD = document.createElement("td");
-    displayTD.appendChild(displayLabel);
-    displayTD.appendChild(getBR());
+    if (show) {
+        var displayLabel = document.createElement("label");
+        displayLabel.setAttribute("style", "white-space: nowrap;");
+        displayLabel.setAttribute("for", fieldID + "_display");
+        displayLabel.innerHTML = "Display";
+        displayTD.appendChild(displayLabel);
+        displayTD.appendChild(getBR());
+    }
     displayTD.appendChild(display);
     return displayTD;
 }
-function getDefaultValue(fieldID, namePrefix, value) {
+function getDefaultValue(fieldID, namePrefix, value, show) {
     var defaultValue = document.createElement("input");
+    if (!show) {
+        defaultValue.setAttribute("type", "hidden");
+    }
     defaultValue.setAttribute("id", fieldID + "_default_value");
     defaultValue.setAttribute("name", namePrefix + "_" + fieldID + "_default_value");
     defaultValue.setAttribute("style", "width: 100%;");
     defaultValue.setAttribute("value", value);
-    var defaultValueLabel = document.createElement("label");
-    defaultValueLabel.setAttribute("style", "white-space: nowrap;");
-    defaultValueLabel.setAttribute("for", fieldID + "_default_value");
-    defaultValueLabel.innerHTML = "Default Value";
     var defaultValueTD = document.createElement("td");
-    defaultValueTD.appendChild(defaultValueLabel);
-    defaultValueTD.appendChild(getBR());
+    if (show) {
+        var defaultValueLabel = document.createElement("label");
+        defaultValueLabel.setAttribute("style", "white-space: nowrap;");
+        defaultValueLabel.setAttribute("for", fieldID + "_default_value");
+        defaultValueLabel.innerHTML = "Default Value";
+        defaultValueTD.appendChild(defaultValueLabel);
+        defaultValueTD.appendChild(getBR());
+    }
     defaultValueTD.appendChild(defaultValue);
     return defaultValueTD;
 }
-function getPlaceholder(fieldID, namePrefix, value) {
+function getPlaceholder(fieldID, namePrefix, value, show) {
     var placeholder = document.createElement("input");
+    if (!show) {
+        placeholder.setAttribute("type", "hidden");
+    }
     placeholder.setAttribute("id", fieldID + "_placeholder");
     placeholder.setAttribute("name", namePrefix + "_" + fieldID + "_placeholder");
     placeholder.setAttribute("style", "width: 100%;");
     placeholder.setAttribute("value", value);
-    var placeholderLabel = document.createElement("label");
-    placeholderLabel.setAttribute("style", "white-space: nowrap;");
-    placeholderLabel.setAttribute("for", fieldID + "_placeholder");
-    placeholderLabel.innerHTML = "Placeholder";
     var placeholderTD = document.createElement("td");
-    placeholderTD.appendChild(placeholderLabel);
-    placeholderTD.appendChild(getBR());
+    if (show) {
+        var placeholderLabel = document.createElement("label");
+        placeholderLabel.setAttribute("style", "white-space: nowrap;");
+        placeholderLabel.setAttribute("for", fieldID + "_placeholder");
+        placeholderLabel.innerHTML = "Placeholder";
+        placeholderTD.appendChild(placeholderLabel);
+        placeholderTD.appendChild(getBR());
+    }
     placeholderTD.appendChild(placeholder);
     return placeholderTD;
 }
-function getClass(fieldID, namePrefix, value) {
+function getClass(fieldID, namePrefix, value, show) {
     var classField = document.createElement("input");
+    if (!show) {
+        classField.setAttribute("type", "hidden");
+    }
     classField.setAttribute("id", fieldID + "_class");
     classField.setAttribute("name", namePrefix + "_" + fieldID + "_class");
     classField.setAttribute("style", "width: 100%;");
     classField.setAttribute("value", value);
-    var classLabel = document.createElement("label");
-    classLabel.setAttribute("style", "white-space: nowrap;");
-    classLabel.setAttribute("for", fieldID + "_class");
-    classLabel.innerHTML = "Class";
     var classTD = document.createElement("td");
-    classTD.appendChild(classLabel);
-    classTD.appendChild(getBR());
+    if (show) {
+        var classLabel = document.createElement("label");
+        classLabel.setAttribute("style", "white-space: nowrap;");
+        classLabel.setAttribute("for", fieldID + "_class");
+        classLabel.innerHTML = "Class";
+        classTD.appendChild(classLabel);
+        classTD.appendChild(getBR());
+    }
     classTD.appendChild(classField);
     return classTD;
 }
-function getStyle(fieldID, namePrefix, value) {
+function getStyle(fieldID, namePrefix, value, show) {
     var style = document.createElement("input");
+    if (!show) {
+        style.setAttribute("type", "hidden");
+    }
     style.setAttribute("id", fieldID + "_style");
     style.setAttribute("name", namePrefix + "_" + fieldID + "_style");
     style.setAttribute("style", "width: 100%;");
     style.setAttribute("value", value);
-    var styleLabel = document.createElement("label");
-    styleLabel.setAttribute("style", "white-space: nowrap;");
-    styleLabel.setAttribute("for", fieldID + "_style");
-    styleLabel.innerHTML = "Style";
     var styleTD = document.createElement("td");
-    styleTD.appendChild(styleLabel);
-    styleTD.appendChild(getBR());
+    if (show) {
+        var styleLabel = document.createElement("label");
+        styleLabel.setAttribute("style", "white-space: nowrap;");
+        styleLabel.setAttribute("for", fieldID + "_style");
+        styleLabel.innerHTML = "Style";
+        styleTD.appendChild(styleLabel);
+        styleTD.appendChild(getBR());
+    }
     styleTD.appendChild(style);
     return styleTD;
 }

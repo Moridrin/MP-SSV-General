@@ -1,6 +1,9 @@
 <?php
 
+require_once 'TabField.php';
+require_once 'HeaderField.php';
 require_once 'InputField.php';
+require_once 'LabelField.php';
 
 /**
  * Created by PhpStorm.
