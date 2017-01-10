@@ -6,6 +6,7 @@ var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
 function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, values) {
+    // alert(JSON.stringify(values));
     var container = document.getElementById(containerID);
 
     var fieldTitle = '';
@@ -18,14 +19,28 @@ function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, value
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (values.constructor === Array) {
-        fieldTitle = values['field_title'];
+    if (typeof values['title'] !== 'undefined') {
+        fieldTitle = values['title'];
+    }
+    if (typeof values['name'] !== 'undefined') {
         name = values['name'];
+    }
+    if (typeof values['required'] !== 'undefined') {
         required = values['required'];
+    }
+    if (typeof values['display'] !== 'undefined') {
         display = values['display'];
+    }
+    if (typeof values['default_value'] !== 'undefined') {
         defaultValue = values['default_value'];
+    }
+    if (typeof values['placeholder'] !== 'undefined') {
         placeholder = values['placeholder'];
+    }
+    if (typeof values['class'] !== 'undefined') {
         classValue = values['class'];
+    }
+    if (typeof values['style'] !== 'undefined') {
         style = values['style'];
     }
 
@@ -153,7 +168,7 @@ function getRequired(fieldID, namePrefix, value) {
     required.setAttribute("id", fieldID + "_required");
     required.setAttribute("name", namePrefix + "_" + fieldID + "_required");
     required.setAttribute("value", "true");
-    if (value) {
+    if (value == 'true') {
         required.setAttribute("checked", "checked");
     }
     var requiredReset = document.createElement("input");

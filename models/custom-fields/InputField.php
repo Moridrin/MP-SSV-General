@@ -41,7 +41,7 @@ class InputField extends Field
         $this->required     = $required;
         $this->display      = $display;
         $this->defaultValue = $defaultValue;
-        $this->placeholder  = $required;
+        $this->placeholder  = $placeholder;
         $this->class        = $class;
         $this->style        = $style;
     }
@@ -78,17 +78,17 @@ class InputField extends Field
     public function toJSON()
     {
         $values = array(
-            $this->id,
-            $this->title,
-            $this->fieldType,
-            $this->inputType,
-            $this->name,
-            $this->required,
-            $this->display,
-            $this->defaultValue,
-            $this->placeholder,
-            $this->class,
-            $this->style,
+            'id' => $this->id,
+            'title' => $this->title,
+            'field_type' => $this->fieldType,
+            'input_type' => $this->inputType,
+            'name' => $this->name,
+            'required' => $this->required,
+            'display' => $this->display,
+            'default_value' => $this->defaultValue,
+            'placeholder' => $this->placeholder,
+            'class' => $this->class,
+            'style' => $this->style,
         );
         return json_encode($values);
     }
