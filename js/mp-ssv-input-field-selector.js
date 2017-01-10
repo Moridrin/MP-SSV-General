@@ -5,7 +5,29 @@
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
-function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, values) {
+function mp_ssv_add_new_tab_field(containerID, fieldID, namePrefix, values, allowTabs) {
+    // alert(JSON.stringify(values));
+    var container = document.getElementById(containerID);
+
+    var fieldTitle = '';
+    var fieldType = 'tab';
+    if (typeof values['title'] !== 'undefined') {
+        fieldTitle = values['title'];
+    }
+
+    var tr = document.createElement("tr");
+    tr.setAttribute("style", "border-bottom: 1px solid gray; border-top: 1px solid gray;");
+
+    tr.appendChild(getStart(fieldID, namePrefix));
+    tr.appendChild(getFieldID(fieldID, namePrefix));
+    tr.appendChild(getDraggable());
+    tr.appendChild(getFieldTitle(fieldID, namePrefix, fieldTitle));
+    tr.appendChild(getFieldType(fieldID, namePrefix, fieldType, allowTabs));
+    tr.appendChild(getEnd(fieldID, namePrefix));
+
+    container.appendChild(tr);
+}
+function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, values, allowTabs) {
     // alert(JSON.stringify(values));
     var container = document.getElementById(containerID);
 
@@ -19,28 +41,14 @@ function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, value
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (typeof values['title'] !== 'undefined') {
+    if (typeof values != 'undefined') {
         fieldTitle = values['title'];
-    }
-    if (typeof values['name'] !== 'undefined') {
         name = values['name'];
-    }
-    if (typeof values['required'] !== 'undefined') {
         required = values['required'];
-    }
-    if (typeof values['display'] !== 'undefined') {
         display = values['display'];
-    }
-    if (typeof values['default_value'] !== 'undefined') {
         defaultValue = values['default_value'];
-    }
-    if (typeof values['placeholder'] !== 'undefined') {
         placeholder = values['placeholder'];
-    }
-    if (typeof values['class'] !== 'undefined') {
         classValue = values['class'];
-    }
-    if (typeof values['style'] !== 'undefined') {
         style = values['style'];
     }
 
@@ -51,7 +59,7 @@ function mp_ssv_add_new_text_input_field(containerID, fieldID, namePrefix, value
     tr.appendChild(getFieldID(fieldID, namePrefix));
     tr.appendChild(getDraggable());
     tr.appendChild(getFieldTitle(fieldID, namePrefix, fieldTitle));
-    tr.appendChild(getFieldType(fieldID, namePrefix, fieldType));
+    tr.appendChild(getFieldType(fieldID, namePrefix, fieldType, allowTabs));
     tr.appendChild(getInputType(fieldID, namePrefix, inputType));
     tr.appendChild(getName(fieldID, namePrefix, name));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
@@ -106,7 +114,6 @@ function getFieldTitle(fieldID, namePrefix, value) {
     fieldTitle.setAttribute("name", namePrefix + "_" + fieldID + "_title");
     fieldTitle.setAttribute("style", "width: 100%;");
     fieldTitle.setAttribute("value", value);
-    fieldTitle.setAttribute("required", "required");
     var fieldTitleLabel = document.createElement("label");
     fieldTitleLabel.setAttribute("style", "white-space: nowrap;");
     fieldTitleLabel.setAttribute("for", fieldID + "_field_title");
@@ -117,8 +124,14 @@ function getFieldTitle(fieldID, namePrefix, value) {
     fieldTitleTD.appendChild(fieldTitle);
     return fieldTitleTD;
 }
-function getFieldType(fieldID, namePrefix, value) {
-    var fieldType = mp_ssv_create_select(namePrefix + "_" + fieldID + "_field_type", ["Tab", "Header", "Input", "Label"], 'input');
+function getFieldType(fieldID, namePrefix, value, allowTabs) {
+    var options;
+    if (allowTabs) {
+        options = ["Tab", "Header", "Input", "Label"];
+    } else {
+        options = ["Header", "Input", "Label"];
+    }
+    var fieldType = mp_ssv_create_select(namePrefix + "_" + fieldID + "_field_type", options, 'input');
     fieldType.setAttribute("style", "width: 100%;");
     fieldType.setAttribute("value", value);
     var fieldTypeLabel = document.createElement("label");

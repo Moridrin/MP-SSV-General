@@ -166,15 +166,16 @@ if (!class_exists('SSV_General')) {
         #region getCustomFieldsContainer($prefix)
         /**
          * @param string $prefix
+         * @param int    $start_index
          */
-        public static function getCustomFieldsContainer($prefix)
+        public static function getCustomFieldsContainer($prefix, $start_index = 0)
         {
             ?>
             <table id="custom-fields-placeholder" class="sortable"></table>
             <button type="button" onclick="mp_ssv_add_new_field()">Add Field</button>
             <script>
+                i = <?= $start_index ?>;
                 mp_ssv_sortable_table('custom-fields-placeholder');
-                i = 0;
                 function mp_ssv_add_new_field() {
                     mp_ssv_add_new_text_input_field('custom-fields-placeholder', i, '<?= $prefix ?>');
                     i++;
