@@ -8,7 +8,7 @@
  */
 class TabField extends Field
 {
-    const FIELD_TYPE = 'tab-field';
+    const FIELD_TYPE = 'tab';
 
     /**
      * TabField constructor.
@@ -30,7 +30,7 @@ class TabField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        if ($values->fieldType != self::FIELD_TYPE) {
+        if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
         return new TabField(
@@ -45,9 +45,9 @@ class TabField extends Field
     public function toJSON()
     {
         $values = array(
-            $this->id,
-            $this->title,
-            $this->fieldType,
+            'id'        => $this->id,
+            'title'     => $this->title,
+            'field_type' => $this->fieldType,
         );
         return json_encode($values);
     }

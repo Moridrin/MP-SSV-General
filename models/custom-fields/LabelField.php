@@ -8,7 +8,7 @@
  */
 class LabelField extends Field
 {
-    const FIELD_TYPE = 'label-field';
+    const FIELD_TYPE = 'label';
 
     /** @var string $text */
     public $text;
@@ -35,7 +35,7 @@ class LabelField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        if ($values->fieldType != self::FIELD_TYPE) {
+        if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
         return new LabelField(
@@ -51,10 +51,10 @@ class LabelField extends Field
     public function toJSON()
     {
         $values = array(
-            $this->id,
-            $this->title,
-            $this->fieldType,
-            $this->text,
+            'id'        => $this->id,
+            'title'     => $this->title,
+            'field_type' => $this->fieldType,
+            'text'      => $this->text,
         );
         return json_encode($values);
     }

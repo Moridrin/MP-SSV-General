@@ -14,8 +14,6 @@ class SelectInputField extends InputField
     public $name;
     /** @var array $options */
     public $options;
-    /** @var string $display */
-    public $display;
     /** @var string $class */
     public $class;
     /** @var string $style */
@@ -23,22 +21,19 @@ class SelectInputField extends InputField
 
     /**
      * SelectInputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $name
      * @param string $options
-     * @param string $preview
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $name, $options, $preview, $class, $style)
+    protected function __construct($id, $title, $name, $options, $class, $style)
     {
         parent::__construct($id, $title, self::INPUT_TYPE);
         $this->name    = $name;
         $this->options = explode(',', $options);
-        $this->display = $preview;
         $this->class   = $class;
         $this->style   = $style;
     }
@@ -55,10 +50,8 @@ class SelectInputField extends InputField
         return new SelectInputField(
             $values->id,
             $values->title,
-            $values->input_type,
             $values->name,
             $values->options,
-            $values->display,
             $values->class,
             $values->style
         );
@@ -76,7 +69,6 @@ class SelectInputField extends InputField
             'input_type' => $this->inputType,
             'name'       => $this->name,
             'options'    => implode(',', $this->options),
-            'display'    => $this->display,
             'class'      => $this->class,
             'style'      => $this->style,
         );

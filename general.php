@@ -181,13 +181,13 @@ if (!class_exists('SSV_General')) {
             ?>
             <div style="overflow-x: auto;">
                 <table id="custom-fields-placeholder" class="sortable"></table>
-                <button type="button" onclick="mp_ssv_add_new_field()">Add Field</button>
+                <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
             </div>
             <script>
                 i = <?= $start_index ?>;
                 mp_ssv_sortable_table('custom-fields-placeholder');
-                function mp_ssv_add_new_field() {
-                    mp_ssv_add_new_text_input_field('custom-fields-placeholder', i, '<?= $prefix ?>');
+                function mp_ssv_add_new_custom_field() {
+                    mp_ssv_add_new_field('input', 'text', 'custom-fields-placeholder', i, '<?= $prefix ?>');
                     i++;
                 }
             </script>
@@ -205,15 +205,15 @@ if (!class_exists('SSV_General')) {
         {
             $customFields      = array();
             $customFieldValues = array();
-            $id                = 15;
+            $id                = 0;
             foreach ($_POST as $key => $value) {
                 if (strpos($key, $prefix) !== false) {
-                    if (strpos($key, '_field_start') !== false) {
+                    if (strpos($key, '_start') !== false) {
                         $customFieldValues = array();
-                        $id                = str_replace($prefix . '_', '', str_replace('_field_start', '', $key));
+                        $id                = str_replace($prefix . '_', '', str_replace('_start', '', $key));
                     }
                     $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = $value;
-                    if (strpos($key, '_field_end') !== false) {
+                    if (strpos($key, '_end') !== false) {
                         $customFields[$id] = Field::fromJSON(json_encode($customFieldValues));
                     }
                 }

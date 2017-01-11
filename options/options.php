@@ -21,7 +21,8 @@ function ssv_settings_page()
             SSV_General::resetOptions();
         } else {
             update_option(SSV_General::OPTION_BOARD_ROLE, sanitize_text_field($_POST['board_role']));
-            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($_POST['custom_field_fields'])));
+            $customFieldFields = isset($_POST['custom_field_fields']) ? $_POST['custom_field_fields'] : null;
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($customFieldFields)));
         }
     }
     ?>
@@ -30,7 +31,7 @@ function ssv_settings_page()
     </div>
     <?php do_action(SSV_General::HOOK_GENERAL_OPTIONS_PAGE_CONTENT); ?>
     <div class="wrap">
-        <h1>SSV General Options</h1>
+        <h1>General Options</h1>
     </div>
     <form method="post" action="#">
         <table class="form-table">

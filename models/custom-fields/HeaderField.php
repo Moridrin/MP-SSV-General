@@ -8,7 +8,7 @@
  */
 class HeaderField extends Field
 {
-    const FIELD_TYPE = 'header-field';
+    const FIELD_TYPE = 'header';
 
     /**
      * HeaderField constructor.
@@ -30,7 +30,7 @@ class HeaderField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        if ($values->fieldType != self::FIELD_TYPE) {
+        if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
         return new HeaderField(
@@ -45,9 +45,9 @@ class HeaderField extends Field
     public function toJSON()
     {
         $values = array(
-            $this->id,
-            $this->title,
-            $this->fieldType,
+            'id'        => $this->id,
+            'title'     => $this->title,
+            'field_type' => $this->fieldType,
         );
         return json_encode($values);
     }

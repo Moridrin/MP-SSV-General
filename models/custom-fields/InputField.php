@@ -45,6 +45,10 @@ class InputField extends Field
                 return TextInputField::fromJSON($json);
             case SelectInputField::INPUT_TYPE:
                 return SelectInputField::fromJSON($json);
+            case CheckboxInputField::INPUT_TYPE:
+                return CheckboxInputField::fromJSON($json);
+            case ImageInputField::INPUT_TYPE:
+                return ImageInputField::fromJSON($json);
             default:
                 return CustomInputField::fromJSON($json);
         }
