@@ -39,12 +39,12 @@ function getTabField(containerID, fieldID, namePrefix, values, allowTabs) {
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getClass(fieldID, namePrefix, ""));
     tr.appendChild(getStyle(fieldID, namePrefix, ""));
     tr.appendChild(getEnd(fieldID, namePrefix));
@@ -61,12 +61,12 @@ function getHeaderField(containerID, fieldID, namePrefix, values, allowTabs) {
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
-    tr.appendChild(getEmpty());
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getClass(fieldID, namePrefix, ""));
     tr.appendChild(getStyle(fieldID, namePrefix, ""));
     tr.appendChild(getEnd(fieldID, namePrefix));
@@ -268,7 +268,7 @@ function getCheckboxInputFields(tr, fieldID, namePrefix, inputType, name, requir
     tr.appendChild(getDisplay(fieldID, namePrefix, display));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
     tr.appendChild(getDefaultSelected(fieldID, namePrefix, defaultSelected));
-    tr.appendChild(getEmpty());
+    tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getClass(fieldID, namePrefix, classValue));
     tr.appendChild(getStyle(fieldID, namePrefix, style));
     tr.appendChild(getEnd(fieldID, namePrefix));
@@ -304,9 +304,9 @@ function getBR() {
     br.innerHTML = '<br/>';
     return br.childNodes[0];
 }
-function getEmpty() {
+function getEmpty(fieldID) {
     var td = document.createElement("td");
-    td.setAttribute("class", "empty_td");
+    td.setAttribute("class", fieldID + "empty_td");
     return td;
 }
 function getStart(fieldID, namePrefix) {
@@ -557,23 +557,23 @@ function getDefaultSelected(fieldID, namePrefix, value) {
     } else {
         defaultSelected.setAttribute("type", "checkbox");
     }
-    defaultSelected.setAttribute("id", fieldID + "_default_selected");
-    defaultSelected.setAttribute("name", namePrefix + "_" + fieldID + "_default_selected");
+    defaultSelected.setAttribute("id", fieldID + "_default_checked");
+    defaultSelected.setAttribute("name", namePrefix + "_" + fieldID + "_default_checked");
     defaultSelected.setAttribute("value", "true");
     if (value == 'true') {
         defaultSelected.setAttribute("checked", "checked");
     }
     var defaultSelectedReset = document.createElement("input");
     defaultSelectedReset.setAttribute("type", "hidden");
-    defaultSelectedReset.setAttribute("id", fieldID + "_default_selected");
-    defaultSelectedReset.setAttribute("name", namePrefix + "_" + fieldID + "_default_selected");
+    defaultSelectedReset.setAttribute("id", fieldID + "_default_checked");
+    defaultSelectedReset.setAttribute("name", namePrefix + "_" + fieldID + "_default_checked");
     defaultSelectedReset.setAttribute("value", "false");
     var requiredTD = document.createElement("td");
-    requiredTD.setAttribute("id", fieldID + "_default_selected_td");
+    requiredTD.setAttribute("id", fieldID + "_default_checked_td");
     if (show) {
         var requiredLabel = document.createElement("label");
         requiredLabel.setAttribute("style", "white-space: nowrap;");
-        requiredLabel.setAttribute("for", fieldID + "_default_selected");
+        requiredLabel.setAttribute("for", fieldID + "_default_checked");
         requiredLabel.innerHTML = "Default Selected";
         requiredTD.appendChild(requiredLabel);
         requiredTD.appendChild(getBR());
@@ -673,11 +673,11 @@ function fieldTypeChanged(fieldID, namePrefix) {
     removeField(document.getElementById(fieldID + "_options_td"));
     removeField(document.getElementById(fieldID + "_display_td"));
     removeField(document.getElementById(fieldID + "_default_value_td"));
-    removeField(document.getElementById(fieldID + "_default_selected_td"));
+    removeField(document.getElementById(fieldID + "_default_checked_td"));
     removeField(document.getElementById(fieldID + "_placeholder_td"));
     removeField(document.getElementById(fieldID + "_class_td"));
     removeField(document.getElementById(fieldID + "_style_td"));
-    removeField(document.getElementById(fieldID + "_stop_td"));
+    removeField(document.getElementById(fieldID + "_end_td"));
     removeFields(document.getElementsByClassName("empty_td"));
     if (fieldType == 'input') {
         tr.appendChild(getInputType(fieldID, namePrefix, ""));
@@ -695,12 +695,12 @@ function fieldTypeChanged(fieldID, namePrefix) {
         tr.appendChild(getStyle(fieldID, namePrefix, ""));
         tr.appendChild(getEnd(fieldID, namePrefix));
     } else {
-        tr.appendChild(getEmpty());
-        tr.appendChild(getEmpty());
-        tr.appendChild(getEmpty());
-        tr.appendChild(getEmpty());
-        tr.appendChild(getEmpty());
-        tr.appendChild(getEmpty());
+        tr.appendChild(getEmpty(fieldID));
+        tr.appendChild(getEmpty(fieldID));
+        tr.appendChild(getEmpty(fieldID));
+        tr.appendChild(getEmpty(fieldID));
+        tr.appendChild(getEmpty(fieldID));
+        tr.appendChild(getEmpty(fieldID));
         tr.appendChild(getClass(fieldID, namePrefix, ""));
         tr.appendChild(getStyle(fieldID, namePrefix, ""));
         tr.appendChild(getEnd(fieldID, namePrefix));
@@ -715,12 +715,12 @@ function inputTypeChanged(fieldID, namePrefix) {
     removeField(document.getElementById(fieldID + "_options_td"));
     removeField(document.getElementById(fieldID + "_display_td"));
     removeField(document.getElementById(fieldID + "_default_value_td"));
-    removeField(document.getElementById(fieldID + "_default_selected_td"));
+    removeField(document.getElementById(fieldID + "_default_checked_td"));
     removeField(document.getElementById(fieldID + "_placeholder_td"));
     removeField(document.getElementById(fieldID + "_class_td"));
     removeField(document.getElementById(fieldID + "_style_td"));
-    removeField(document.getElementById(fieldID + "_stop_td"));
-    removeFields(document.getElementsByClassName("empty_td"));
+    removeField(document.getElementById(fieldID + "_end_td"));
+    removeFields(document.getElementsByClassName(fieldID + "empty_td"));
     if (inputType == 'text') {
         getTextInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "", "", "");
     } else if (inputType == 'select') {

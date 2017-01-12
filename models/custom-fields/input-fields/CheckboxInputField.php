@@ -8,10 +8,8 @@
  */
 class CheckboxInputField extends InputField
 {
-    const INPUT_TYPE = 'text';
+    const INPUT_TYPE = 'checkbox';
 
-    /** @var string $name */
-    public $name;
     /** @var array $required */
     public $required;
     /** @var string $display */
@@ -25,9 +23,8 @@ class CheckboxInputField extends InputField
 
     /**
      * CheckboxInputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $name
      * @param string $required
@@ -89,5 +86,28 @@ class CheckboxInputField extends InputField
             'style'           => $this->style,
         );
         return json_encode($values);
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $this->class = $this->class ?: 'filled-in';
+        $checked     = $this->defaultChecked == "true" ? 'checked' : '';
+        ob_start();
+        if (current_theme_supports('materialize')) {
+            ?>
+            <div class="col s12">
+                <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="false"/>
+                <p>
+                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="true" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?> <?= $this->display ?>/>
+                    <label for="field_<?= $this->id ?>"><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                </p>
+            </div>
+            <?php
+        }
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 }

@@ -10,8 +10,6 @@ class ImageInputField extends InputField
 {
     const INPUT_TYPE = 'text';
 
-    /** @var string $name */
-    public $name;
     /** @var array $required */
     public $required;
     /** @var string $preview */

@@ -8,9 +8,6 @@
  */
 class CustomInputField extends InputField
 {
-
-    /** @var string $name */
-    public $name;
     /** @var array $required */
     public $required;
     /** @var string $display */

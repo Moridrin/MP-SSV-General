@@ -51,4 +51,16 @@ class HeaderField extends Field
         );
         return json_encode($values);
     }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        ob_start();
+        ?>
+        <h2><?= $this->title ?></h2>
+        <?php
+        return ob_get_clean();
+    }
 }

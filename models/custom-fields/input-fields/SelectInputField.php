@@ -10,8 +10,6 @@ class SelectInputField extends InputField
 {
     const INPUT_TYPE = 'select';
 
-    /** @var string $name */
-    public $name;
     /** @var array $options */
     public $options;
     /** @var string $class */

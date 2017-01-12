@@ -10,8 +10,6 @@ class TextInputField extends InputField
 {
     const INPUT_TYPE = 'text';
 
-    /** @var string $name */
-    public $name;
     /** @var array $required */
     public $required;
     /** @var string $display */
@@ -27,9 +25,8 @@ class TextInputField extends InputField
 
     /**
      * TextInputField constructor.
-
-*
-*@param int          $id
+     *
+     * @param int    $id
      * @param string $title
      * @param string $name
      * @param string $required
@@ -95,5 +92,33 @@ class TextInputField extends InputField
             'style'         => $this->style,
         );
         return json_encode($values);
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $value       = $this->defaultValue;
+        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
+        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $display     = $this->display;
+        $required    = $this->required == "true" ? 'required' : '';
+
+        ob_start();
+        if (current_theme_supports('materialize')) {
+            ?>
+            <div class="input-field col s12">
+                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
+                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
+            </div>
+            <?php
+        }
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 }

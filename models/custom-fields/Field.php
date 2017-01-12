@@ -64,4 +64,13 @@ abstract class Field
     {
         throw new Exception('This should be implemented in a sub class.');
     }
+
+    /**
+     * @return string the field as HTML object.
+     * @throws Exception if the method is not implemented by a sub class.
+     */
+    public function getHTML()
+    {
+        throw new Exception('This should be implemented in sub class: '. get_class($this) .'.');
+    }
 }
