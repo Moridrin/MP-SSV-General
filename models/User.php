@@ -184,10 +184,6 @@ class User extends \WP_User
      */
     function getMeta($meta_key, $default = '')
     {
-        if (!$this->__isset($meta_key)) {
-            return $default;
-        }
-
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
             return $this->user_email;
         } elseif ($meta_key == "name" || $meta_key == "display_name") {
