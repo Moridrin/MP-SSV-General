@@ -98,7 +98,7 @@ class CheckboxInputField extends InputField
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div class="col s12">
+            <div>
                 <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="false"/>
                 <p>
                     <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="true" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?> <?= $this->display ?>/>

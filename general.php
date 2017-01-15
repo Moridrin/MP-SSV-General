@@ -72,7 +72,7 @@ if (!class_exists('SSV_General')) {
          *
          * @param string $location is the url where the page should be redirected to.
          */
-        function redirect($location)
+        public static function redirect($location)
         {
             $redirect_script = '<script type="text/javascript">';
             $redirect_script .= 'window.location = "' . $location . '"';

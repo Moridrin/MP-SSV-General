@@ -112,7 +112,7 @@ class TextInputField extends InputField
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div class="input-field col s12">
+            <div class="input-field">
                 <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
                 <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
             </div>
