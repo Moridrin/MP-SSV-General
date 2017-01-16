@@ -72,4 +72,31 @@ class SelectInputField extends InputField
         );
         return json_encode($values);
     }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+
+        ob_start();
+        if (current_theme_supports('materialize')) {
+            ?>
+            <div class="input-field">
+                <select <?= $name ?> <?= $class ?> <?= $style ?>>
+                    <option value="" disabled selected>Choose your option</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                </select>            </div>
+            <?php
+        }
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
 }
