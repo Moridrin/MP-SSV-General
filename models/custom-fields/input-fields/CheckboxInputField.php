@@ -19,9 +19,8 @@ class CheckboxInputField extends InputField
 
     /**
      * CheckboxInputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $name
      * @param bool   $disabled
@@ -109,5 +108,17 @@ class CheckboxInputField extends InputField
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return Message[]|bool array of errors or true if no errors.
+     */
+    public function isValid()
+    {
+        $errors = array();
+        if ($this->required && empty($this->value)) {
+            $errors[] = new Message('This field is required but not set.', Message::ERROR_MESSAGE);
+        }
+        return empty($errors) ? true : $errors;
     }
 }

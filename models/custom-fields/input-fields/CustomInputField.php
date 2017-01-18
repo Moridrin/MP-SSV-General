@@ -19,9 +19,8 @@ class CustomInputField extends InputField
 
     /**
      * CustomInputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $inputType
      * @param string $name
@@ -111,5 +110,47 @@ class CustomInputField extends InputField
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return array|bool array of errors or true if no errors.
+     */
+    public function isValid()
+    {
+        $errors = array();
+        if (!empty($this->id) || !is_int($this->id)) {
+            $errors[] = new Message('ID [' . $this->id . '] is invalid', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->title) || !is_string($this->title)) {
+            $errors[] = new Message('Title [' . $this->title . '] is invalid', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->fieldType) || !is_string($this->fieldType) || $this->fieldType || $this->fieldType != self::FIELD_TYPE) {
+            $errors[] = new Message('Field Type [' . $this->fieldType . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->inputType) || !is_string($this->inputType)) {
+            $errors[] = new Message('Input Type [' . $this->inputType . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->name) || !is_string($this->name)) {
+            $errors[] = new Message('Name [' . $this->name . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->disabled) || !is_bool($this->disabled)) {
+            $errors[] = new Message('Disabled [' . $this->disabled . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->required) || !is_bool($this->required)) {
+            $errors[] = new Message('Required [' . $this->required . '] is invalid', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->defaultChecked) || !is_string($this->defaultValue)) {
+            $errors[] = new Message('Default Value [' . $this->defaultValue . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->defaultChecked) || !is_string($this->placeholder)) {
+            $errors[] = new Message('Placeholder [' . $this->placeholder . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->class) || !is_string($this->class)) {
+            $errors[] = new Message('Class [' . $this->class . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        if (!empty($this->style) || !is_string($this->style)) {
+            $errors[] = new Message('Style [' . $this->style . '] is invalid.', Message::ERROR_MESSAGE);
+        }
+        return empty($errors) ? true : $errors;
     }
 }

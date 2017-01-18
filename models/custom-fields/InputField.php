@@ -20,8 +20,6 @@ class InputField extends Field
     public $inputType;
     /** @var string $name */
     public $name;
-    /** @var bool $disabled */
-    public $disabled;
 
     /** @var string $value */
     public $value;
@@ -79,6 +77,15 @@ class InputField extends Field
      * @throws Exception if the method is not implemented by a sub class.
      */
     public function getHTML()
+    {
+        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
+    }
+
+    /**
+     * @return array|bool array of errors or true if no errors.
+     * @throws Exception if the method is not implemented by a sub class.
+     */
+    public function isValid()
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
