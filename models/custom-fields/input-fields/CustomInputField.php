@@ -16,10 +16,6 @@ class CustomInputField extends InputField
     public $defaultValue;
     /** @var string $placeholder */
     public $placeholder;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
 
     /**
      * CustomInputField constructor.
@@ -37,14 +33,11 @@ class CustomInputField extends InputField
      */
     protected function __construct($id, $title, $inputType, $name, $required, $display, $defaultValue, $placeholder, $class, $style)
     {
-        parent::__construct($id, $title, $inputType);
-        $this->name         = $name;
-        $this->required     = $required;
+        parent::__construct($id, $title, $inputType, $name, $class, $style);
+        $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->display      = $display;
         $this->defaultValue = $defaultValue;
         $this->placeholder  = $placeholder;
-        $this->class        = $class;
-        $this->style        = $style;
     }
 
     /**
@@ -96,23 +89,22 @@ class CustomInputField extends InputField
      */
     public function getHTML()
     {
-        $value       = $this->defaultValue;
+        $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . $this->inputType . '"';
-        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
         $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
         $display     = $this->display;
-        $required    = $this->required == "true" ? 'required' : '';
+        $required    = $this->required ? 'required' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <input <?= $inputType ?> <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
-                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?>/>
+                <label for="<?= $this->id ?>"><?php echo $this->title; ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
         }

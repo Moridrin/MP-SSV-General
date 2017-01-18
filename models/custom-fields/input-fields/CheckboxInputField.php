@@ -10,16 +10,12 @@ class CheckboxInputField extends InputField
 {
     const INPUT_TYPE = 'checkbox';
 
-    /** @var array $required */
+    /** @var bool $required */
     public $required;
     /** @var string $display */
     public $display;
     /** @var bool $defaultChecked */
     public $defaultChecked;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
 
     /**
      * CheckboxInputField constructor.
@@ -35,13 +31,10 @@ class CheckboxInputField extends InputField
      */
     protected function __construct($id, $title, $name, $required, $preview, $defaultChecked, $class, $style)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE);
-        $this->name           = $name;
-        $this->required       = $required;
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->display        = $preview;
         $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
-        $this->class          = $class;
-        $this->style          = $style;
     }
 
     /**
@@ -93,16 +86,22 @@ class CheckboxInputField extends InputField
      */
     public function getHTML()
     {
-        $this->class = $this->class ?: 'filled-in';
-        $checked     = $this->defaultChecked == "true" ? 'checked' : '';
+        $isChecked = isset($this->value) ? $this->value : $this->defaultChecked;
+        $name      = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class     = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate filled-in"';
+        $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $display   = $this->display;
+        $required  = $this->required ? 'required' : '';
+        $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
+
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div>
-                <input type="hidden" id="<?= $this->id ?>" name="<?= $this->name ?>" value="false"/>
+                <input type="hidden" id="<?= $this->id ?>_reset" <?= $name ?> value="false"/>
                 <p>
-                    <input type="checkbox" id="field_<?= $this->id ?>" name="<?= $this->name ?>" value="true" class="<?= $this->class ?>" style="<?= $this->style; ?>" <?= $checked ?> <?= $this->display ?>/>
-                    <label for="field_<?= $this->id ?>"><?= $this->title ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                    <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $style; ?> <?= $checked ?> <?= $display ?>/>
+                    <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
                 </p>
             </div>
             <?php

@@ -78,7 +78,6 @@ function getTextInputField(containerID, fieldID, namePrefix, values, allowTabs) 
 
     var fieldTitle = '';
     var fieldType = 'input';
-    var inputType = 'text';
     var name = '';
     var required = '';
     var display = 'normal';
@@ -98,7 +97,7 @@ function getTextInputField(containerID, fieldID, namePrefix, values, allowTabs) 
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr = getTextInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultValue, placeholder, classValue, style);
+    tr = getTextInputFields(tr, fieldID, namePrefix, name, required, display, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
 function getSelectInputField(containerID, fieldID, namePrefix, values, allowTabs) {
@@ -106,7 +105,6 @@ function getSelectInputField(containerID, fieldID, namePrefix, values, allowTabs
 
     var fieldTitle = '';
     var fieldType = 'input';
-    var inputType = 'select';
     var name = '';
     var options = '';
     var display = 'normal';
@@ -122,7 +120,7 @@ function getSelectInputField(containerID, fieldID, namePrefix, values, allowTabs
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr = getSelectInputFields(tr, fieldID, namePrefix, inputType, name, options, display, classValue, style);
+    tr = getSelectInputFields(tr, fieldID, namePrefix, name, options, display, classValue, style);
     container.appendChild(tr);
 }
 function getCheckboxInputField(containerID, fieldID, namePrefix, values, allowTabs) {
@@ -130,7 +128,6 @@ function getCheckboxInputField(containerID, fieldID, namePrefix, values, allowTa
 
     var fieldTitle = '';
     var fieldType = 'input';
-    var inputType = 'checkbox';
     var name = '';
     var required = '';
     var display = 'normal';
@@ -148,7 +145,7 @@ function getCheckboxInputField(containerID, fieldID, namePrefix, values, allowTa
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr = getCheckboxInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultSelected, classValue, style);
+    tr = getCheckboxInputFields(tr, fieldID, namePrefix, name, required, display, defaultSelected, classValue, style);
     container.appendChild(tr);
 }
 function getImageInputField(containerID, fieldID, namePrefix, values, allowTabs) {
@@ -156,27 +153,20 @@ function getImageInputField(containerID, fieldID, namePrefix, values, allowTabs)
 
     var fieldTitle = '';
     var fieldType = 'input';
-    var inputType = 'image';
     var name = '';
     var required = '';
-    var display = 'normal';
-    var defaultValue = '';
-    var placeholder = '';
     var classValue = '';
     var style = '';
     if (typeof values != 'undefined') {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
-        display = values['display'];
-        defaultValue = values['default_value'];
-        placeholder = values['placeholder'];
         classValue = values['class'];
         style = values['style'];
     }
 
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
-    tr = getImageInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultValue, placeholder, classValue, style);
+    tr = getImageInputFields(tr, fieldID, namePrefix, name, required, classValue, style);
     container.appendChild(tr);
 }
 function getCustomInputField(inputType, containerID, fieldID, namePrefix, values, allowTabs) {
@@ -240,8 +230,8 @@ function getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs) {
     tr.appendChild(getFieldType(fieldID, namePrefix, fieldType, allowTabs));
     return tr;
 }
-function getTextInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultValue, placeholder, classValue, style) {
-    tr.appendChild(getInputType(fieldID, namePrefix, inputType));
+function getTextInputFields(tr, fieldID, namePrefix, name, required, display, defaultValue, placeholder, classValue, style) {
+    tr.appendChild(getInputType(fieldID, namePrefix, 'text'));
     tr.appendChild(getName(fieldID, namePrefix, name));
     tr.appendChild(getDisplay(fieldID, namePrefix, display));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
@@ -252,8 +242,8 @@ function getTextInputFields(tr, fieldID, namePrefix, inputType, name, required, 
     tr.appendChild(getEnd(fieldID, namePrefix));
     return tr;
 }
-function getSelectInputFields(tr, fieldID, namePrefix, inputType, name, options, display, classValue, style) {
-    tr.appendChild(getInputType(fieldID, namePrefix, inputType));
+function getSelectInputFields(tr, fieldID, namePrefix, name, options, display, classValue, style) {
+    tr.appendChild(getInputType(fieldID, namePrefix, 'select'));
     tr.appendChild(getName(fieldID, namePrefix, name));
     tr.appendChild(getDisplay(fieldID, namePrefix, display));
     tr.appendChild(getOptions(fieldID, namePrefix, options));
@@ -262,8 +252,8 @@ function getSelectInputFields(tr, fieldID, namePrefix, inputType, name, options,
     tr.appendChild(getEnd(fieldID, namePrefix));
     return tr;
 }
-function getCheckboxInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultSelected, classValue, style) {
-    tr.appendChild(getInputType(fieldID, namePrefix, inputType));
+function getCheckboxInputFields(tr, fieldID, namePrefix, name, required, display, defaultSelected, classValue, style) {
+    tr.appendChild(getInputType(fieldID, namePrefix, 'checkbox'));
     tr.appendChild(getName(fieldID, namePrefix, name));
     tr.appendChild(getDisplay(fieldID, namePrefix, display));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
@@ -274,13 +264,13 @@ function getCheckboxInputFields(tr, fieldID, namePrefix, inputType, name, requir
     tr.appendChild(getEnd(fieldID, namePrefix));
     return tr;
 }
-function getImageInputFields(tr, fieldID, namePrefix, inputType, name, required, display, defaultValue, placeholder, classValue, style) {
-    tr.appendChild(getInputType(fieldID, namePrefix, inputType));
+function getImageInputFields(tr, fieldID, namePrefix, name, required, classValue, style) {
+    tr.appendChild(getInputType(fieldID, namePrefix, 'image'));
     tr.appendChild(getName(fieldID, namePrefix, name));
-    tr.appendChild(getDisplay(fieldID, namePrefix, display));
+    tr.appendChild(getPreview(fieldID, namePrefix, required));
     tr.appendChild(getRequired(fieldID, namePrefix, required));
-    tr.appendChild(getDefaultValue(fieldID, namePrefix, defaultValue));
-    tr.appendChild(getPlaceholder(fieldID, namePrefix, placeholder));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getClass(fieldID, namePrefix, classValue));
     tr.appendChild(getStyle(fieldID, namePrefix, style));
     tr.appendChild(getEnd(fieldID, namePrefix));
@@ -480,6 +470,32 @@ function getRequired(fieldID, namePrefix, value) {
     requiredTD.appendChild(required);
     return requiredTD;
 }
+function getPreview(fieldID, namePrefix, value) {
+    var preview = document.createElement("input");
+    preview.setAttribute("type", "checkbox");
+    preview.setAttribute("id", fieldID + "_preview");
+    preview.setAttribute("name", namePrefix + "_" + fieldID + "_preview");
+    preview.setAttribute("value", "true");
+    if (value == 'true') {
+        preview.setAttribute("checked", "checked");
+    }
+    var previewReset = document.createElement("input");
+    previewReset.setAttribute("type", "hidden");
+    previewReset.setAttribute("id", fieldID + "_preview");
+    previewReset.setAttribute("name", namePrefix + "_" + fieldID + "_preview");
+    previewReset.setAttribute("value", "false");
+    var previewLabel = document.createElement("label");
+    previewLabel.setAttribute("style", "white-space: nowrap;");
+    previewLabel.setAttribute("for", fieldID + "_preview");
+    previewLabel.innerHTML = "Preview";
+    var previewTD = document.createElement("td");
+    previewTD.setAttribute("id", fieldID + "_preview_td");
+    previewTD.appendChild(previewLabel);
+    previewTD.appendChild(getBR());
+    previewTD.appendChild(previewReset);
+    previewTD.appendChild(preview);
+    return previewTD;
+}
 function getDisplay(fieldID, namePrefix, value) {
     var display;
     var show = custom_field_fields.indexOf('display') !== -1;
@@ -669,6 +685,7 @@ function fieldTypeChanged(fieldID, namePrefix) {
     removeField(document.getElementById(fieldID + "_text_td"));
     removeField(document.getElementById(fieldID + "_input_type_td"));
     removeField(document.getElementById(fieldID + "_name_td"));
+    removeField(document.getElementById(fieldID + "_preview_td"));
     removeField(document.getElementById(fieldID + "_required_td"));
     removeField(document.getElementById(fieldID + "_options_td"));
     removeField(document.getElementById(fieldID + "_display_td"));
@@ -711,6 +728,7 @@ function inputTypeChanged(fieldID, namePrefix) {
     var inputType = document.getElementById(fieldID + "_input_type").value;
     removeField(document.getElementById(fieldID + "_input_type_td"));
     removeField(document.getElementById(fieldID + "_name_td"));
+    removeField(document.getElementById(fieldID + "_preview_td"));
     removeField(document.getElementById(fieldID + "_required_td"));
     removeField(document.getElementById(fieldID + "_options_td"));
     removeField(document.getElementById(fieldID + "_display_td"));
@@ -722,15 +740,15 @@ function inputTypeChanged(fieldID, namePrefix) {
     removeField(document.getElementById(fieldID + "_end_td"));
     removeFields(document.getElementsByClassName(fieldID + "empty_td"));
     if (inputType == 'text') {
-        getTextInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "", "", "");
+        getTextInputFields(tr, fieldID, namePrefix, "", "", "", "", "", "", "");
     } else if (inputType == 'select') {
-        getSelectInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "");
+        getSelectInputFields(tr, fieldID, namePrefix, "", "", "", "", "");
     } else if (inputType == 'checkbox') {
-        getCheckboxInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "", "")
+        getCheckboxInputFields(tr, fieldID, namePrefix, "", "", "", "", "", "")
     } else if (inputType == 'image') {
-        getImageInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "", "", "");
+        getImageInputFields(tr, fieldID, namePrefix, "", "", "", "");
     } else {
-        getCustomInputFields(tr, fieldID, namePrefix, inputType, "", "", "", "", "", "", "");
+        getCustomInputFields(tr, fieldID, namePrefix, "", "", "", "", "", "", "");
     }
 }
 

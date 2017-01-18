@@ -115,7 +115,7 @@ if (!class_exists('SSV_General')) {
 
                     $MovedChar      = substr($iban, 4) . substr($iban, 0, 4);
                     $MovedCharArray = str_split($MovedChar);
-                    $NewString      = "";
+                    $NewString = '';
 
                     foreach ($MovedCharArray AS $key => $value) {
                         if (!is_numeric($MovedCharArray[$key])) {
@@ -247,10 +247,10 @@ if (!class_exists('SSV_General')) {
                     $print = highlight_string("<?php " . var_export($variable, true), true);
                 }
                 $print = trim($print);
-                $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
-                $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
+                $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print, 1);  // remove prefix
+                $print = preg_replace("|\\</code\\>\$|", '', $print, 1);
                 $print = trim($print);
-                $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
+                $print = preg_replace("|\\</span\\>\$|", '', $print, 1);
                 $print = trim($print);
                 $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
                 $print .= ';';

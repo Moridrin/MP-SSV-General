@@ -12,10 +12,6 @@ class SelectInputField extends InputField
 
     /** @var array $options */
     public $options;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
 
     /**
      * SelectInputField constructor.
@@ -29,11 +25,8 @@ class SelectInputField extends InputField
      */
     protected function __construct($id, $title, $name, $options, $class, $style)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE);
-        $this->name    = $name;
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
         $this->options = explode(',', $options);
-        $this->class   = $class;
-        $this->style   = $style;
     }
 
     /**
@@ -78,22 +71,21 @@ class SelectInputField extends InputField
      */
     public function getHTML()
     {
-        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
-        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
-        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $name  = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <select <?= $name ?> <?= $class ?> <?= $style ?>>
-                    <option value="" disabled selected>Choose your option</option>
-                    <option value="1">Option 1</option>
-                    <option value="2">Option 2</option>
-                    <option value="3">Option 3</option>
-                </select>            </div>
+                <select id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?>>
+                    <?php foreach ($this->options as $option): ?>
+                        <option value="<?= $option ?>" <?= $this->value == $option ? 'selected' : '' ?>><?= $option ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="<?= $this->id ?>"><?= $this->title ?></label>
+            </div>
             <?php
         }
 

@@ -19,19 +19,28 @@ abstract class Field
     public $title;
     /** @var string $fieldType */
     public $fieldType;
+    /** @var string $class */
+    public $class;
+    /** @var string $style */
+    public $style;
 
     /**
      * Field constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $fieldType
+     * @param string $class
+     * @param string $style
      */
-    protected function __construct($id, $title, $fieldType)
+    protected function __construct($id, $title, $fieldType, $class, $style)
     {
         $this->id        = $id;
         $this->title     = $title;
         $this->fieldType = $fieldType;
+        $this->class = $class;
+        $this->style = $style;
     }
 
     /**
@@ -71,6 +80,6 @@ abstract class Field
      */
     public function getHTML()
     {
-        throw new Exception('This should be implemented in sub class: '. get_class($this) .'.');
+        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
 }

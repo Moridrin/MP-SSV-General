@@ -126,9 +126,9 @@ class SqlFormatter
     public static $cli_quote = "\x1b[34;1m";
     public static $cli_backtick_quote = "\x1b[35;1m";
     public static $cli_reserved = "\x1b[37m";
-    public static $cli_boundary = "";
+    public static $cli_boundary = '';
     public static $cli_number = "\x1b[32;1m";
-    public static $cli_word = "";
+    public static $cli_word = '';
     public static $cli_error = "\x1b[31;1;7m";
     public static $cli_comment = "\x1b[30;1m";
     public static $cli_functions = "\x1b[37m";
@@ -336,7 +336,7 @@ class SqlFormatter
         // This checks for the following patterns:
         // 1. backtick quoted string using `` to escape
         // 2. square bracket quoted string (SQL Server) using ]] to escape
-        // 3. double quoted string using "" or \" to escape
+        // 3. double quoted string using '' or \" to escape
         // 4. single quoted string using '' or \' to escape
         if ( preg_match('/^(((`[^`]*($|`))+)|((\[[^\]]*($|\]))(\][^\]]*($|\]))*)|(("[^"\\\\]*(?:\\\\.[^"\\\\]*)*("|$))+)|((\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*(\'|$))+))/s', $string, $matches)) {
             $ret = $matches[1];

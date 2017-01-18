@@ -16,7 +16,7 @@ function starts_with($haystack, $needle)
 
 function ends_with($haystack, $needle)
 {
-    return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+    return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
 }
 #endregion
 
@@ -70,7 +70,7 @@ function ssv_get_text_input($title, $id, $value, $type = "text", $args = array()
     $value = $esc_html ? esc_html($value) : $value;
     $type  = $esc_html ? esc_html($type) : $type;
     ob_start();
-    if ($title != "") {
+    if ($title != '') {
         $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
         ?>
         <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
@@ -95,7 +95,7 @@ function ssv_get_text_area($title, $id, $value, $type = "text", $args = array(),
     $value = $esc_html ? esc_html($value) : $value;
     $type  = $esc_html ? esc_html($type) : $type;
     ob_start();
-    if ($title != "") {
+    if ($title != '') {
         $object_name = $id . "_" . strtolower(str_replace(" ", "_", $title));
         ?>
         <label for="<?php echo $object_name; ?>"><?php echo $title; ?></label>
@@ -256,7 +256,7 @@ function ssv_get_role_select($id, $title, $value, $with_title = true, $args = ar
     ?>
     <select id="<?php echo $object_name; ?>" name="<?php echo $object_name; ?>" style="width: 100%;" <?php foreach ($args as $arg) :
         echo $esc_html ? esc_html($arg) : $arg; endforeach; ?>>
-        <option value=""></option><?php echo $roles_options; ?>
+        <option value=''></option><?php echo $roles_options; ?>
     </select>
     <?php
     return trim(preg_replace('/\s+/', ' ', ob_get_clean()));

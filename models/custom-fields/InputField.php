@@ -21,17 +21,25 @@ class InputField extends Field
     /** @var string $name */
     public $name;
 
+    /** @var string $value */
+    public $value;
+
     /**
      * InputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $inputType
+     * @param string $name
+     * @param string $class
+     * @param string $style
      */
-    protected function __construct($id, $title, $inputType)
+    protected function __construct($id, $title, $inputType, $name, $class, $style)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
         $this->inputType = $inputType;
+        $this->name      = $name;
     }
 
     /**
@@ -71,6 +79,6 @@ class InputField extends Field
      */
     public function getHTML()
     {
-        throw new Exception('This should be implemented in sub class: '. get_class($this) .'.');
+        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
 }

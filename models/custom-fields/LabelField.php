@@ -15,15 +15,20 @@ class LabelField extends Field
 
     /**
      * TabField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $text
+     * @param string $class
+     * @param string $style
      */
-    protected function __construct($id, $title, $text)
+    protected function __construct($id, $title, $text, $class, $style)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
         $this->text = $text;
+        $this->class = $class;
+        $this->style = $style;
     }
 
     /**
@@ -41,7 +46,9 @@ class LabelField extends Field
         return new LabelField(
             $values->id,
             $values->title,
-            $values->text
+            $values->text,
+            $values->class,
+            $values->style
         );
     }
 
@@ -51,11 +58,27 @@ class LabelField extends Field
     public function toJSON()
     {
         $values = array(
-            'id'        => $this->id,
-            'title'     => $this->title,
+            'id'         => $this->id,
+            'title'      => $this->title,
             'field_type' => $this->fieldType,
-            'text'      => $this->text,
+            'text'       => $this->text,
+            'class'      => $this->class,
+            'style'      => $this->style,
         );
         return json_encode($values);
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
+        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        ob_start();
+        ?>
+        <p <?= $class ?> <?= $style ?>><?= $this->text ?></p><br/>
+        <?php
+        return ob_get_clean();
     }
 }

@@ -8,16 +8,12 @@
  */
 class ImageInputField extends InputField
 {
-    const INPUT_TYPE = 'text';
+    const INPUT_TYPE = 'image';
 
     /** @var array $required */
     public $required;
     /** @var string $preview */
     public $preview;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
 
     /**
      * ImageInputField constructor.
@@ -32,12 +28,9 @@ class ImageInputField extends InputField
      */
     protected function __construct($id, $title, $name, $required, $preview, $class, $style)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE);
-        $this->name     = $name;
-        $this->required = $required;
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        $this->required = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->preview  = $preview;
-        $this->class    = $class;
-        $this->style    = $style;
     }
 
     /**
@@ -80,5 +73,37 @@ class ImageInputField extends InputField
             'style'      => $this->style,
         );
         return json_encode($values);
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class    = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $preview  = $this->preview;
+        $required = $this->required && !empty($this->value) ? 'required' : '';
+
+        ob_start();
+        if (current_theme_supports('materialize')) {
+            ?>
+            <div style="padding-top: 10px;">
+                <label for="<?= $this->id ?>"><?= $this->title ?><?= $this->required ? '*' : '' ?></label>
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>Image</span>
+                        <input type="file" id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+            <?php
+        }
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 }

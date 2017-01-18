@@ -18,10 +18,6 @@ class TextInputField extends InputField
     public $defaultValue;
     /** @var string $placeholder */
     public $placeholder;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
 
     /**
      * TextInputField constructor.
@@ -38,14 +34,11 @@ class TextInputField extends InputField
      */
     protected function __construct($id, $title, $name, $required, $preview, $defaultChecked, $placeholder, $class, $style)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE);
-        $this->name         = $name;
-        $this->required     = $required;
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->display      = $preview;
         $this->defaultValue = $defaultChecked;
         $this->placeholder  = $placeholder;
-        $this->class        = $class;
-        $this->style        = $style;
     }
 
     /**
@@ -99,7 +92,7 @@ class TextInputField extends InputField
      */
     public function getHTML()
     {
-        $value       = $this->defaultValue;
+        $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
         $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
         $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
@@ -114,7 +107,7 @@ class TextInputField extends InputField
             ?>
             <div class="input-field">
                 <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
-                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : "" ?></label>
+                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : '' ?></label>
             </div>
             <?php
         }
