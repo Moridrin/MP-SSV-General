@@ -8,10 +8,10 @@
  */
 class CustomInputField extends InputField
 {
+    /** @var bool $disabled */
+    public $disabled;
     /** @var array $required */
     public $required;
-    /** @var string $display */
-    public $display;
     /** @var string $defaultValue */
     public $defaultValue;
     /** @var string $placeholder */
@@ -19,23 +19,24 @@ class CustomInputField extends InputField
 
     /**
      * CustomInputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $inputType
      * @param string $name
+     * @param bool   $disabled
      * @param string $required
-     * @param string $display
      * @param string $defaultValue
      * @param string $placeholder
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $inputType, $name, $required, $display, $defaultValue, $placeholder, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style)
     {
         parent::__construct($id, $title, $inputType, $name, $class, $style);
+        $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
-        $this->display      = $display;
         $this->defaultValue = $defaultValue;
         $this->placeholder  = $placeholder;
     }
@@ -54,8 +55,8 @@ class CustomInputField extends InputField
             $values->title,
             $values->input_type,
             $values->name,
+            $values->disabled,
             $values->required,
-            $values->display,
             $values->default_value,
             $values->placeholder,
             $values->class,
@@ -74,8 +75,8 @@ class CustomInputField extends InputField
             'field_type'    => $this->fieldType,
             'input_type'    => $this->inputType,
             'name'          => $this->name,
+            'disabled'      => $this->disabled,
             'required'      => $this->required,
-            'display'       => $this->display,
             'default_value' => $this->defaultValue,
             'placeholder'   => $this->placeholder,
             'class'         => $this->class,
@@ -96,14 +97,14 @@ class CustomInputField extends InputField
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
-        $display     = $this->display;
+        $disabled    = $this->disabled ? 'disabled' : '';
         $required    = $this->required ? 'required' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?>/>
+                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
                 <label for="<?= $this->id ?>"><?php echo $this->title; ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php

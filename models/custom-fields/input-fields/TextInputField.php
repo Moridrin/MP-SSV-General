@@ -10,10 +10,10 @@ class TextInputField extends InputField
 {
     const INPUT_TYPE = 'text';
 
+    /** @var bool $disabled */
+    public $disabled;
     /** @var array $required */
     public $required;
-    /** @var string $display */
-    public $display;
     /** @var string $defaultValue */
     public $defaultValue;
     /** @var string $placeholder */
@@ -21,23 +21,24 @@ class TextInputField extends InputField
 
     /**
      * TextInputField constructor.
+
      *
-     * @param int    $id
+*@param int    $id
      * @param string $title
      * @param string $name
      * @param string $required
-     * @param string $preview
-     * @param string $defaultChecked
+     * @param string $disabled
+     * @param string $defaultValue
      * @param string $placeholder
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $name, $required, $preview, $defaultChecked, $placeholder, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style)
     {
         parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
-        $this->display      = $preview;
-        $this->defaultValue = $defaultChecked;
+        $this->defaultValue = $defaultValue;
         $this->placeholder  = $placeholder;
     }
 
@@ -57,8 +58,8 @@ class TextInputField extends InputField
             $values->id,
             $values->title,
             $values->name,
+            $values->disabled,
             $values->required,
-            $values->display,
             $values->default_value,
             $values->placeholder,
             $values->class,
@@ -77,8 +78,8 @@ class TextInputField extends InputField
             'field_type'    => $this->fieldType,
             'input_type'    => $this->inputType,
             'name'          => $this->name,
+            'disabled'      => $this->disabled,
             'required'      => $this->required,
-            'display'       => $this->display,
             'default_value' => $this->defaultValue,
             'placeholder'   => $this->placeholder,
             'class'         => $this->class,
@@ -99,7 +100,7 @@ class TextInputField extends InputField
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
-        $display     = $this->display;
+        $display     = $this->disabled ? 'disabled' : '';
         $required    = $this->required == "true" ? 'required' : '';
 
         ob_start();

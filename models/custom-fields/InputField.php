@@ -20,15 +20,16 @@ class InputField extends Field
     public $inputType;
     /** @var string $name */
     public $name;
+    /** @var bool $disabled */
+    public $disabled;
 
     /** @var string $value */
     public $value;
 
     /**
      * InputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $inputType
      * @param string $name

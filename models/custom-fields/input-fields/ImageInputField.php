@@ -10,23 +10,24 @@ class ImageInputField extends InputField
 {
     const INPUT_TYPE = 'image';
 
-    /** @var array $required */
-    public $required;
     /** @var string $preview */
     public $preview;
+    /** @var array $required */
+    public $required;
 
     /**
      * ImageInputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $name
+     * @param bool   $preview
      * @param string $required
-     * @param string $preview
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $name, $required, $preview, $class, $style)
+    protected function __construct($id, $title, $name, $preview, $required, $class, $style)
     {
         parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
         $this->required = filter_var($required, FILTER_VALIDATE_BOOLEAN);
@@ -49,8 +50,8 @@ class ImageInputField extends InputField
             $values->id,
             $values->title,
             $values->name,
-            $values->required,
             $values->preview,
+            $values->required,
             $values->class,
             $values->style
         );
@@ -67,8 +68,8 @@ class ImageInputField extends InputField
             'field_type' => $this->fieldType,
             'input_type' => $this->inputType,
             'name'       => $this->name,
-            'required'   => $this->required,
             'preview'    => $this->preview,
+            'required'   => $this->required,
             'class'      => $this->class,
             'style'      => $this->style,
         );
@@ -83,7 +84,6 @@ class ImageInputField extends InputField
         $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
         $class    = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $preview  = $this->preview;
         $required = $this->required && !empty($this->value) ? 'required' : '';
 
         ob_start();
@@ -101,6 +101,9 @@ class ImageInputField extends InputField
                     </div>
                 </div>
             </div>
+            <?php if ($this->preview): ?>
+                <img src=""/>
+            <?php endif; ?>
             <?php
         }
 

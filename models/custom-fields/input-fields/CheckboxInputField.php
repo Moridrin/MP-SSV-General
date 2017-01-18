@@ -10,30 +10,31 @@ class CheckboxInputField extends InputField
 {
     const INPUT_TYPE = 'checkbox';
 
+    /** @var bool $disabled */
+    public $disabled;
     /** @var bool $required */
     public $required;
-    /** @var string $display */
-    public $display;
     /** @var bool $defaultChecked */
     public $defaultChecked;
 
     /**
      * CheckboxInputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $name
+     * @param bool   $disabled
      * @param string $required
-     * @param string $preview
      * @param string $defaultChecked
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $name, $required, $preview, $defaultChecked, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style)
     {
         parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        $this->disabled       = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
-        $this->display        = $preview;
         $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
     }
 
@@ -53,8 +54,8 @@ class CheckboxInputField extends InputField
             $values->id,
             $values->title,
             $values->name,
+            $values->disabled,
             $values->required,
-            $values->display,
             $values->default_checked,
             $values->class,
             $values->style
@@ -72,9 +73,9 @@ class CheckboxInputField extends InputField
             'field_type'      => $this->fieldType,
             'input_type'      => $this->inputType,
             'name'            => $this->name,
+            'disabled'        => $this->disabled,
             'required'        => $this->required,
-            'display'         => $this->display,
-            'default_checked' => $this->defaultChecked ? 'true' : 'false',
+            'default_checked' => $this->defaultChecked,
             'class'           => $this->class,
             'style'           => $this->style,
         );
@@ -90,7 +91,7 @@ class CheckboxInputField extends InputField
         $name      = !empty($this->name) ? 'name="' . $this->name . '"' : '';
         $class     = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate filled-in"';
         $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $display   = $this->display;
+        $disabled  = $this->disabled ? 'disabled' : '';
         $required  = $this->required ? 'required' : '';
         $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
 
@@ -100,7 +101,7 @@ class CheckboxInputField extends InputField
             <div>
                 <input type="hidden" id="<?= $this->id ?>_reset" <?= $name ?> value="false"/>
                 <p>
-                    <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $style; ?> <?= $checked ?> <?= $display ?>/>
+                    <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $style; ?> <?= $checked ?> <?= $disabled ?>/>
                     <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
                 </p>
             </div>

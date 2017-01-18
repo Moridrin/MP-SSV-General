@@ -10,23 +10,28 @@ class SelectInputField extends InputField
 {
     const INPUT_TYPE = 'select';
 
+    /** @var bool $disabled */
+    public $disabled;
     /** @var array $options */
     public $options;
 
     /**
      * SelectInputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $name
+     * @param bool   $disabled
      * @param string $options
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $name, $options, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $options, $class, $style)
     {
         parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
-        $this->options = explode(',', $options);
+        $this->disabled = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
+        $this->options  = explode(',', $options);
     }
 
     /**
@@ -42,6 +47,7 @@ class SelectInputField extends InputField
             $values->id,
             $values->title,
             $values->name,
+            $values->disabled,
             $values->options,
             $values->class,
             $values->style
@@ -59,6 +65,7 @@ class SelectInputField extends InputField
             'field_type' => $this->fieldType,
             'input_type' => $this->inputType,
             'name'       => $this->name,
+            'disabled'   => $this->disabled,
             'options'    => implode(',', $this->options),
             'class'      => $this->class,
             'style'      => $this->style,
@@ -71,15 +78,16 @@ class SelectInputField extends InputField
      */
     public function getHTML()
     {
-        $name  = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $class    = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $disabled = $this->disabled ? 'disabled' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <select id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?>>
+                <select id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= $this->value == $option ? 'selected' : '' ?>><?= $option ?></option>
                     <?php endforeach; ?>

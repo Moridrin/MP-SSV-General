@@ -26,9 +26,8 @@ abstract class Field
 
     /**
      * Field constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $fieldType
      * @param string $class
