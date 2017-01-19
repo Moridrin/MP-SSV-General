@@ -110,37 +110,13 @@ class ImageInputField extends InputField
     }
 
     /**
-     * @return array|bool array of errors or true if no errors.
+     * @return Message[]|bool array of errors or true if no errors.
      */
     public function isValid()
     {
         $errors = array();
-        if (!empty($this->id) || !is_int($this->id)) {
-            $errors[] = new Message('ID [' . $this->id . '] is invalid', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->title) || !is_string($this->title)) {
-            $errors[] = new Message('Title [' . $this->title . '] is invalid', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->fieldType) || !is_string($this->fieldType) || $this->fieldType || $this->fieldType != self::FIELD_TYPE) {
-            $errors[] = new Message('Field Type [' . $this->fieldType . '] is invalid.', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->inputType) || !is_string($this->inputType) || $this->inputType != self::INPUT_TYPE) {
-            $errors[] = new Message('Input Type [' . $this->inputType . '] is invalid.', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->name) || !is_string($this->name)) {
-            $errors[] = new Message('Name [' . $this->name . '] is invalid.', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->disabled) || !is_bool($this->preview)) {
-            $errors[] = new Message('Preview [' . $this->preview . '] is invalid.', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->required) || !is_bool($this->required)) {
-            $errors[] = new Message('Required [' . $this->required . '] is invalid', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->class) || !is_string($this->class)) {
-            $errors[] = new Message('Class [' . $this->class . '] is invalid.', Message::ERROR_MESSAGE);
-        }
-        if (!empty($this->style) || !is_string($this->style)) {
-            $errors[] = new Message('Style [' . $this->style . '] is invalid.', Message::ERROR_MESSAGE);
+        if ($this->required && (empty($this->value) || !starts_with($this->value, SSV_General::BASE_URL))) {
+            $errors[] = new Message('This field is required but not set.', Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

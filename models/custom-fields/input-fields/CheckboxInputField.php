@@ -116,7 +116,7 @@ class CheckboxInputField extends InputField
     public function isValid()
     {
         $errors = array();
-        if ($this->required && empty($this->value)) {
+        if (($this->required && !$this->disabled) && (empty($this->value) || !is_bool($this->value) || !$this->value)) {
             $errors[] = new Message('This field is required but not set.', Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
