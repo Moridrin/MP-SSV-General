@@ -74,9 +74,9 @@ class User extends \WP_User
             return new Message('This email address already exists. Try resetting your password.', Message::ERROR_MESSAGE);
         }
         $id = wp_create_user(
-            sanitize_text_field($username),
-            sanitize_text_field($password),
-            sanitize_text_field($email)
+            SSV_General::sanitize($username),
+            SSV_General::sanitize($password),
+            SSV_General::sanitize($email)
         );
 
         return self::getByID($id);
@@ -135,22 +135,22 @@ class User extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
-        $value = sanitize_text_field($value);
+        $value = SSV_General::sanitize($value);
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
-            wp_update_user(array('ID' => $this->ID, 'user_email' => sanitize_text_field($value)));
+            wp_update_user(array('ID' => $this->ID, 'user_email' => $value));
             update_user_meta($this->ID, 'user_email', $value);
             $this->user_email = $value;
             return true;
         } elseif ($meta_key == "name" || $meta_key == "display_name") {
-            wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($value)));
-            update_user_meta($this->ID, 'display_name', sanitize_text_field($value));
+            wp_update_user(array('ID' => $this->ID, 'display_name' => $value));
+            update_user_meta($this->ID, 'display_name', $value);
             $this->display_name = $value;
             return true;
         } elseif ($meta_key == "first_name" || $meta_key == "last_name") {
-            update_user_meta($this->ID, $meta_key, sanitize_text_field($value));
+            update_user_meta($this->ID, $meta_key, $value);
             $display_name = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
-            wp_update_user(array('ID' => $this->ID, 'display_name' => sanitize_text_field($display_name)));
-            update_user_meta($this->ID, 'display_name', sanitize_text_field($display_name));
+            wp_update_user(array('ID' => $this->ID, 'display_name' => $display_name));
+            update_user_meta($this->ID, 'display_name', $display_name);
             $this->display_name = $display_name;
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {

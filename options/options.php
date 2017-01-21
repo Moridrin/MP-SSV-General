@@ -20,9 +20,9 @@ function ssv_settings_page()
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            update_option(SSV_General::OPTION_BOARD_ROLE, sanitize_text_field($_POST['board_role']));
-            $customFieldFields = isset($_POST['custom_field_fields']) ? $_POST['custom_field_fields'] : null;
-            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($customFieldFields)));
+            update_option(SSV_General::OPTION_BOARD_ROLE, SSV_General::sanitize($_POST['board_role']));
+            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields']) : null;
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields));
         }
     }
     ?>

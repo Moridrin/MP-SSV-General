@@ -62,7 +62,7 @@ if (!class_exists('SSV_General')) {
         {
             update_option(self::OPTION_BOARD_ROLE, 'administrator');
             $defaultSelected = array('display', 'default', 'placeholder');
-            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, sanitize_text_field(json_encode($defaultSelected)));
+            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, SSV_General::sanitize(json_encode($defaultSelected)));
         }
         #endregion
 
@@ -212,13 +212,28 @@ if (!class_exists('SSV_General')) {
                         $customFieldValues = array();
                         $id                = str_replace($prefix . '_', '', str_replace('_start', '', $key));
                     }
-                    $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = $value;
+                    $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = SSV_General::sanitize($value);
                     if (strpos($key, '_end') !== false) {
                         $customFields[$id] = Field::fromJSON(json_encode($customFieldValues));
                     }
                 }
             }
             return $customFields;
+        }
+        #endregion
+
+        #region sanitize($value)
+        /**
+         * @param $value
+         *
+         * @return string
+         */
+        public static function sanitize($value)
+        {
+            $value = stripslashes($value);
+            $value = esc_attr($value);
+            $value = sanitize_text_field($value);
+            return $value;
         }
         #endregion
 
