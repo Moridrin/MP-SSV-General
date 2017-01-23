@@ -9,7 +9,7 @@ if (!class_exists('SSV_General')) {
     #region Register Scripts
     function mp_ssv_general_admin_scripts()
     {
-        wp_enqueue_script('mp-ssv-input-field-selector', SSV_Events::URL . 'general/js/mp-ssv-input-field-selector.js', array('jquery'));
+        wp_enqueue_script('mp-ssv-input-field-selector', SSV_General::URL . 'general/js/mp-ssv-input-field-selector.js', array('jquery'));
         wp_localize_script(
             'mp-ssv-input-field-selector',
             'settings',
@@ -23,6 +23,8 @@ if (!class_exists('SSV_General')) {
 
     #region Class
     global $wpdb;
+    define('SSV_GENERAL_PATH', plugin_dir_path(__FILE__));
+    define('SSV_GENERAL_URL', plugins_url() . '/ssv-events/general');
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 
     class SSV_General
