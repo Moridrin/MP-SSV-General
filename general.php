@@ -175,8 +175,9 @@ if (!class_exists('SSV_General')) {
         /**
          * @param string $prefix
          * @param int    $start_index
+         * @param bool   $allowTabs
          */
-        public static function getCustomFieldsContainer($prefix, $start_index = 0)
+        public static function getCustomFieldsContainer($prefix, $start_index = 0, $allowTabs = false)
         {
             ?>
             <div style="overflow-x: auto;">
@@ -187,7 +188,7 @@ if (!class_exists('SSV_General')) {
                 i = <?= $start_index ?>;
                 mp_ssv_sortable_table('custom-fields-placeholder');
                 function mp_ssv_add_new_custom_field() {
-                    mp_ssv_add_new_field('input', 'text', 'custom-fields-placeholder', i, '<?= $prefix ?>');
+                    mp_ssv_add_new_field('input', 'text', 'custom-fields-placeholder', i, '<?= $prefix ?>', null, <?= $allowTabs ? 'true' : 'false' ?>);
                     i++;
                 }
             </script>
@@ -206,6 +207,8 @@ if (!class_exists('SSV_General')) {
             $customFields      = array();
             $customFieldValues = array();
             $id                = 0;
+            /** @var TabField $currentTab */
+            $currentTab = null;
             foreach ($_POST as $key => $value) {
                 if (strpos($key, $prefix) !== false) {
                     if (strpos($key, '_start') !== false) {
@@ -214,7 +217,15 @@ if (!class_exists('SSV_General')) {
                     }
                     $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = SSV_General::sanitize($value);
                     if (strpos($key, '_end') !== false) {
-                        $customFields[$id] = Field::fromJSON(json_encode($customFieldValues));
+                        $field = Field::fromJSON(json_encode($customFieldValues));
+                        if ($field instanceof TabField) {
+                            $currentTab        = $field;
+                            $customFields[$id] = $field;
+                        } elseif ($currentTab != null) {
+                            $currentTab->addField($field);
+                        } else {
+                            $customFields[$id] = $field;
+                        }
                     }
                 }
             }
@@ -230,6 +241,9 @@ if (!class_exists('SSV_General')) {
          */
         public static function sanitize($value)
         {
+            if (is_array($value)) {
+                return $value;
+            }
             $value = stripslashes($value);
             $value = esc_attr($value);
             $value = sanitize_text_field($value);

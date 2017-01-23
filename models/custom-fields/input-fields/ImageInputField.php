@@ -57,9 +57,11 @@ class ImageInputField extends InputField
     }
 
     /**
-     * @return string the class as JSON object.
+     * @param bool $encode
+     *
+*@return string the class as JSON object.
      */
-    public function toJSON()
+    public function toJSON($encode = true)
     {
         $values = array(
             'id'         => $this->id,
@@ -72,7 +74,10 @@ class ImageInputField extends InputField
             'class'      => $this->class,
             'style'      => $this->style,
         );
-        return json_encode($values);
+        if ($encode) {
+            $values = json_encode($values);
+        }
+        return $values;
     }
 
     /**

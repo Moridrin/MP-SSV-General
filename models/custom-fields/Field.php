@@ -65,10 +65,12 @@ abstract class Field
     }
 
     /**
-     * @return string the class as JSON object.
+     * @param bool $encode
+     *
+*@return string the class as JSON object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function toJSON()
+    public function toJSON($encode = true)
     {
         throw new Exception('This should be implemented in a sub class.');
     }

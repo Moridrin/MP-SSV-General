@@ -7,7 +7,9 @@ var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
 function mp_ssv_add_new_field(fieldType, inputType, containerID, fieldID, namePrefix, values, allowTabs) {
-    // alert(JSON.stringify(values));
+    if (typeof values == 'undefined' || values == null) {
+        values = [];
+    }
     if (fieldType == 'tab') {
         getTabField(containerID, fieldID, namePrefix, values, allowTabs);
     } else if (fieldType == 'header') {
@@ -33,11 +35,30 @@ function getTabField(containerID, fieldID, namePrefix, values, allowTabs) {
     var container = document.getElementById(containerID);
 
     var fieldTitle = '';
+    var fields = {};
     var fieldType = 'tab';
     if (typeof values['title'] !== 'undefined') {
         fieldTitle = values['title'];
     }
+    if (typeof values['fields'] !== 'undefined') {
+        fields = values['fields'];
+    }
 
+    var startTR = document.createElement("tr");
+    startTR.setAttribute("id", fieldID + "_tr");
+    startTR.setAttribute("id", fieldID + "_tab_end");
+    var startLabel = document.createTextNode("Start of Tab");
+    startTR.appendChild(getStart(fieldID, namePrefix, true));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(startLabel);
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEnd(fieldID, namePrefix));
     var tr = getBaseFields(fieldID, namePrefix, fieldTitle, fieldType, allowTabs);
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
@@ -48,8 +69,29 @@ function getTabField(containerID, fieldID, namePrefix, values, allowTabs) {
     tr.appendChild(getClass(fieldID, namePrefix, ""));
     tr.appendChild(getStyle(fieldID, namePrefix, ""));
     tr.appendChild(getEnd(fieldID, namePrefix));
+    var endTR = document.createElement("tr");
+    endTR.setAttribute("id", fieldID + "_tr");
+    endTR.setAttribute("id", fieldID + "_tab_end");
+    var endLabel = document.createTextNode("End of Tab");
+    endTR.appendChild(getStart(fieldID, namePrefix, true));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(endLabel);
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEnd(fieldID, namePrefix));
 
     container.appendChild(tr);
+    // container.appendChild(startTR);
+    for (var i in fields) {
+        // alert(JSON.stringify(fields[i]));
+        mp_ssv_add_new_field(fields[i]['field_type'], fields[i]['input_type'], containerID, fields[i]['id'], namePrefix, fields[i], allowTabs);
+    }
+    // container.appendChild(endTR);
 }
 function getHeaderField(containerID, fieldID, namePrefix, values, allowTabs) {
     var container = document.getElementById(containerID);
@@ -85,7 +127,7 @@ function getTextInputField(containerID, fieldID, namePrefix, values, allowTabs) 
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (typeof values != 'undefined') {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -110,7 +152,7 @@ function getSelectInputField(containerID, fieldID, namePrefix, values, allowTabs
     var disabled = false;
     var classValue = '';
     var style = '';
-    if (typeof values != 'undefined') {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         options = values['options'];
@@ -133,7 +175,7 @@ function getCheckboxInputField(containerID, fieldID, namePrefix, values, allowTa
     var defaultChecked = '';
     var classValue = '';
     var style = '';
-    if (typeof values != 'undefined') {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -156,7 +198,7 @@ function getImageInputField(containerID, fieldID, namePrefix, values, allowTabs)
     var required = false;
     var classValue = '';
     var style = '';
-    if (typeof values != 'undefined') {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -180,7 +222,7 @@ function getCustomInputField(inputType, containerID, fieldID, namePrefix, values
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (typeof values != 'undefined') {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -298,13 +340,16 @@ function getEmpty(fieldID) {
     td.setAttribute("class", fieldID + "_empty_td");
     return td;
 }
-function getStart(fieldID, namePrefix) {
+function getStart(fieldID, namePrefix, isTab) {
     var start = document.createElement("input");
     start.setAttribute("type", "hidden");
     start.setAttribute("id", fieldID + "_start");
     start.setAttribute("name", namePrefix + "_" + fieldID + "_start");
     start.setAttribute("value", "start");
     var startTD = document.createElement("td");
+    if (isTab) {
+        startTD.setAttribute("style", "border-left: solid;");
+    }
     startTD.setAttribute("id", fieldID + "_start_td");
     startTD.appendChild(start);
     return startTD;
@@ -666,13 +711,16 @@ function getStyle(fieldID, namePrefix, value) {
     styleTD.appendChild(style);
     return styleTD;
 }
-function getEnd(fieldID, namePrefix) {
+function getEnd(fieldID, namePrefix, isTab) {
     var stop = document.createElement("input");
     stop.setAttribute("type", "hidden");
     stop.setAttribute("id", fieldID + "_end");
     stop.setAttribute("name", namePrefix + "_" + fieldID + "_end");
     stop.setAttribute("value", "end");
     var stopTD = document.createElement("td");
+    if (isTab) {
+        stopTD.setAttribute("style", "border-right: solid;");
+    }
     stopTD.setAttribute("id", fieldID + "_end_td");
     stopTD.appendChild(stop);
     return stopTD;
