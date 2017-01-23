@@ -66,7 +66,7 @@ class InputField extends Field
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      * @throws Exception if the method is not implemented by a sub class.
      */
     public function toJSON($encode = true)

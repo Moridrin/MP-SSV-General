@@ -67,20 +67,63 @@ abstract class Field
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
-     * @throws Exception if the method is not implemented by a sub class.
+     * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
-    {
-        throw new Exception('This should be implemented in a sub class.');
-    }
+    abstract public function toJSON($encode = true);
 
     /**
      * @return string the field as HTML object.
-     * @throws Exception if the method is not implemented by a sub class.
      */
-    public function getHTML()
+    abstract public function getHTML();
+
+    /**
+     * @param $fields
+     *
+     * @return string the field as HTML object.
+     */
+    public static function getFormFields($fields)
     {
-        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
+        /** @var Field $field */
+        $tabs    = array();
+        $content = '';
+        foreach ($fields as $field) {
+            if ($field instanceof TabField) {
+                $tabs[] = $field;
+            } else {
+                $content .= $field->getHTML();
+            }
+        }
+        if (!empty($tabs)) {
+            $tabsHTML        = '<ul class="tabs">';
+            $tabsContentHTML = '';
+            /** @var TabField $tab */
+            foreach ($tabs as $tab) {
+                $tabsHTML .= $tab->getHTML();
+                $tabsContentHTML .= $tab->getFieldsHTML();
+            }
+            $tabsHTML .= '</ul>';
+            $content .= $tabsHTML . $tabsContentHTML;
+        }
+
+        return $content;
+    }
+
+    /**
+     * @param Field[] $fields
+     *
+     * @return int
+     */
+    public static function getMaxID($fields)
+    {
+        $maxID = 0;
+        foreach ($fields as $field) {
+            $maxID = $field->id > $maxID ? $field->id : $maxID;
+            if ($field instanceof TabField) {
+                foreach ($field->fields as $tabField) {
+                    $maxID = $tabField->id > $maxID ? $tabField->id : $maxID;
+                }
+            }
+        }
+        return $maxID;
     }
 }

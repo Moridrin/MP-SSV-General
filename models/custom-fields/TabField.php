@@ -11,6 +11,7 @@ class TabField extends Field
     const FIELD_TYPE = 'tab';
 
     public $fields;
+    private $name;
 
     /**
      * TabField constructor.
@@ -25,6 +26,7 @@ class TabField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
         $this->fields = $fields;
+        $this->name = strtolower(str_replace(' ', '_', $title));
     }
 
     /**
@@ -47,19 +49,25 @@ class TabField extends Field
         if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
+        $fields = array();
+        if (isset($values->fields)) {
+            foreach ($values->fields as $field) {
+                $fields[] = Field::fromJSON(json_encode($field));
+            }
+        }
         return new TabField(
             $values->id,
             $values->title,
             $values->class,
             $values->style,
-            isset($values->fields) ? $values->fields : array()
+            $fields
         );
     }
 
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -90,10 +98,19 @@ class TabField extends Field
         $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         ob_start();
         ?>
-        <div class="col s12">
-            <ul class="tabs">
-                <li <?= $class ?>><a href="#test1"><?= $this->title ?></a></li>
-            </ul>
+        <li <?= $class ?> <?= $style ?>><a href="#<?= $this->name ?>"><?= $this->title ?></a></li>
+        <?php
+        return ob_get_clean();
+    }
+
+    public function getFieldsHTML()
+    {
+        ob_start();
+        ?>
+        <div id="<?= $this->name ?>">
+            <?php foreach ($this->fields as $field): ?>
+                <?= $field->getHTML() ?>
+            <?php endforeach; ?>
         </div>
         <?php
         return ob_get_clean();
