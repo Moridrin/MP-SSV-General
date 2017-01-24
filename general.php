@@ -9,13 +9,13 @@ if (!class_exists('SSV_General')) {
     #region Register Scripts
     function mp_ssv_general_admin_scripts()
     {
-        wp_enqueue_script('mp-ssv-input-field-selector', SSV_General::URL . 'general/js/mp-ssv-input-field-selector.js', array('jquery'));
+        wp_enqueue_script('mp-ssv-input-field-selector', SSV_General::URL . '/js/mp-ssv-input-field-selector.js', array('jquery'));
         wp_localize_script(
             'mp-ssv-input-field-selector',
             'settings',
             array('custom_field_fields' => get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS))
         );
-        wp_enqueue_script('mp-ssv-sortable-tables', SSV_Events::URL . 'general/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
+        wp_enqueue_script('mp-ssv-sortable-tables', SSV_General::URL . '/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
     }
 
     add_action('admin_enqueue_scripts', 'mp_ssv_general_admin_scripts');
@@ -24,12 +24,15 @@ if (!class_exists('SSV_General')) {
     #region Class
     global $wpdb;
     define('SSV_GENERAL_PATH', plugin_dir_path(__FILE__));
-    define('SSV_GENERAL_URL', plugins_url() . '/ssv-events/general');
+    define('SSV_GENERAL_URL', plugins_url() . '/' . plugin_basename(__DIR__));
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 
     class SSV_General
     {
         #region Constants
+        const PATH = SSV_GENERAL_PATH;
+        const URL = SSV_GENERAL_URL;
+
         const BASE_URL = SSV_GENERAL_BASE_URL;
 
         const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
