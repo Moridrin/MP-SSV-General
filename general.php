@@ -178,58 +178,64 @@ if (!class_exists('SSV_General')) {
 
         #region getCustomFieldsContainer($prefix)
         /**
-         * @param string $prefix
-         * @param int    $start_index
-         * @param bool   $allowTabs
+         * @param bool $allowTabs
          */
-        public static function getCustomFieldsContainer($prefix, $start_index = 0, $allowTabs = false)
+        public static function getCustomFieldsContainer($allowTabs)
         {
+            $fields = Field::getFromMeta();
             ?>
             <div style="overflow-x: auto;">
                 <table id="custom-fields-placeholder" class="sortable"></table>
                 <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
             </div>
             <script>
-                i = <?= $start_index ?>;
+                i = <?= Field::getMaxID($fields) + 1 ?>;
                 mp_ssv_sortable_table('custom-fields-placeholder');
                 function mp_ssv_add_new_custom_field() {
-                    mp_ssv_add_new_field('input', 'text', 'custom-fields-placeholder', i, '<?= $prefix ?>', null, <?= $allowTabs ? 'true' : 'false' ?>);
+                    mp_ssv_add_new_field('input', 'text', i, null, <?= $allowTabs ? 'true' : 'false' ?>);
                     i++;
                 }
+                <?php foreach($fields as $field): ?>
+                mp_ssv_add_new_field('<?= $field->fieldType ?>', '<?= isset($field->inputType) ? $field->inputType : '' ?>', <?= $field->id ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+                <?php endforeach; ?>
             </script>
             <?php
         }
         #endregion
 
-        #region getCustomFieldsFromPost($prefix)
+        #region getCustomFieldsFromPost()
         /**
-         * @param string $prefix
-         *
          * @return array of all the custom fields matching the $prefix.
          */
-        public static function getCustomFieldsFromPost($prefix)
+        public static function getCustomFieldsFromPost()
         {
             $customFields      = array();
             $customFieldValues = array();
             $id                = 0;
+            $fieldID = 0;
+            $prefix = 'custom_field_';
             /** @var TabField $currentTab */
             $currentTab = null;
             foreach ($_POST as $key => $value) {
                 if (strpos($key, $prefix) !== false) {
                     if (strpos($key, '_start') !== false) {
                         $customFieldValues = array();
-                        $id                = str_replace($prefix . '_', '', str_replace('_start', '', $key));
+                        $fieldID = str_replace($prefix, '', str_replace('_start', '', $key));
                     }
-                    $customFieldValues[str_replace($id . '_', '', str_replace($prefix . '_', '', $key))] = SSV_General::sanitize($value);
+                    $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
+                    $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value);
                     if (strpos($key, '_end') !== false) {
                         $field = Field::fromJSON(json_encode($customFieldValues));
-                        if ($field instanceof TabField) {
-                            $currentTab        = $field;
-                            $customFields[$id] = $field;
-                        } elseif ($currentTab != null) {
-                            $currentTab->addField($field);
-                        } else {
-                            $customFields[$id] = $field;
+                        if (!empty($field->title)) {
+                            if ($field instanceof TabField) {
+                                $currentTab        = $field;
+                                $customFields[$id] = $field;
+                            } elseif ($currentTab != null) {
+                                $currentTab->addField($field);
+                            } else {
+                                $customFields[$id] = $field;
+                            }
+                            $id++;
                         }
                     }
                 }

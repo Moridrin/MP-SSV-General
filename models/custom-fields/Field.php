@@ -13,6 +13,9 @@ require_once 'LabelField.php';
  */
 abstract class Field
 {
+    const PREFIX = 'custom_field_';
+    const ID_TAG = 'custom_field_ids';
+
     /** @var int $id */
     public $id;
     /** @var string $title */
@@ -81,7 +84,7 @@ abstract class Field
      *
      * @return string the field as HTML object.
      */
-    public static function getFormFields($fields)
+    public static function getFormFromFields($fields)
     {
         /** @var Field $field */
         $tabs    = array();
@@ -126,4 +129,22 @@ abstract class Field
         }
         return $maxID;
     }
+
+    #region getFromMeta()
+    /**
+     * @return Field[]
+     */
+    public static function getFromMeta()
+    {
+        global $post;
+        $fieldIDs = get_post_meta($post->ID, self::ID_TAG, true);
+        $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
+        $fields   = array();
+        foreach ($fieldIDs as $id) {
+            $field    = get_post_meta($post->ID, self::PREFIX . $id, true);
+            $fields[] = Field::fromJSON($field);
+        }
+        return $fields;
+    }
+    #endregion
 }
