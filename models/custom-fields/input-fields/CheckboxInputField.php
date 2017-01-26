@@ -64,7 +64,7 @@ class CheckboxInputField extends InputField
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -93,21 +93,24 @@ class CheckboxInputField extends InputField
     {
         $isChecked = isset($this->value) ? $this->value : $this->defaultChecked;
         $name      = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class     = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate filled-in"';
+        $class     = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate filled-in"';
         $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $disabled  = $this->disabled ? 'disabled' : '';
         $required  = $this->required ? 'required' : '';
         $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
 
+        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+            $disabled = '';
+            $required = '';
+        }
+
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div>
+            <div <?= $style; ?>>
                 <input type="hidden" id="<?= $this->id ?>_reset" <?= $name ?> value="false"/>
-                <p>
-                    <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $style; ?> <?= $checked ?> <?= $disabled ?>/>
-                    <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
-                </p>
+                <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
+                <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
             </div>
             <?php
         }

@@ -76,7 +76,7 @@ function ssv_settings_page()
                 </td>
             </tr>
         </table>
-        <?php SSV_General::formSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER); ?>
+        <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER); ?>
     </form>
     <?php
 }

@@ -11,7 +11,7 @@ class TabField extends Field
     const FIELD_TYPE = 'tab';
 
     public $fields;
-    private $name;
+    public $name;
 
     /**
      * TabField constructor.
@@ -94,11 +94,12 @@ class TabField extends Field
      */
     public function getHTML()
     {
-        $class = !empty($this->class) ? 'class="tab ' . $this->class . '"' : 'class="tab"';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'class="active"' : '';
+        $class       = !empty($this->class) ? 'class="tab ' . $this->class . '"' : 'class="tab ' . $activeClass . '"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         ob_start();
         ?>
-        <li <?= $class ?> <?= $style ?>><a href="#<?= $this->name ?>"><?= $this->title ?></a></li>
+        <li <?= $class ?> <?= $style ?>><a href="#<?= $this->name ?>" <?= $activeClass ?>><?= $this->title ?></a></li>
         <?php
         return ob_get_clean();
     }
@@ -107,6 +108,7 @@ class TabField extends Field
     {
         ob_start();
         ?>
+        <input type="hidden" name="tab" value="<?= $this->id ?>">
         <div id="<?= $this->name ?>">
             <?php foreach ($this->fields as $field): ?>
                 <?= $field->getHTML() ?>

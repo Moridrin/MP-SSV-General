@@ -13,9 +13,12 @@ require_once 'LabelField.php';
  */
 abstract class Field
 {
+    #region Constants
     const PREFIX = 'custom_field_';
     const ID_TAG = 'custom_field_ids';
+    #endregion
 
+    #region Variables
     /** @var int $id */
     public $id;
     /** @var string $title */
@@ -26,7 +29,9 @@ abstract class Field
     public $class;
     /** @var string $style */
     public $style;
+    #endregion
 
+    #region __construct($id, $title, $fieldType, $class, $style)
     /**
      * Field constructor.
      *
@@ -44,8 +49,36 @@ abstract class Field
         $this->class = $class;
         $this->style = $style;
     }
+    #endregion
 
+    #region fromMeta()
     /**
+     * This function gets all the Fields from the post metadata.
+     *
+     * @return Field[]
+     */
+    public static function fromMeta()
+    {
+        global $post;
+        $fieldIDs = get_post_meta($post->ID, self::ID_TAG, true);
+        $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
+        $fields   = array();
+        foreach ($fieldIDs as $id) {
+            $field = Field::fromJSON(get_post_meta($post->ID, self::PREFIX . $id, true));
+            if ($field instanceof InputField && is_user_logged_in() && SSV_General::usersPluginActive()) {
+                $user         = User::getCurrent();
+                $field->value = $user ? $user->getMeta($field->name) : '';
+            }
+            $fields[] = $field;
+        }
+        return $fields;
+    }
+    #endregion
+
+    #region fromJSON($json)
+    /**
+     * This function extracts a Field from the JSON string.
+     *
      * @param string $json
      *
      * @return Field
@@ -66,55 +99,36 @@ abstract class Field
         }
         throw new Exception('Unknown field type');
     }
+    #endregion
 
+    #region toJSON($encode = true)
     /**
-     * @param bool $encode
+     * This function creates an array containing all variables of this Field.
      *
-     * @return string the class as JSON object.
+     * @param bool $encode can be set to false if it is important not to json_encode the array.
+     *
+*@return string the class as JSON object.
      */
     abstract public function toJSON($encode = true);
+    #endregion
 
+    #region getHTML()
     /**
-     * @return string the field as HTML object.
+     * This function returns a string with the Field as HTML (to be used in the frontend).
+     *
+*@return string the field as HTML object.
      */
     abstract public function getHTML();
+    #endregion
 
+    #region getMaxID($fields)
     /**
-     * @param $fields
-     *
-     * @return string the field as HTML object.
-     */
-    public static function getFormFromFields($fields)
-    {
-        /** @var Field $field */
-        $tabs    = array();
-        $content = '';
-        foreach ($fields as $field) {
-            if ($field instanceof TabField) {
-                $tabs[] = $field;
-            } else {
-                $content .= $field->getHTML();
-            }
-        }
-        if (!empty($tabs)) {
-            $tabsHTML        = '<ul class="tabs">';
-            $tabsContentHTML = '';
-            /** @var TabField $tab */
-            foreach ($tabs as $tab) {
-                $tabsHTML .= $tab->getHTML();
-                $tabsContentHTML .= $tab->getFieldsHTML();
-            }
-            $tabsHTML .= '</ul>';
-            $content .= $tabsHTML . $tabsContentHTML;
-        }
+     * This function returns the highest ID in all the fields (including all sub-fields)
 
-        return $content;
-    }
-
-    /**
-     * @param Field[] $fields
+*
+*@param Field[] $fields
      *
-     * @return int
+     * @return int the max ID
      */
     public static function getMaxID($fields)
     {
@@ -128,23 +142,6 @@ abstract class Field
             }
         }
         return $maxID;
-    }
-
-    #region getFromMeta()
-    /**
-     * @return Field[]
-     */
-    public static function getFromMeta()
-    {
-        global $post;
-        $fieldIDs = get_post_meta($post->ID, self::ID_TAG, true);
-        $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
-        $fields   = array();
-        foreach ($fieldIDs as $id) {
-            $field    = get_post_meta($post->ID, self::PREFIX . $id, true);
-            $fields[] = Field::fromJSON($field);
-        }
-        return $fields;
     }
     #endregion
 }

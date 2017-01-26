@@ -69,7 +69,7 @@ class TextInputField extends InputField
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -100,18 +100,23 @@ class TextInputField extends InputField
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
         $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class       = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $class       = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
         $value       = !empty($value) ? 'value="' . $value . '"' : '';
-        $display     = $this->disabled ? 'disabled' : '';
+        $disabled    = $this->disabled ? 'disabled' : '';
         $required    = $this->required == "true" ? 'required' : '';
+
+        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+            $disabled = '';
+            $required = '';
+        }
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $display ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
+                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
                 <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : '' ?></label>
             </div>
             <?php

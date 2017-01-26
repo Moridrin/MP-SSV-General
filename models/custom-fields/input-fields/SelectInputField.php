@@ -56,7 +56,7 @@ class SelectInputField extends InputField
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -83,9 +83,13 @@ class SelectInputField extends InputField
     public function getHTML()
     {
         $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $class    = !empty($this->class) ? 'class="validate ' . $this->class . '"' : 'class="validate"';
+        $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $disabled = $this->disabled ? 'disabled' : '';
+
+        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+            $disabled = '';
+        }
 
         ob_start();
         if (current_theme_supports('materialize')) {

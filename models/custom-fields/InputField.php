@@ -91,4 +91,18 @@ class InputField extends Field
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
+
+    /**
+     * @param string|array|User|mixed $value
+     */
+    public function setValue($value)
+    {
+        if (is_array($value)) {
+            $this->value = $value[$this->name];
+        } elseif ($value instanceof User) {
+            $this->value = $value->getMeta($this->name);
+        } else {
+            $this->value = $value;
+        }
+    }
 }
