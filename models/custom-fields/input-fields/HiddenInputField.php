@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * Created by PhpStorm.
+ * User: moridrin
+ * Date: 10-1-17
+ * Time: 12:03
+ */
+class HiddenInputField extends InputField
+{
+    const INPUT_TYPE = 'hidden';
+
+    /**
+     * HiddenInputField constructor.
+     *
+     * @param int    $id
+     * @param string $title
+     * @param string $inputType
+     * @param string $name
+     * @param string $class
+     * @param string $style
+     */
+    protected function __construct($id, $title, $inputType, $name, $class, $style)
+    {
+        parent::__construct($id, $title, $inputType, $name, $class, $style);
+    }
+
+    /**
+     * @param string $json
+     *
+     * @return HiddenInputField
+     * @throws Exception
+     */
+    public static function fromJSON($json)
+    {
+        $values = json_decode($json);
+        return new HiddenInputField(
+            $values->id,
+            $values->title,
+            $values->input_type,
+            $values->name,
+            $values->class,
+            $values->style
+        );
+    }
+
+    /**
+     * @param bool $encode
+     *
+     * @return string the class as JSON object.
+     */
+    public function toJSON($encode = true)
+    {
+        $values = array(
+            'id'         => $this->id,
+            'title'      => $this->title,
+            'field_type' => $this->fieldType,
+            'input_type' => $this->inputType,
+            'name'       => $this->name,
+            'class'      => $this->class,
+            'style'      => $this->style,
+        );
+        if ($encode) {
+            $values = json_encode($values);
+        }
+        return $values;
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getHTML()
+    {
+        $name  = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $value = !empty($this->value) ? 'value="' . $this->value . '"' : '';
+
+        ob_start();
+        if (current_theme_supports('materialize')) {
+            ?>
+            <input type="hidden" <?= $name ?> <?= $value ?>/>
+            <?php
+        }
+
+        return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return Message[]|bool array of errors or true if no errors.
+     */
+    public function isValid()
+    {
+        return true;
+    }
+}

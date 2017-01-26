@@ -4,6 +4,7 @@ require_once 'input-fields/TextInputField.php';
 require_once 'input-fields/CheckboxInputField.php';
 require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
+require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
 
 /**
@@ -58,6 +59,8 @@ class InputField extends Field
                 return CheckboxInputField::fromJSON($json);
             case ImageInputField::INPUT_TYPE:
                 return ImageInputField::fromJSON($json);
+            case HiddenInputField::INPUT_TYPE:
+                return HiddenInputField::fromJSON($json);
             default:
                 return CustomInputField::fromJSON($json);
         }
@@ -98,9 +101,13 @@ class InputField extends Field
     public function setValue($value)
     {
         if (is_array($value)) {
-            $this->value = $value[$this->name];
+            if (!isset($value[$this->name])) {
+                $this->value = $value[$this->name];
+            }
         } elseif ($value instanceof User) {
-            $this->value = $value->getMeta($this->name);
+            if (!empty($value->getMeta($this->name))) {
+                $this->value = $value->getMeta($this->name);
+            }
         } else {
             $this->value = $value;
         }
