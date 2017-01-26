@@ -101,15 +101,15 @@ class InputField extends Field
     public function setValue($value)
     {
         if (is_array($value)) {
-            if (!isset($value[$this->name])) {
-                $this->value = $value[$this->name];
+            if (isset($value[$this->name])) {
+                $this->value = SSV_General::sanitize($value[$this->name]);
             }
         } elseif ($value instanceof User) {
             if (!empty($value->getMeta($this->name))) {
-                $this->value = $value->getMeta($this->name);
+                $this->value = SSV_General::sanitize($value->getMeta($this->name));
             }
-        } else {
-            $this->value = $value;
+        } elseif ($value != null) {
+            $this->value = SSV_General::sanitize($value);
         }
     }
 }
