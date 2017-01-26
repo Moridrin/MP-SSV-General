@@ -112,9 +112,9 @@ class CustomInputField extends InputField
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div class="input-field">
-                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+            <div>
                 <label for="<?= $this->id ?>"><?php echo $this->title; ?><?= $this->required ? '*' : '' ?></label>
+                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
             </div>
             <?php
         }
