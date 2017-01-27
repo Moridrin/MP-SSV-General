@@ -27,11 +27,10 @@ class User extends \WP_User
     /**
      * This function searches for a User by its ID.
 
-     *
+*
 *@param int $id is the ID used to find the SSV_User
-
      *
-*@return User|null returns the User it found or null if it can't find one.
+     * @return User|null returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
@@ -58,9 +57,8 @@ class User extends \WP_User
      * @param $username
      * @param $password
      * @param $email
-
      *
-*@return Message|null|User
+     * @return Message|null|User
      */
     public static function register($username, $password, $email)
     {
@@ -118,6 +116,17 @@ class User extends \WP_User
         return wp_check_password($password, $this->data->user_pass, $this->ID);
     }
     #endregion
+
+    /**
+     * This method updates all
+     * @param InputField[] $inputFields
+     */
+    public function update($inputFields)
+    {
+        foreach ($inputFields as $field) {
+            $this->updateMeta($field->name, $field->value);
+        }
+    }
 
     #region updateMeta($meta_key, $value)
     /**
