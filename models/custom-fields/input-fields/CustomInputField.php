@@ -117,6 +117,22 @@ class CustomInputField extends InputField
                 <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
             </div>
             <?php
+            if ($this->inputType == 'date' && $this->required) {
+                ?>
+                <script>
+                    jQuery(function ($) {
+                        var dateField = $('#<?= $this->id ?>');
+                        dateField.change(function () {
+                            if (dateField.val() == '') {
+                                dateField.addClass('invalid')
+                            } else {
+                                dateField.removeClass('invalid')
+                            }
+                        });
+                    });
+                </script>
+                <?php
+            }
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

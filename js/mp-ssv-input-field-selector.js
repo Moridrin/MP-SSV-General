@@ -98,8 +98,12 @@ function getHeaderField(fieldID, values, allowTabs) {
 
     var fieldTitle = '';
     var fieldType = 'header';
-    if (typeof values['title'] !== 'undefined') {
+    var classValue = '';
+    var style = '';
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
+        classValue = values['class'];
+        style = values['style'];
     }
 
     var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
@@ -109,8 +113,8 @@ function getHeaderField(fieldID, values, allowTabs) {
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
-    tr.appendChild(getClass(fieldID, ""));
-    tr.appendChild(getStyle(fieldID, ""));
+    tr.appendChild(getClass(fieldID, classValue));
+    tr.appendChild(getStyle(fieldID, style));
     tr.appendChild(getEnd(fieldID));
 
     container.appendChild(tr);
