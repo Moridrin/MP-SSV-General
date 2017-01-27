@@ -66,7 +66,7 @@ class CustomInputField extends InputField
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -129,22 +129,23 @@ class CustomInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && empty($this->value)) {
-            $errors[] = new Message('This field is required but not set.', Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' field is required but not set.', Message::ERROR_MESSAGE);
         }
-        switch ($this->inputType) {
+        switch (strtolower($this->inputType)) {
             case 'iban':
+                $this->value = str_replace(' ', '', strtoupper($this->value));
                 if (!SSV_General::isValidIBAN($this->value)) {
-                    $errors[] = new Message('This field is not a valid IBAN.', Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', Message::ERROR_MESSAGE);
                 }
                 break;
             case 'email':
                 if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
-                    $errors[] = new Message('This field is not a valid email.', Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid email.', Message::ERROR_MESSAGE);
                 }
                 break;
             case 'url':
                 if (!filter_var($this->value, FILTER_VALIDATE_URL)) {
-                    $errors[] = new Message('This field is not a valid url.', Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid url.', Message::ERROR_MESSAGE);
                 }
                 break;
         }

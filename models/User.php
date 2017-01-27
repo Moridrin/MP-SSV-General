@@ -26,11 +26,10 @@ class User extends \WP_User
     #region By ID
     /**
      * This function searches for a User by its ID.
-
-*
-*@param int $id is the ID used to find the SSV_User
      *
-     * @return User|null returns the User it found or null if it can't find one.
+     * @param int $id is the ID used to find the SSV_User
+     *
+*@return User|null returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
@@ -119,7 +118,8 @@ class User extends \WP_User
 
     /**
      * This method updates all
-     * @param InputField[] $inputFields
+     *
+*@param InputField[] $inputFields
      */
     public function update($inputFields)
     {
@@ -164,13 +164,6 @@ class User extends \WP_User
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return new Message('Cannot change the user-login. Please consider setting the field display to \'disabled\'', Message::NOTIFICATION_MESSAGE); //cannot change user_login
-        } elseif ($meta_key == "iban" || $meta_key == "IBAN") {
-            if (!SSV_General::isValidIBAN($value)) {
-                return new Message('The IBAN is invalid!', Message::ERROR_MESSAGE);
-            } else {
-                update_user_meta($this->ID, $meta_key, $value);
-                return true;
-            }
         } else {
             update_user_meta($this->ID, $meta_key, $value);
             return true;
