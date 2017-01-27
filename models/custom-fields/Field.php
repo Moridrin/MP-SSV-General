@@ -67,7 +67,9 @@ abstract class Field
             $field = Field::fromJSON(get_post_meta($post->ID, self::PREFIX . $id, true));
             if ($field instanceof InputField && is_user_logged_in() && SSV_General::usersPluginActive()) {
                 $user         = User::getCurrent();
-                $field->value = $user ? $user->getMeta($field->name) : '';
+                if ($user != null) {
+                    $field->setValue($user->getMeta($field->name));
+                }
             }
             $fields[] = $field;
         }

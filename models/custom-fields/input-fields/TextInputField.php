@@ -99,7 +99,7 @@ class TextInputField extends InputField
     {
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
-        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $name        = 'name="' . $this->name . '"';
         $class       = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';

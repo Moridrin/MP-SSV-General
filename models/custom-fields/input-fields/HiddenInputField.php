@@ -10,19 +10,25 @@ class HiddenInputField extends InputField
 {
     const INPUT_TYPE = 'hidden';
 
+    /** @var string $defaultValue */
+    public $defaultValue;
+
     /**
      * HiddenInputField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $inputType
      * @param string $name
+     * @param string $defaultValue
      * @param string $class
      * @param string $style
      */
-    protected function __construct($id, $title, $inputType, $name, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $defaultValue, $class, $style)
     {
         parent::__construct($id, $title, $inputType, $name, $class, $style);
+        $this->defaultValue = $defaultValue;
     }
 
     /**
@@ -39,6 +45,7 @@ class HiddenInputField extends InputField
             $values->title,
             $values->input_type,
             $values->name,
+            $values->default_value,
             $values->class,
             $values->style
         );
@@ -52,13 +59,14 @@ class HiddenInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'input_type' => $this->inputType,
-            'name'       => $this->name,
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'            => $this->id,
+            'title'         => $this->title,
+            'field_type'    => $this->fieldType,
+            'input_type'    => $this->inputType,
+            'name'          => $this->name,
+            'default_value' => $this->defaultValue,
+            'class'         => $this->class,
+            'style'         => $this->style,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -71,13 +79,15 @@ class HiddenInputField extends InputField
      */
     public function getHTML()
     {
-        $name  = !empty($this->name) ? 'name="' . $this->name . '"' : '';
-        $value = !empty($this->value) ? 'value="' . $this->value . '"' : '';
+        $name  = 'name="' . $this->name . '"';
+        $value = 'value="' . $this->defaultValue . '"';
+        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
+        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <input type="hidden" <?= $name ?> <?= $value ?>/>
+            <input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> />
             <?php
         }
 

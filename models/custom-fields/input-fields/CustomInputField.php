@@ -96,7 +96,7 @@ class CustomInputField extends InputField
     {
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . $this->inputType . '"';
-        $name        = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $name = 'name="' . $this->name . '"';
         $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';

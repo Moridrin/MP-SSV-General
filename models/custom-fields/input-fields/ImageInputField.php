@@ -85,7 +85,7 @@ class ImageInputField extends InputField
      */
     public function getHTML()
     {
-        $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $name     = 'name="' . $this->name . '"';
         $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $required = $this->required && !empty($this->value) ? 'required' : '';

@@ -26,10 +26,11 @@ class User extends \WP_User
     #region By ID
     /**
      * This function searches for a User by its ID.
+
      *
-     * @param int $id is the ID used to find the SSV_User
+*@param int $id is the ID used to find the SSV_User
      *
-*@return User|null returns the User it found or null if it can't find one.
+     * @return User|null returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
@@ -57,7 +58,7 @@ class User extends \WP_User
      * @param $password
      * @param $email
      *
-     * @return Message|null|User
+     * @return Message|User
      */
     public static function register($username, $password, $email)
     {
@@ -77,6 +78,103 @@ class User extends \WP_User
         );
 
         return self::getByID($id);
+    }
+
+    #endregion
+
+    #region getDefaultFields()
+    public static function getDefaultFields()
+    {
+        #region Username
+        /** @var TextInputField $usernameField */
+        $usernameField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Username',
+                    'field_type'    => 'input',
+                    'input_type'    => 'text',
+                    'name'          => 'username',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => '',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        #region Email
+        /** @var TextInputField $emailField */
+        $emailField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Email',
+                    'field_type'    => 'input',
+                    'input_type'    => 'text',
+                    'name'          => 'email',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => '',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        #region Password
+        /** @var CustomInputField $passwordField */
+        $passwordField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Password',
+                    'field_type'    => 'input',
+                    'input_type'    => 'password',
+                    'name'          => 'password',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => 'validate',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        #region Confirm Password
+        /** @var CustomInputField $confirmPasswordField */
+        $confirmPasswordField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Confirm Password',
+                    'field_type'    => 'input',
+                    'input_type'    => 'password',
+                    'name'          => 'password_confirm',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => 'validate',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        return array(
+            $usernameField->name        => $usernameField,
+            $emailField->name           => $emailField,
+            $passwordField->name        => $passwordField,
+            $confirmPasswordField->name => $confirmPasswordField,
+        );
     }
     #endregion
 
@@ -116,10 +214,11 @@ class User extends \WP_User
     }
     #endregion
 
+    #region update($inputFields)
     /**
      * This method updates all
      *
-*@param InputField[] $inputFields
+     * @param InputField[] $inputFields
      */
     public function update($inputFields)
     {
@@ -127,6 +226,7 @@ class User extends \WP_User
             $this->updateMeta($field->name, $field->value);
         }
     }
+    #endregion
 
     #region updateMeta($meta_key, $value)
     /**

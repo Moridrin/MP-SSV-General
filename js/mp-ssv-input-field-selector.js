@@ -23,6 +23,8 @@ function mp_ssv_add_new_field(fieldType, inputType, fieldID, values, allowTabs) 
             getCheckboxInputField(fieldID, values, allowTabs);
         } else if (inputType == 'image') {
             getImageInputField(fieldID, values, allowTabs);
+        } else if (inputType == 'hidden') {
+            getHiddenInputField(fieldID, values, allowTabs);
         } else {
             getCustomInputField(inputType, fieldID, values, allowTabs);
         }
@@ -214,6 +216,27 @@ function getImageInputField(fieldID, values, allowTabs) {
     tr = getImageInputFields(tr, fieldID, name, required, classValue, style);
     container.appendChild(tr);
 }
+function getHiddenInputField(fieldID, values, allowTabs) {
+    var container = document.getElementById("custom-fields-placeholder");
+
+    var fieldTitle = '';
+    var fieldType = 'input';
+    var name = '';
+    var defaultValue = '';
+    var classValue = '';
+    var style = '';
+    if (Object.keys(values).length > 0) {
+        fieldTitle = values['title'];
+        name = values['name'];
+        defaultValue = values['default_value'];
+        classValue = values['class'];
+        style = values['style'];
+    }
+
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
+    tr = getHiddenInputFields(tr, fieldID, name, defaultValue, classValue, style);
+    container.appendChild(tr);
+}
 function getCustomInputField(inputType, fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
@@ -315,6 +338,18 @@ function getImageInputFields(tr, fieldID, name, required, classValue, style) {
     tr.appendChild(getPreview(fieldID, required));
     tr.appendChild(getRequired(fieldID, required));
     tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getClass(fieldID, classValue));
+    tr.appendChild(getStyle(fieldID, style));
+    tr.appendChild(getEnd(fieldID));
+    return tr;
+}
+function getHiddenInputFields(tr, fieldID, name, defaultValue, classValue, style) {
+    tr.appendChild(getInputType(fieldID, 'hidden'));
+    tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getDefaultValue(fieldID, defaultValue));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getClass(fieldID, classValue));
     tr.appendChild(getStyle(fieldID, style));
@@ -439,9 +474,9 @@ function getText(fieldID, value) {
     return fieldTitleTD;
 }
 function getInputType(fieldID, value) {
-    var options = ["Text", "Select", "Checkbox", "Image", "Custom"];
+    var options = ["Text", "Select", "Checkbox", "Image", "Hidden", "Custom"];
     var customValue = '';
-    if (["text", "select", "checkbox", "image", "custom"].indexOf(value) == -1) {
+    if (["text", "select", "checkbox", "image", "hidden", "custom"].indexOf(value) == -1) {
         customValue = value;
         value = 'custom';
     }
@@ -624,7 +659,7 @@ function getDefaultSelected(fieldID, value) {
     defaultSelected.setAttribute("id", fieldID + "_default_checked");
     defaultSelected.setAttribute("name", "custom_field_" + fieldID + "_default_checked");
     defaultSelected.setAttribute("value", "true");
-    if (value == 'true') {
+    if (value) {
         defaultSelected.setAttribute("checked", "checked");
     }
     var defaultSelectedReset = document.createElement("input");
@@ -798,6 +833,8 @@ function inputTypeChanged(fieldID) {
         getCheckboxInputFields(tr, fieldID, "", "", "", "", "", "")
     } else if (inputType == 'image') {
         getImageInputFields(tr, fieldID, "", "", "", "");
+    } else if (inputType == 'hidden') {
+        getHiddenInputFields(tr, fieldID, "", "", "", "");
     } else {
         getCustomInputFields(tr, fieldID, "", "", "", "", "", "", "");
     }

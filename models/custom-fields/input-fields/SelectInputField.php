@@ -82,7 +82,7 @@ class SelectInputField extends InputField
      */
     public function getHTML()
     {
-        $name     = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $name     = 'name="' . $this->name . '"';
         $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $disabled = $this->disabled ? 'disabled' : '';

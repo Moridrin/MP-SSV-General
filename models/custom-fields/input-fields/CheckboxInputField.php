@@ -91,8 +91,8 @@ class CheckboxInputField extends InputField
      */
     public function getHTML()
     {
-        $isChecked = isset($this->value) ? $this->value : $this->defaultChecked;
-        $name      = !empty($this->name) ? 'name="' . $this->name . '"' : '';
+        $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
+        $name      = 'name="' . $this->name . '"';
         $class     = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate filled-in"';
         $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $disabled  = $this->disabled ? 'disabled' : '';
