@@ -55,9 +55,11 @@ abstract class Field
     /**
      * This function gets all the Fields from the post metadata.
      *
-     * @return Field[]
+     * @param bool $setValues
+     *
+*@return Field[]
      */
-    public static function fromMeta()
+    public static function fromMeta($setValues = true)
     {
         global $post;
         $fieldIDs = get_post_meta($post->ID, self::ID_TAG, true);
@@ -65,9 +67,18 @@ abstract class Field
         $fields   = array();
         foreach ($fieldIDs as $id) {
             $field = Field::fromJSON(get_post_meta($post->ID, self::PREFIX . $id, true));
-            if ($field instanceof InputField && is_user_logged_in() && SSV_General::usersPluginActive()) {
-                $user         = User::getCurrent();
-                if ($user != null) {
+            if ($setValues && is_user_logged_in()) {
+                $user = User::getCurrent();
+                if (isset($_GET['member']) && $user->isBoard()) {
+                    $user = User::getByID($_GET['member']);
+                }
+                if ($field instanceof TabField) {
+                    foreach ($field->fields as $childField) {
+                        if ($childField instanceof InputField) {
+                            $childField->setValue($user->getMeta($childField->name));
+                        }
+                    }
+                } elseif ($field instanceof InputField) {
                     $field->setValue($user->getMeta($field->name));
                 }
             }
@@ -106,10 +117,11 @@ abstract class Field
     #region toJSON($encode = true)
     /**
      * This function creates an array containing all variables of this Field.
+
      *
-     * @param bool $encode can be set to false if it is important not to json_encode the array.
+*@param bool $encode can be set to false if it is important not to json_encode the array.
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     abstract public function toJSON($encode = true);
     #endregion
@@ -118,7 +130,7 @@ abstract class Field
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
      *
-*@return string the field as HTML object.
+     * @return string the field as HTML object.
      */
     abstract public function getHTML();
     #endregion
@@ -126,11 +138,11 @@ abstract class Field
     #region getMaxID($fields)
     /**
      * This function returns the highest ID in all the fields (including all sub-fields)
-
-*
-*@param Field[] $fields
      *
-     * @return int the max ID
+     * @param Field[] $fields
+
+     *
+*@return int the max ID
      */
     public static function getMaxID($fields)
     {
