@@ -30,11 +30,12 @@ class TabField extends Field
     }
 
     /**
+     * @param int   $id
      * @param Field $field
      */
-    public function addField($field)
+    public function addField($id, $field)
     {
-        $this->fields[] = $field;
+        $this->fields[$id] = $field;
     }
 
     /**
