@@ -100,14 +100,33 @@ class InputField extends Field
      */
     public function setValue($value)
     {
-        if (is_array($value)) {
+        if ($this instanceof HiddenInputField) {
+            return; //Can't change the value of hidden fields.
+        }
+        if ($value instanceof User) { //User values can always be set (even if isDisabled())
+            $this->value = SSV_General::sanitize($value->getMeta($this->name));
+        } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
                 $this->value = SSV_General::sanitize($value[$this->name]);
             }
-        } elseif ($value instanceof User) {
-            $this->value = SSV_General::sanitize($value->getMeta($this->name));
         } else {
             $this->value = SSV_General::sanitize($value);
+        }
+    }
+
+    /**
+     * @return bool returns if the field is disabled or not.
+     */
+    public function isDisabled()
+    {
+        if ($this instanceof CheckboxInputField
+            || $this instanceof CustomInputField
+            || $this instanceof SelectInputField
+            || $this instanceof TextInputField
+        ) {
+            return $this->disabled;
+        } else {
+            return false;
         }
     }
 }

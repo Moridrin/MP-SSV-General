@@ -300,7 +300,7 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            return stripslashes(get_user_meta($this->ID, $meta_key, true));
+            return get_user_meta($this->ID, $meta_key, true);
         }
     }
     #endregion
