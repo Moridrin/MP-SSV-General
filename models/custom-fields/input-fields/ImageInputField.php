@@ -90,7 +90,7 @@ class ImageInputField extends InputField
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $required = $this->required && !empty($this->value) ? 'required' : '';
 
-        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+        if (is_user_logged_in() && User::isBoard()) {
             $required = '';
         }
 

@@ -87,7 +87,7 @@ class SelectInputField extends InputField
         $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $disabled = $this->disabled ? 'disabled' : '';
 
-        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+        if (is_user_logged_in() && User::isBoard()) {
             $disabled = '';
         }
 

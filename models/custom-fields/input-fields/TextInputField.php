@@ -107,7 +107,7 @@ class TextInputField extends InputField
         $disabled    = $this->disabled ? 'disabled' : '';
         $required    = $this->required == "true" ? 'required' : '';
 
-        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+        if (is_user_logged_in() && User::isBoard()) {
             $disabled = '';
             $required = '';
         }

@@ -99,7 +99,7 @@ class CheckboxInputField extends InputField
         $required  = $this->required ? 'required' : '';
         $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
 
-        if (is_user_logged_in() && User::getCurrent()->isBoard()) {
+        if (is_user_logged_in() && User::isBoard()) {
             $disabled = '';
             $required = '';
         }

@@ -105,10 +105,8 @@ class InputField extends Field
                 $this->value = SSV_General::sanitize($value[$this->name]);
             }
         } elseif ($value instanceof User) {
-            if (!empty($value->getMeta($this->name))) {
-                $this->value = SSV_General::sanitize($value->getMeta($this->name));
-            }
-        } elseif ($value != null) {
+            $this->value = SSV_General::sanitize($value->getMeta($this->name));
+        } else {
             $this->value = SSV_General::sanitize($value);
         }
     }

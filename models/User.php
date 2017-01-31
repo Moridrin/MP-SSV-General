@@ -27,25 +27,28 @@ class User extends \WP_User
     /**
      * This function searches for a User by its ID.
 
-     *
+*
 *@param int $id is the ID used to find the SSV_User
      *
-     * @return User|null returns the User it found or null if it can't find one.
+     * @return User|false returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
         if ($id == null) {
-            return null;
+            return false;
         }
         return new User(get_user_by('id', $id));
     }
     #endregion
 
     #region Current
+    /**
+     * @return bool|User
+     */
     public static function getCurrent()
     {
         if (!is_user_logged_in()) {
-            return null;
+            return false;
         }
         return new User(wp_get_current_user());
     }
@@ -196,9 +199,13 @@ class User extends \WP_User
     /**
      * @return bool true if this user has the board role (and can edit other member profiles).
      */
-    public function isBoard()
+    public static function isBoard()
     {
-        return in_array(get_option(SSV_General::OPTION_BOARD_ROLE), $this->roles);
+        $user = User::getCurrent();
+        if (!$user) {
+            return false;
+        }
+        return in_array(get_option(SSV_General::OPTION_BOARD_ROLE), $user->roles);
     }
     #endregion
 
