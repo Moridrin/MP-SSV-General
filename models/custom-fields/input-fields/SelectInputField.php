@@ -115,7 +115,7 @@ class SelectInputField extends InputField
     {
         $errors = array();
         if (!$this->disabled && (empty($this->value) || !in_array($this->value, $this->options))) {
-            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', Message::ERROR_MESSAGE);
+            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

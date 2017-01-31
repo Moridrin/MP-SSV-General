@@ -7,6 +7,7 @@ class Message
 {
     const NOTIFICATION_MESSAGE = 'notification';
     const ERROR_MESSAGE = 'error';
+    const SOFT_ERROR_MESSAGE = 'soft-error';
 
     public $message;
     public $type;
@@ -33,8 +34,22 @@ class Message
 
     public function getHTML()
     {
+        switch ($this->type) {
+            case Message::SOFT_ERROR_MESSAGE: {
+                $class = '';
+                break;
+            }
+            case Message::ERROR_MESSAGE: {
+                $class = 'error';
+                break;
+            }
+            case Message::NOTIFICATION_MESSAGE:
+            default: {
+                $class = 'success';
+                break;
+            }
+        }
         ob_start();
-        $class = $this->type == Message::NOTIFICATION_MESSAGE ? 'primary' : 'red';
         ?>
         <div class="col s12 card-panel <?php echo $class; ?>" style="padding: 10px;">
             <?php echo $this->message; ?>

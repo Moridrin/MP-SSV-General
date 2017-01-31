@@ -247,7 +247,7 @@ class Form
     /**
      * @param int|null $tabID if set it will only check the fields inside that tab.
      *
-*@return array|bool array of errors or true if no errors.
+     * @return array|bool array of errors or true if no errors.
      */
     public function isValid($tabID = null)
     {
@@ -271,54 +271,56 @@ class Form
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
+
      *
-     * @param int|null $tabID if set it will only save the fields inside that tab.
+*@param int|null $tabID if set it will only save the fields inside that tab.
      *
-     * @return Message[]
+     * @return Message[]|true
      */
     public function save($tabID = null)
     {
-        $messages = array();
-        $this->loopRecursive(
+        $messages = $this->loopRecursive(
             function ($field) {
                 if ($field instanceof InputField) {
                     if (!$field->isDisabled() || User::isBoard()) {
-                        $messages[] = $this->user->updateMeta($field->name, $field->value);
+                        return $this->user->updateMeta($field->name, $field->value);
                     }
                 }
+                return true;
             },
             $tabID
         );
-        if (empty($messages)) {
-            $messages[] = new Message('Saved successful.', Message::NOTIFICATION_MESSAGE);
-        }
-        return $messages;
+        $messages = array_diff($messages, array(true));
+        return empty($messages) ? true : $messages;
     }
     #endregion
 
     #region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
-
      *
-*@param callable $callback The function to be called with the field as parameter.
-     * @param int|null $tabID if set it will only run the callback on the fields inside that tab.
+     * @param callable $callback The function to be called with the field as parameter.
+     * @param int|null $tabID    if set it will only run the callback on the fields inside that tab.
+     *
+     * @return array
      */
     public function loopRecursive($callback, $tabID = null)
     {
+        $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
             if ($tabID === null) {
-                $callback($field);
+                $return[] = $callback($field);
             } elseif ($field->id != $tabID) {
                 continue;
             }
             if ($field instanceof TabField) {
                 foreach ($field->fields as $childField) {
-                    $callback($childField);
+                    $return[] = $callback($childField);
                 }
             }
         }
+        return $return;
     }
     #endregion
 }

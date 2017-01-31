@@ -252,6 +252,9 @@ class User extends \WP_User
     function updateMeta($meta_key, $value)
     {
         $value = SSV_General::sanitize($value);
+        if ($this->getMeta($meta_key) == $value) {
+            return true;
+        }
         if ($meta_key == "email" || $meta_key == "email_address" || $meta_key == "user_email" || $meta_key == "member_email") {
             wp_update_user(array('ID' => $this->ID, 'user_email' => $value));
             update_user_meta($this->ID, 'user_email', $value);
@@ -270,7 +273,7 @@ class User extends \WP_User
             $this->display_name = $display_name;
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
-            return new Message('Cannot change the user-login. Please consider setting the field display to \'disabled\'', Message::NOTIFICATION_MESSAGE); //cannot change user_login
+            return new Message('Cannot change the user-login.', Message::ERROR_MESSAGE); //cannot change user_login
         } else {
             update_user_meta($this->ID, $meta_key, $value);
             return true;

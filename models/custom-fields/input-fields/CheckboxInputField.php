@@ -125,8 +125,17 @@ class CheckboxInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && (empty($this->value) || !is_bool($this->value) || !$this->value)) {
-            $errors[] = new Message($this->title . ' is required but not set.', Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
+    }
+
+    /**
+     * @param string|array|User|mixed $value
+     */
+    public function setValue($value)
+    {
+        parent::setValue($value);
+        $this->value = filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
     }
 }
