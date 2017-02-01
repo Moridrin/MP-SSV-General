@@ -15,9 +15,8 @@ class HiddenInputField extends InputField
 
     /**
      * HiddenInputField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $inputType
      * @param string $name
@@ -79,6 +78,9 @@ class HiddenInputField extends InputField
      */
     public function getHTML()
     {
+        if ($this->defaultValue == 'NOW') {
+            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
+        }
         $name  = 'name="' . $this->name . '"';
         $value = 'value="' . $this->defaultValue . '"';
         $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';

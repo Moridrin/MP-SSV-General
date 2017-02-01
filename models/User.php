@@ -26,11 +26,10 @@ class User extends \WP_User
     #region By ID
     /**
      * This function searches for a User by its ID.
-
-*
-*@param int $id is the ID used to find the SSV_User
      *
-     * @return User|false returns the User it found or null if it can't find one.
+     * @param int $id is the ID used to find the SSV_User
+     *
+*@return User|false returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
@@ -88,6 +87,24 @@ class User extends \WP_User
     #region getDefaultFields()
     public static function getDefaultFields()
     {
+        #region Registration Date
+        /** @var HiddenInputField $registrationDateField */
+        $registrationDateField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Registration Date',
+                    'field_type'    => 'input',
+                    'input_type'    => 'hidden',
+                    'name'          => 'registration_date',
+                    'default_value' => 'NOW',
+                    'class'         => '',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
         #region Username
         /** @var TextInputField $usernameField */
         $usernameField = Field::fromJSON(
@@ -173,10 +190,11 @@ class User extends \WP_User
         #endregion
 
         return array(
-            $usernameField->name        => $usernameField,
-            $emailField->name           => $emailField,
-            $passwordField->name        => $passwordField,
-            $confirmPasswordField->name => $confirmPasswordField,
+            $registrationDateField->name => $registrationDateField,
+            $usernameField->name         => $usernameField,
+            $emailField->name            => $emailField,
+            $passwordField->name         => $passwordField,
+            $confirmPasswordField->name  => $confirmPasswordField,
         );
     }
     #endregion

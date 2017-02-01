@@ -94,6 +94,9 @@ class CustomInputField extends InputField
      */
     public function getHTML()
     {
+        if ($this->defaultValue == 'NOW') {
+            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
+        }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . $this->inputType . '"';
         $name = 'name="' . $this->name . '"';
