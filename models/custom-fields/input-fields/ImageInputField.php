@@ -59,7 +59,7 @@ class ImageInputField extends InputField
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -98,7 +98,10 @@ class ImageInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div style="padding-top: 10px;">
-                <label for="<?= $this->id ?>"><?= $this->title ?><?= $this->required ? '*' : '' ?></label>
+                <label for="<?= $this->id ?>"><?= $this->title ?><?= $this->required ? '*' : '' ?></label><br/>
+                <?php if ($this->preview): ?>
+                    <img src="<?= $this->value ?>" <?= $class ?> <?= $style ?>/>
+                <?php endif; ?>
                 <div class="file-field input-field">
                     <div class="btn">
                         <span>Image</span>
@@ -109,9 +112,6 @@ class ImageInputField extends InputField
                     </div>
                 </div>
             </div>
-            <?php if ($this->preview): ?>
-                <img src=""/>
-            <?php endif; ?>
             <?php
         }
 

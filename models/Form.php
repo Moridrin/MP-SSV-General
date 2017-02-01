@@ -208,7 +208,7 @@ class Form
         if (empty($tabs)) {
             ob_start();
             ?>
-            <form action="<?= http_build_query($_GET) ?>" method="POST">
+            <form action="<?= http_build_query($_GET) ?>" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
                 <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
                 <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
@@ -224,7 +224,7 @@ class Form
                 ob_start();
                 ?>
                 <div id="<?= $tab->name ?>">
-                    <form action="<?= http_build_query($_GET) ?>" method="POST">
+                    <form action="<?= http_build_query($_GET) ?>" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="<?= $tab->id ?>">
                         <?php foreach ($tab->fields as $childField): ?>
                             <?= $childField->getHTML() ?>
@@ -271,13 +271,15 @@ class Form
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
+
      *
-     * @param int|null $tabID if set it will only save the fields inside that tab.
+*@param int|null $tabID if set it will only save the fields inside that tab.
      *
-*@return Message[]|true
+     * @return Message[]
      */
     public function save($tabID = null)
     {
+        //Fields
         $messages = $this->loopRecursive(
             function ($field) {
                 if ($field instanceof InputField) {
@@ -289,8 +291,24 @@ class Form
             },
             $tabID
         );
+
+        //Files
+        foreach ($_FILES as $name => $file) {
+            if (!function_exists('wp_handle_upload')) {
+                require_once(ABSPATH . 'wp-admin/includes/file.php');
+            }
+            $overrides     = array('test_form' => false, 'mimes' => array('jpg' => 'image/jpg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif', 'png' => 'image/png'));
+            $file_location = wp_handle_upload($file, $overrides);
+            if ($file_location && !isset($file_location['error'])) {
+                $this->user->updateMeta($name, $file_location["url"]);
+                $this->user->updateMeta($name . '_path', $file_location["file"]);
+            } else {
+                $messages[] = new Message($file_location['error'], Message::ERROR_MESSAGE);
+            }
+        }
+
         $messages = array_diff($messages, array(true));
-        return empty($messages) ? true : $messages;
+        return $messages;
     }
     #endregion
 
@@ -322,12 +340,12 @@ class Form
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
 
-     *
-*@param callable       $callback The function to be called with the field as parameter.
+*
+     * @param callable $callback The function to be called with the field as parameter.
      * @param int|null $tabID    if set it will only run the callback on the fields inside that tab.
      * @param array    $args
      *
-*@return array
+     * @return array
      */
     public function loopRecursive($callback, $tabID = null, $args = array())
     {
