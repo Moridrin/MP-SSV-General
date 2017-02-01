@@ -271,11 +271,10 @@ class Form
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
-
      *
-*@param int|null $tabID if set it will only save the fields inside that tab.
+     * @param int|null $tabID if set it will only save the fields inside that tab.
      *
-     * @return Message[]|true
+*@return Message[]|true
      */
     public function save($tabID = null)
     {
@@ -295,28 +294,54 @@ class Form
     }
     #endregion
 
+    #region getValue($name)
+    /**
+     * @param string $name of the field to return the value
+     *
+     * @return $string|null
+     */
+    public function getValue($name)
+    {
+        $values = $this->loopRecursive(
+            function ($field, $args) {
+                if ($field instanceof InputField) {
+                    if ($field->name == $args['field_name']) {
+                        return $field->value;
+                    }
+                }
+            },
+            null,
+            array('field_name' => $name)
+        );
+        $values = array_diff($values, array(null));
+        return count($values) ? reset($values) : null;
+    }
+    #endregion
+
     #region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
+
      *
-     * @param callable $callback The function to be called with the field as parameter.
+*@param callable       $callback The function to be called with the field as parameter.
      * @param int|null $tabID    if set it will only run the callback on the fields inside that tab.
+     * @param array    $args
      *
-     * @return array
+*@return array
      */
-    public function loopRecursive($callback, $tabID = null)
+    public function loopRecursive($callback, $tabID = null, $args = array())
     {
         $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
             if ($tabID === null) {
-                $return[] = $callback($field);
+                $return[] = $callback($field, $args);
             } elseif ($field->id != $tabID) {
                 continue;
             }
             if ($field instanceof TabField) {
                 foreach ($field->fields as $childField) {
-                    $return[] = $callback($childField);
+                    $return[] = $callback($childField, $args);
                 }
             }
         }
