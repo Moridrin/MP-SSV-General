@@ -24,7 +24,7 @@ if (!class_exists('SSV_General')) {
     global $wpdb;
     define('SSV_GENERAL_PATH', plugin_dir_path(__FILE__));
     define('SSV_GENERAL_URL', plugins_url() . '/' . plugin_basename(__DIR__));
-    define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
+    define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
     require_once 'SSV_General.php';
 
     SSV_General::_init();

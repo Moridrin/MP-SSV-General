@@ -282,7 +282,7 @@ class Form
         //Fields
         $messages = $this->loopRecursive(
             function ($field) {
-                if ($field instanceof InputField) {
+                if ($field instanceof InputField && !$field instanceof ImageInputField) {
                     if (!$field->isDisabled() || User::isBoard()) {
                         return $this->user->updateMeta($field->name, $field->value);
                     }
@@ -294,16 +294,24 @@ class Form
 
         //Files
         foreach ($_FILES as $name => $file) {
+            if ($file['size'] == 0) {
+                continue;
+            }
             if (!function_exists('wp_handle_upload')) {
                 require_once(ABSPATH . 'wp-admin/includes/file.php');
             }
             $overrides     = array('test_form' => false, 'mimes' => array('jpg' => 'image/jpg', 'jpeg' => 'image/jpeg', 'gif' => 'image/gif', 'png' => 'image/png'));
             $file_location = wp_handle_upload($file, $overrides);
             if ($file_location && !isset($file_location['error'])) {
+                $currentURL      = $this->user->getMeta($name);
+                $currentLocation = $this->user->getMeta($name . '_path');
+                if ($currentURL != '' && starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
+                    unlink($currentLocation);
+                }
                 $this->user->updateMeta($name, $file_location["url"]);
                 $this->user->updateMeta($name . '_path', $file_location["file"]);
             } else {
-                $messages[] = new Message($file_location['error'], Message::ERROR_MESSAGE);
+                $messages[] = new Message($file_location['error'], User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
             }
         }
 
