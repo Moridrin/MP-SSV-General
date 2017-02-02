@@ -28,6 +28,9 @@ class HiddenInputField extends InputField
     {
         parent::__construct($id, $title, $inputType, $name, $class, $style);
         $this->defaultValue = $defaultValue;
+        if ($this->defaultValue == 'NOW') {
+            $this->value = (new DateTime('NOW'))->format('Y-m-d');
+        }
     }
 
     /**
@@ -78,11 +81,8 @@ class HiddenInputField extends InputField
      */
     public function getHTML()
     {
-        if ($this->defaultValue == 'NOW') {
-            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
-        }
         $name  = 'name="' . $this->name . '"';
-        $value = 'value="' . $this->defaultValue . '"';
+        $value = 'value="' . $this->value . '"';
         $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
 

@@ -271,17 +271,20 @@ class Form
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
+
      *
-     * @param int|null $tabID if set it will only save the fields inside that tab.
+*@param int|null $tabID if set it will only save the fields inside that tab.
      *
-*@return Message[]
+     * @return Message[]
      */
     public function save($tabID = null)
     {
         //Fields
         $messages = $this->loopRecursive(
             function ($field) {
-                if ($field instanceof InputField && !$field instanceof ImageInputField) {
+                if ($field instanceof ImageInputField) {
+                    //Do Nothing
+                } elseif ($field instanceof InputField) {
                     if (!$field->isDisabled() || User::isBoard()) {
                         return $this->user->updateMeta($field->name, $field->value);
                     }
@@ -347,13 +350,13 @@ class Form
     #region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
-     *
-*@param callable $callback The function to be called with the field as parameter.
+
+*
+     * @param callable $callback The function to be called with the field as parameter.
      * @param int|null $tabID    if set it will only run the callback on the fields inside that tab.
      * @param array    $args
-
      *
-*@return array
+     * @return array
      */
     public function loopRecursive($callback, $tabID = null, $args = array())
     {
