@@ -47,7 +47,7 @@ class Form
     public static function fromMeta($setValues = true)
     {
         global $post;
-        $fieldIDs = get_post_meta($post->ID, Field::ID_TAG, true);
+        $fieldIDs = get_post_meta($post->ID, Field::CUSTOM_FIELD_IDS_META, true);
         $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
         $form     = new Form();
         foreach ($fieldIDs as $id) {

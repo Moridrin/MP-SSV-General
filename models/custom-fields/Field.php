@@ -15,7 +15,7 @@ abstract class Field
 {
     #region Constants
     const PREFIX = 'custom_field_';
-    const ID_TAG = 'custom_field_ids';
+    const CUSTOM_FIELD_IDS_META = 'custom_field_ids';
     #endregion
 
     #region Variables

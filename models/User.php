@@ -26,10 +26,11 @@ class User extends \WP_User
     #region By ID
     /**
      * This function searches for a User by its ID.
+
      *
-     * @param int $id is the ID used to find the SSV_User
+*@param int $id is the ID used to find the SSV_User
      *
-*@return User|false returns the User it found or null if it can't find one.
+     * @return User|false returns the User it found or null if it can't find one.
      */
     public static function getByID($id)
     {
@@ -348,8 +349,8 @@ class User extends \WP_User
      */
     public function getProfileURL()
     {
-        $url = get_edit_user_link();
-        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url);
+        $url = get_edit_user_link($this->ID);
+        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
     }
     #endregion
