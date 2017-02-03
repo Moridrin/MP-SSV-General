@@ -346,6 +346,30 @@ class Form
     }
     #endregion
 
+    #region getInputFieldProperty($_property)
+    /**
+     * @param string $_property
+     *
+     * @return string[] array of all properties for the fields that have that property
+     */
+    public function getInputFieldProperty($_property)
+    {
+        global $property;
+        $property   = $_property;
+        $properties = $this->loopRecursive(
+            function ($field) {
+                global $property;
+                if (isset($field->$property)) {
+                    return $field->$property;
+                }
+                return null;
+            }
+        );
+        $properties = array_diff($properties, array(null));
+        return $properties;
+    }
+    #endregion
+
     #region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
