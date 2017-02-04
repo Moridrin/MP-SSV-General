@@ -42,7 +42,7 @@ class Form
      *
      * @param bool $setValues
      *
-     * @return Form
+     * @return Form|Message
      */
     public static function fromMeta($setValues = true)
     {
@@ -50,14 +50,22 @@ class Form
         $fieldIDs = get_post_meta($post->ID, Field::CUSTOM_FIELD_IDS_META, true);
         $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
         $form     = new Form();
+        if ($setValues) {
+            if (isset($_GET['member']) && User::isBoard()) {
+                $user = User::getByID($_GET['member']);
+                if (!$user) {
+                    echo (new Message('User not found.', Message::ERROR_MESSAGE))->getHTML();
+                    return $form;
+                }
+            } else {
+                $user = User::getCurrent();
+            }
+        } else {
+            $user = false;
+        }
         foreach ($fieldIDs as $id) {
             $field = Field::fromJSON(get_post_meta($post->ID, Field::PREFIX . $id, true));
-            if ($setValues && is_user_logged_in()) {
-                if (isset($_GET['member']) && User::isBoard()) {
-                    $user = User::getByID($_GET['member']);
-                } else {
-                    $user = User::getCurrent();
-                }
+            if ($user) {
                 if ($field instanceof TabField) {
                     foreach ($field->fields as $childField) {
                         if ($childField instanceof InputField) {
@@ -373,7 +381,7 @@ class Form
     {
         global $hidePasswordFields;
         $hidePasswordFields = $_hidePasswordFields;
-        $rows = $this->loopRecursive(
+        $rows               = $this->loopRecursive(
             function ($field) {
                 if ($field instanceof TabField) {
                     return '<tr><td colspan="2"><h1>' . $field->title . '</h1></td></tr>';

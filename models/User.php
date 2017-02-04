@@ -37,7 +37,11 @@ class User extends \WP_User
         if ($id == null) {
             return false;
         }
-        return new User(get_user_by('id', $id));
+        $user = new User(get_user_by('id', $id));
+        if ($user->ID != $id) {
+            return false;
+        }
+        return $user;
     }
     #endregion
 
