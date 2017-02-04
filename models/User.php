@@ -224,7 +224,8 @@ class User extends \WP_User
         if (!$user) {
             return false;
         }
-        return in_array(get_option(SSV_General::OPTION_BOARD_ROLE), $user->roles);
+        $boardRole = get_option(SSV_General::OPTION_BOARD_ROLE);
+        return in_array($boardRole, $user->roles);
     }
     #endregion
 

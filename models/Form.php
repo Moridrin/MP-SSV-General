@@ -341,7 +341,6 @@ class Form
             null,
             array('field_name' => $name)
         );
-        $values = array_diff($values, array(null));
         return count($values) ? reset($values) : null;
     }
     #endregion
@@ -365,10 +364,39 @@ class Form
                 return null;
             }
         );
-        $properties = array_diff($properties, array(null));
         return $properties;
     }
+
     #endregion
+
+    public function getEmail($_hidePasswordFields = true)
+    {
+        global $hidePasswordFields;
+        $hidePasswordFields = $_hidePasswordFields;
+        $rows = $this->loopRecursive(
+            function ($field) {
+                if ($field instanceof TabField) {
+                    return '<tr><td colspan="2"><h1>' . $field->title . '</h1></td></tr>';
+                } elseif ($field instanceof HeaderField) {
+                    return '<tr><td colspan="2"><h3>' . $field->title . '</h3></td></tr>';
+                } elseif ($field instanceof InputField) {
+                    if ($field->name == 'password_confirm') {
+                        return null;
+                    }
+                    global $hidePasswordFields;
+                    if ($hidePasswordFields && $field->name == 'password') {
+                        return '<tr><td>' . $field->title . '</td><td>********</td></tr>';
+                    } else {
+                        return '<tr><td>' . $field->title . '</td><td>' . $field->value . '</td></tr>';
+                    }
+                } elseif ($field instanceof LabelField) {
+                    return '<tr><td>' . $field->text . '</td></tr>';
+                }
+                return null;
+            }
+        );
+        return '<table>' . implode('', $rows) . '</table>';
+    }
 
     #region loopRecursive($callback)
     /**
@@ -396,6 +424,7 @@ class Form
                 }
             }
         }
+        $return = array_diff($return, array(null));
         return $return;
     }
     #endregion
