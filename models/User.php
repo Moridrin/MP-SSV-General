@@ -26,9 +26,8 @@ class User extends \WP_User
     #region By ID
     /**
      * This function searches for a User by its ID.
-
      *
-*@param int $id is the ID used to find the SSV_User
+     * @param int $id is the ID used to find the SSV_User
      *
      * @return User|false returns the User it found or null if it can't find one.
      */
@@ -200,6 +199,58 @@ class User extends \WP_User
             $emailField->name            => $emailField,
             $passwordField->name         => $passwordField,
             $confirmPasswordField->name  => $confirmPasswordField,
+        );
+    }
+    #endregion
+
+    #region getLoginFields()
+    public static function getLoginFields()
+    {
+        #region Username
+        /** @var TextInputField $usernameField */
+        $usernameField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Username',
+                    'field_type'    => 'input',
+                    'input_type'    => 'text',
+                    'name'          => 'username',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => '',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        #region Password
+        /** @var CustomInputField $passwordField */
+        $passwordField = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Password',
+                    'field_type'    => 'input',
+                    'input_type'    => 'password',
+                    'name'          => 'password',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => 'validate',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        return array(
+            $usernameField->name => $usernameField,
+            $passwordField->name => $passwordField,
         );
     }
     #endregion

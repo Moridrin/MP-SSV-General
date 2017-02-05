@@ -18,6 +18,9 @@ class SSV_General
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
     const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
+    const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
+    const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
+
     const OPTION_BOARD_ROLE = 'ssv_general__board_role';
     const OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
@@ -243,17 +246,24 @@ class SSV_General
 
     public static function eventsPluginActive()
     {
-        return function_exists('mp_ssv_events_register_plugin');
+        require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        return is_plugin_active('ssv-events/ssv-events.php');
     }
 
     public static function usersPluginActive()
     {
-        return function_exists('mp_ssv_users_register_plugin');
+        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        if (is_plugin_active('ssv-users/ssv-users.php')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static function mailchimpPluginActive()
     {
-        return function_exists('mp_ssv_mailchimp_register_plugin');
+        require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        return is_plugin_active('ssv-mailchimp/ssv-mailchimp.php');
     }
     #endregion
 
