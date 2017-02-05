@@ -46,10 +46,13 @@ class Form
      */
     public static function fromMeta($setValues = true)
     {
+        $form     = new Form();
         global $post;
+        if (!$post) {
+            return $form;
+        }
         $fieldIDs = get_post_meta($post->ID, Field::CUSTOM_FIELD_IDS_META, true);
         $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
-        $form     = new Form();
         if ($setValues) {
             if (isset($_GET['member']) && User::isBoard()) {
                 $user = User::getByID($_GET['member']);
@@ -359,7 +362,7 @@ class Form
      *
      * @return string[] array of all properties for the fields that have that property
      */
-    public function getInputFieldProperty($_property)
+    public function getFieldProperty($_property)
     {
         global $property;
         $property   = $_property;
