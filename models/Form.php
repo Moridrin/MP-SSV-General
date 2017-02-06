@@ -40,14 +40,17 @@ class Form
     /**
      * This function gets all the Fields from the post metadata.
      *
-     * @param bool $setValues
+     * @param bool         $setValues
+     * @param WP_Post|null $post
      *
      * @return Form|Message
      */
-    public static function fromDatabase($setValues = true)
+    public static function fromDatabase($setValues = true, $post = null)
     {
         $form = new Form();
-        global $post;
+        if ($post == null) {
+            global $post;
+        }
         if (!$post) {
             return $form;
         }
