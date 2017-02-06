@@ -25,7 +25,28 @@ if (!class_exists('SSV_General')) {
     define('SSV_GENERAL_PATH', plugin_dir_path(__FILE__));
     define('SSV_GENERAL_URL', plugins_url() . '/' . plugin_basename(__DIR__));
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
+    define('SSV_GENERAL_CUSTOM_FIELDS_TABLE', $wpdb->prefix . "ssv_general_custom_fields");
     require_once 'SSV_General.php';
 
     SSV_General::_init();
+
+    #region Register
+    function mp_ssv_general_register_plugin()
+    {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $table_name = SSV_General::CUSTOM_FIELDS_TABLE;
+        $sql
+                    = "
+		CREATE TABLE IF NOT EXISTS $table_name (
+			ID bigint(20) NOT NULL AUTO_INCREMENT,
+			postID bigint(20) NOT NULL,
+			customField TEXT NOT NULL,
+			PRIMARY KEY (ID)
+		) $charset_collate;";
+        $wpdb->query($sql);
+    }
+    #endregion
 }

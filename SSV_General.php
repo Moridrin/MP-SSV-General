@@ -11,6 +11,7 @@ class SSV_General
     #region Constants
     const PATH = SSV_GENERAL_PATH;
     const URL = SSV_GENERAL_URL;
+    const CUSTOM_FIELDS_TABLE = SSV_GENERAL_CUSTOM_FIELDS_TABLE;
 
     const BASE_URL = SSV_GENERAL_BASE_URL;
 
