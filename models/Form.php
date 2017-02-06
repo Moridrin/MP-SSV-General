@@ -478,7 +478,7 @@ class Form
         $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
-            if (isset($tabID) && $tabID >= 0 && $field->id != $tabID) {
+            if (isset($tabID) && $field->id != $tabID) {
                 continue;
             }
             if ($field instanceof TabField) {
