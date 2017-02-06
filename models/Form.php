@@ -46,7 +46,7 @@ class Form
      */
     public static function fromMeta($setValues = true)
     {
-        $form     = new Form();
+        $form = new Form();
         global $post;
         if (!$post) {
             return $form;
@@ -98,9 +98,9 @@ class Form
             return;
         }
         if ($atEnd) {
-            $this->fields = $this->fields + $fields;
+            $this->fields = array_merge($this->fields, $fields);
         } else {
-            $this->fields = $fields + $this->fields;
+            $this->fields = array_merge($fields, $this->fields);
         }
     }
     #endregion
@@ -252,6 +252,25 @@ class Form
         }
         return $html;
     }
+
+    #endregion
+
+    #region getInputFields()
+    /**
+     * @return InputField[]
+     */
+    public function getInputFields()
+    {
+        return $this->loopRecursive(
+            function ($field) {
+                if ($field instanceof InputField) {
+                    return $field;
+                } else {
+                    return null;
+                }
+            }
+        );
+    }
     #endregion
 
     #region isValid($tabId)
@@ -380,6 +399,12 @@ class Form
 
     #endregion
 
+    #region getEmail($_hidePasswordFields)
+    /**
+     * @param bool $_hidePasswordFields if true, the passwords will be replaced with ******.
+     *
+     * @return string email body in HTML.
+     */
     public function getEmail($_hidePasswordFields = true)
     {
         global $hidePasswordFields;
@@ -408,6 +433,7 @@ class Form
         );
         return '<table>' . implode('', $rows) . '</table>';
     }
+    #endregion
 
     #region loopRecursive($callback)
     /**

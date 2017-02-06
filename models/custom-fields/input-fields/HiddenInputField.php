@@ -82,7 +82,7 @@ class HiddenInputField extends InputField
     public function getHTML()
     {
         $name  = 'name="' . $this->name . '"';
-        $value = 'value="' . $this->value . '"';
+        $value = 'value="' . $this->defaultValue . '"';
         $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
 

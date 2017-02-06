@@ -46,8 +46,8 @@ abstract class Field
         $this->id        = $id;
         $this->title     = $title;
         $this->fieldType = $fieldType;
-        $this->class = $class;
-        $this->style = $style;
+        $this->class     = $class;
+        $this->style     = $style;
     }
     #endregion
 
@@ -83,7 +83,7 @@ abstract class Field
      *
      * @param bool $encode can be set to false if it is important not to json_encode the array.
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     abstract public function toJSON($encode = true);
     #endregion
@@ -100,9 +100,8 @@ abstract class Field
     #region getMaxID($fields)
     /**
      * This function returns the highest ID in all the fields (including all sub-fields)
-
      *
-*@param Field[] $fields
+     * @param Field[] $fields
      *
      * @return int the max ID
      */
@@ -120,4 +119,9 @@ abstract class Field
         return $maxID;
     }
     #endregion
+
+
+    public function __toString() {
+        return $this->getHTML();
+    }
 }

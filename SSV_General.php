@@ -265,6 +265,11 @@ class SSV_General
         require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
         return is_plugin_active('ssv-mailchimp/ssv-mailchimp.php');
     }
+
+    public static function getLoginURL()
+    {
+        return site_url() . '/login';
+    }
     #endregion
 
     #endregion
