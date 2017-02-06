@@ -340,6 +340,9 @@ class Form
                     //Do Nothing
                 } elseif ($field instanceof InputField) {
                     if (!$field->isDisabled() || User::isBoard()) {
+                        if (is_bool($field->value)) {
+                            $field->value = $field->value ? 'true' : 'false';
+                        }
                         return $this->user->updateMeta($field->name, $field->value);
                     }
                 }
@@ -475,15 +478,15 @@ class Form
         $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
-            if ($tabID === null) {
-                $return[] = $callback($field, $args);
-            } elseif ($field->id != $tabID) {
+            if (isset($tabID) && $tabID >= 0 && $field->id != $tabID) {
                 continue;
             }
             if ($field instanceof TabField) {
                 foreach ($field->fields as $childField) {
                     $return[] = $callback($childField, $args);
                 }
+            } else {
+                $return[] = $callback($field, $args);
             }
         }
         $return = array_diff($return, array(null));
