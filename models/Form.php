@@ -241,7 +241,7 @@ class Form
         if (empty($tabs)) {
             ob_start();
             ?>
-            <form action="<?= http_build_query($_GET) ?>" method="POST" enctype="multipart/form-data">
+            <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
                 <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
                 <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
@@ -257,7 +257,7 @@ class Form
                 ob_start();
                 ?>
                 <div id="<?= $tab->name ?>">
-                    <form action="<?= http_build_query($_GET) ?>" method="POST" enctype="multipart/form-data">
+                    <form action="#" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="<?= $tab->id ?>">
                         <?php foreach ($tab->fields as $childField): ?>
                             <?= $childField->getHTML() ?>

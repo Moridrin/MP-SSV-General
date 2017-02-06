@@ -30,6 +30,8 @@ class HiddenInputField extends InputField
         $this->defaultValue = $defaultValue;
         if ($this->defaultValue == 'NOW') {
             $this->value = (new DateTime('NOW'))->format('Y-m-d');
+        } else {
+            $this->value = $this->defaultValue;
         }
     }
 
