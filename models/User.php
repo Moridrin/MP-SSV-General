@@ -203,19 +203,19 @@ class User extends \WP_User
     }
     #endregion
 
-    #region getLoginFields()
-    public static function getLoginFields()
+    #region getPasswordChangeFields()
+    public static function getPasswordChangeFields()
     {
-        #region Username
-        /** @var TextInputField $usernameField */
-        $usernameField = Field::fromJSON(
+        #region Current Password
+        /** @var CustomInputField $currentPassword */
+        $currentPassword = Field::fromJSON(
             json_encode(
                 array(
                     'id'            => -1,
-                    'title'         => 'Username',
+                    'title'         => 'Current Password',
                     'field_type'    => 'input',
-                    'input_type'    => 'text',
-                    'name'          => 'username',
+                    'input_type'    => 'password',
+                    'name'          => 'current_password',
                     'disabled'      => false,
                     'required'      => true,
                     'default_value' => '',
@@ -227,21 +227,42 @@ class User extends \WP_User
         );
         #endregion
 
-        #region Password
-        /** @var CustomInputField $passwordField */
-        $passwordField = Field::fromJSON(
+        #region New Password
+        /** @var CustomInputField $newPassword */
+        $newPassword = Field::fromJSON(
             json_encode(
                 array(
                     'id'            => -1,
-                    'title'         => 'Password',
+                    'title'         => 'New Password',
                     'field_type'    => 'input',
                     'input_type'    => 'password',
-                    'name'          => 'password',
+                    'name'          => 'new_password',
                     'disabled'      => false,
                     'required'      => true,
                     'default_value' => '',
                     'placeholder'   => '',
-                    'class'         => 'validate',
+                    'class'         => '',
+                    'style'         => '',
+                )
+            )
+        );
+        #endregion
+
+        #region Confirm New Password
+        /** @var CustomInputField $confirmNewPassword */
+        $confirmNewPassword = Field::fromJSON(
+            json_encode(
+                array(
+                    'id'            => -1,
+                    'title'         => 'Confirm New Password',
+                    'field_type'    => 'input',
+                    'input_type'    => 'password',
+                    'name'          => 'confirm_new_password',
+                    'disabled'      => false,
+                    'required'      => true,
+                    'default_value' => '',
+                    'placeholder'   => '',
+                    'class'         => '',
                     'style'         => '',
                 )
             )
@@ -249,8 +270,9 @@ class User extends \WP_User
         #endregion
 
         return array(
-            $usernameField->name => $usernameField,
-            $passwordField->name => $passwordField,
+            $currentPassword->name    => $currentPassword,
+            $newPassword->name        => $newPassword,
+            $confirmNewPassword->name => $confirmNewPassword,
         );
     }
     #endregion
