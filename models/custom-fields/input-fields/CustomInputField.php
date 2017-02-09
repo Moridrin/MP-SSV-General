@@ -153,7 +153,7 @@ class CustomInputField extends InputField
         switch (strtolower($this->inputType)) {
             case 'iban':
                 $this->value = str_replace(' ', '', strtoupper($this->value));
-                if (!SSV_General::isValidIBAN($this->value)) {
+                if (!empty($this->value) && !SSV_General::isValidIBAN($this->value)) {
                     $errors[] = new Message($this->title . ' field is not a valid IBAN.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
