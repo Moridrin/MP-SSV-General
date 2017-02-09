@@ -27,11 +27,13 @@ function ssv_settings_page()
     }
     ?>
     <div class="wrap">
-        <h1>SSV Plugins</h1>
-    </div>
-    <?php do_action(SSV_General::HOOK_GENERAL_OPTIONS_PAGE_CONTENT); ?>
-    <div class="wrap">
         <h1>General Options</h1>
+        <h2 class="nav-tab-wrapper">
+            <a href="" class="nav-tab nav-tab-active">General</a>
+            <a href="http://bosso.nl/ssv-general/" target="_blank" class="nav-tab">
+                Help <img src="<?= SSV_Users::URL ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
+            </a>
+        </h2>
     </div>
     <form method="post" action="#">
         <table class="form-table">
