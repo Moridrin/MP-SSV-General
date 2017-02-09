@@ -247,13 +247,13 @@ class SSV_General
 
     public static function eventsPluginActive()
     {
-        require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         return is_plugin_active('ssv-events/ssv-events.php');
     }
 
     public static function usersPluginActive()
     {
-        include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
         if (is_plugin_active('ssv-users/ssv-users.php')) {
             return true;
         } else {
@@ -263,7 +263,7 @@ class SSV_General
 
     public static function mailchimpPluginActive()
     {
-        require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         return is_plugin_active('ssv-mailchimp/ssv-mailchimp.php');
     }
 
