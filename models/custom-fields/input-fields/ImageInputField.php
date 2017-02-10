@@ -126,7 +126,7 @@ class ImageInputField extends InputField
         $errors = array();
         if ($this->required && empty($this->value)) {
             $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-        } elseif (!empty($this->value) && !starts_with($this->value, SSV_General::BASE_URL)) {
+        } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, SSV_General::BASE_URL)) {
             $errors[] = new Message($this->title . ' has an incorrect url.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;

@@ -364,7 +364,7 @@ class Form
             if ($file_location && !isset($file_location['error'])) {
                 $currentURL      = $this->user->getMeta($name);
                 $currentLocation = $this->user->getMeta($name . '_path');
-                if ($currentURL != '' && starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
+                if ($currentURL != '' && mp_ssv_starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
                     unlink($currentLocation);
                 }
                 $this->user->updateMeta($name, $file_location["url"]);
