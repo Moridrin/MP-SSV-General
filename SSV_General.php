@@ -170,7 +170,7 @@ class SSV_General
     /**
      * @param $value
      *
-     * @return string
+     * @return mixed
      */
     public static function sanitize($value)
     {
