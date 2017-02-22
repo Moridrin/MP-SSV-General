@@ -271,6 +271,66 @@ class SSV_General
     {
         return site_url() . '/login';
     }
+
+    public static function getListSelect($name, $options, $selected)
+    {
+        ob_start();
+        $optionCount = count($options);
+        ?>
+        <div style="float:left;margin-right:20px;">
+            <label for="non_selected_fields">Available</label>
+            <br/>
+            <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($options as $option): ?>
+                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div style="float:left;margin-right:20px;">
+            <label for="selected_fields">Selected</label>
+            <br/>
+            <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($selected as $option): ?>
+                    <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
+        <script>
+            var options = [];
+            function <?= $name ?>_add(val) {
+                options.push(val);
+                document.getElementById('<?= $name ?>').value = options;
+                var option = document.createElement("option");
+                option.id = '<?= $name ?>_selected_result_' + val;
+                option.text = val;
+                option.addEventListener("click", function () {
+                    <?= $name ?>_remove(val);
+                }, false);
+                document.getElementById('selected_fields').add(option);
+                option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.parentNode.removeChild(option);
+            }
+
+            function <?= $name ?>_remove(val) {
+                var index = options.indexOf(val);
+                if (index > -1) {
+                    options.splice(index, 1);
+                }
+                var option = document.createElement("option");
+                option.id = '<?= $name ?>_non_selected_result_' + val;
+                option.text = val;
+                option.addEventListener("click", function () {
+                    <?= $name ?>_add(val);
+                }, false);
+                document.getElementById('non_selected_fields').add(option);
+                option = document.getElementById('<?= $name ?>_selected_result_' + val);
+                option.parentNode.removeChild(option);
+            }
+        </script>
+        <?php
+        return ob_get_clean();
+    }
     #endregion
 
     #endregion
