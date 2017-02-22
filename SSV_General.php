@@ -309,7 +309,7 @@ class SSV_General
                 }, false);
                 document.getElementById('selected_fields').add(option);
                 option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
-                option.parentNode.removeChild(option);
+                option.setAttribute("disabled", "disabled");
             }
 
             function <?= $name ?>_remove(val) {
@@ -317,13 +317,8 @@ class SSV_General
                 if (index > -1) {
                     options.splice(index, 1);
                 }
-                var option = document.createElement("option");
-                option.id = '<?= $name ?>_non_selected_result_' + val;
-                option.text = val;
-                option.addEventListener("click", function () {
-                    <?= $name ?>_add(val);
-                }, false);
-                document.getElementById('non_selected_fields').add(option);
+                var option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.removeAttribute("disabled");
                 option = document.getElementById('<?= $name ?>_selected_result_' + val);
                 option.parentNode.removeChild(option);
             }
