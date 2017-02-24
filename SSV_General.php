@@ -315,7 +315,7 @@ class SSV_General
             <br/>
             <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($options as $option): ?>
-                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -330,7 +330,8 @@ class SSV_General
         </div>
         <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
         <script>
-            var options = [];
+            var options = <?= json_encode($selected) ?>;
+            document.getElementById('<?= $name ?>').value = options;
             function <?= $name ?>_add(val) {
                 options.push(val);
                 document.getElementById('<?= $name ?>').value = options;
@@ -350,6 +351,7 @@ class SSV_General
                 if (index > -1) {
                     options.splice(index, 1);
                 }
+                document.getElementById('<?= $name ?>').value = options;
                 var option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
                 option.removeAttribute("disabled");
                 option = document.getElementById('<?= $name ?>_selected_result_' + val);
