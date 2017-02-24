@@ -224,12 +224,13 @@ class Form
 
     #region getHTML($adminReferer, $buttonText = 'save')
     /**
-     * @param string $adminReferer is the admin referer for the form.
-     * @param string $buttonText   is the text on the submit button (default = 'save').
+     * @param string $adminReferrer is the admin referer for the form.
+     * @param string $buttonText    is the text on the submit button (default = 'save').
+
      *
-     * @return string the field as HTML object.
+*@return string the field as HTML object.
      */
-    public function getHTML($adminReferer, $buttonText = 'save')
+    public function getHTML($adminReferrer, $buttonText = 'save')
     {
         $tabs = array();
         $html = '';
@@ -247,7 +248,7 @@ class Form
             <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
                 <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
-                <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
+                <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
             </form>
             <?php
             $html = ob_get_clean();
@@ -266,7 +267,7 @@ class Form
                             <?= $childField->getHTML() ?>
                         <?php endforeach; ?>
                         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
-                        <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
+                        <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
                     </form>
                 </div>
                 <?php

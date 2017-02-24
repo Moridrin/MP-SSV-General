@@ -74,16 +74,19 @@ class SSV_General
 
     #region isValidPOST($adminReferer)
     /**
-     * @param $adminReferer
+     * @param $adminReferrer
      *
      * @return bool true if the request is POST, it isn't a reset request and it has the correct admin referer.
      */
-    public static function isValidPOST($adminReferer)
+    public static function isValidPOST($adminReferrer)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return false;
         }
-        if (!check_admin_referer($adminReferer)) {
+        if (!isset($_POST['admin_referrer']) || $_POST['admin_referrer'] != $adminReferrer) {
+            return false;
+        }
+        if (!check_admin_referer($adminReferrer)) {
             return false;
         }
         return true;
@@ -145,17 +148,17 @@ class SSV_General
 
     #region getFormSecurityFields($adminReferer, $save, $reset)
     /**
-     * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
-     * @param bool   $saveButton   set to false if you don't want the save button to be displayed.
-     * @param bool   $resetButton  set to false if you don't want the reset button to be displayed.
+     * @param string $adminReferrer should be defined by a constant from the class you want to use this form in.
+     * @param bool   $saveButton    set to false if you don't want the save button to be displayed.
+     * @param bool   $resetButton   set to false if you don't want the reset button to be displayed.
      *
      * @return string HTML
      */
-    public static function getFormSecurityFields($adminReferer, $saveButton = true, $resetButton = true)
+    public static function getFormSecurityFields($adminReferrer, $saveButton = true, $resetButton = true)
     {
         ob_start();
-        ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
-        wp_nonce_field($adminReferer);
+        ?><input type="hidden" name="admin_referrer" value="<?= $adminReferrer ?>"><?php
+        wp_nonce_field($adminReferrer);
         if ($saveButton) {
             submit_button();
         }
@@ -184,50 +187,80 @@ class SSV_General
     }
     #endregion
 
-    #region var_export($variable, $die)
+    /**
+     * This function returns a HTML list generated from the array. This function supports multidimensional arrays.
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function arrayToList(Array $array = array())
+    {
+        $list = '<ul>';
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $list .= '<li>' . $key;
+                $list .= self::arrayToList($value);
+                $list .= '</li>';
+            } else {
+                $list .= '<li>' . $value . '</li>';
+            }
+        }
+        $list .= '</ul>';
+        return $list;
+    }
+
     /**
      * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
      *
      * @param mixed $variable any variable that you want to be printed.
      * @param bool  $die      set true if you want to call die() after the print. $die is ignored if $return is true.
+     * @param bool  $return   set true if you want to return the print as string.
+     * @param bool  $newline  set false if you don't want to print a newline at the end of the print.
      *
      * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
      */
-    public static function var_export($variable, $die = false)
+    public static function var_export($variable, $die = false, $return = false, $newline = true)
     {
-        if (is_string($variable) && strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
+        if ($variable instanceof \Zend_Db_Table_Select || $variable instanceof \Zend_Db_Select) {
             ob_start();
             echo $variable . ';';
             $query = ob_get_clean();
-            include_once('lib/SqlFormatter.php');
             $print = SqlFormatter::highlight($query);
             $print = trim(preg_replace('/\s+/', ' ', $print));
         } else {
-            if (self::_hasCircularReference($variable)) {
-                $print = highlight_string("<?php " . var_dump($variable, true), true);
+            if (self::hasCircularReference($variable)) {
+                ob_start();
+                var_dump($variable);
+                $var_dump = ob_get_clean();
+                $print = highlight_string("<?php " . $var_dump, true);
             } else {
                 $print = highlight_string("<?php " . var_export($variable, true), true);
             }
             $print = trim($print);
-            $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print, 1);  // remove prefix
-            $print = preg_replace("|\\</code\\>\$|", '', $print, 1);
+            $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", "", $print, 1);  // remove prefix
+            $print = preg_replace("|\\</code\\>\$|", "", $print, 1);
             $print = trim($print);
-            $print = preg_replace("|\\</span\\>\$|", '', $print, 1);
+            $print = preg_replace("|\\</span\\>\$|", "", $print, 1);
             $print = trim($print);
             $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
             $print .= ';';
         }
-        echo $print;
-        echo '<br/>';
+        if ($return) {
+            return $print;
+        } else {
+            echo $print;
+            if ($newline) {
+                echo '<br/>';
+            }
+        }
 
         if ($die) {
             die();
         }
         return null;
     }
-    #endregion
 
-    #region _hasCircularReference($variable)
     /**
      * This function checks if the given $variable is recursive.
      *
@@ -235,7 +268,7 @@ class SSV_General
      *
      * @return bool true if the $variable contains circular reference.
      */
-    private static function _hasCircularReference($variable)
+    public static function hasCircularReference($variable)
     {
         $dump = print_r($variable, true);
         if (strpos($dump, '*RECURSION*') !== false) {
@@ -326,7 +359,6 @@ class SSV_General
         <?php
         return ob_get_clean();
     }
-    #endregion
 
     #endregion
 }
