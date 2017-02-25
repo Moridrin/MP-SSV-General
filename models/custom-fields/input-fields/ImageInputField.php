@@ -119,6 +119,21 @@ class ImageInputField extends InputField
     }
 
     /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?>
+        <select id="<?= $this->id ?>" name="<?= $this->name ?>">
+            <option value="0">No Image</option>
+            <option value="1">Has Image</option>
+        </select>
+        <?php
+        return $this->getFilterRowBase(ob_get_clean());
+    }
+
+    /**
      * @return Message[]|bool array of errors or true if no errors.
      */
     public function isValid()

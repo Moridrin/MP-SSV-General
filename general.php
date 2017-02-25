@@ -16,6 +16,7 @@ if (!class_exists('SSV_General')) {
             array('custom_field_fields' => get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS))
         );
         wp_enqueue_script('mp-ssv-sortable-tables', SSV_General::URL . '/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
+        wp_enqueue_script('mp-ssv-field-filters', SSV_General::URL . '/js/mp-ssv-field-filters.js', array('jquery'));
     }
 
     add_action('admin_enqueue_scripts', 'mp_ssv_general_admin_scripts');

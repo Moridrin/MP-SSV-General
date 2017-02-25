@@ -247,7 +247,7 @@ class Form
             ?>
             <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
-                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
+                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button>
                 <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
             </form>
             <?php

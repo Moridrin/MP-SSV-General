@@ -109,6 +109,22 @@ class SelectInputField extends InputField
     }
 
     /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?>
+        <select id="<?= $this->id ?>" name="<?= $this->name ?>">
+            <?php foreach ($this->options as $option): ?>
+                <option value="<?= $option ?>"><?= $option ?></option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+        return $this->getFilterRowBase(ob_get_clean());
+    }
+
+    /**
      * @return Message[]|bool array of errors or true if no errors.
      */
     public function isValid()

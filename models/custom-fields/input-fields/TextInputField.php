@@ -129,6 +129,16 @@ class TextInputField extends InputField
     }
 
     /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?><input id="<?= $this->id ?>" type="text" name="<?= $this->name ?>" class="field-filter"/><?php
+        return $this->getFilterRowBase(ob_get_clean());
+    }
+
+    /**
      * @return Message[]|bool array of errors or true if no errors.
      */
     public function isValid()

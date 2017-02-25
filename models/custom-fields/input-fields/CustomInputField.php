@@ -99,7 +99,7 @@ class CustomInputField extends InputField
         }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . $this->inputType . '"';
-        $name = 'name="' . $this->name . '"';
+        $name        = 'name="' . $this->name . '"';
         $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
@@ -139,6 +139,16 @@ class CustomInputField extends InputField
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?><input id="<?= $this->id ?>" type="<?= $this->inputType ?>" name="<?= $this->name ?>"/><?php
+        return $this->getFilterRowBase(ob_get_clean());
     }
 
     /**
