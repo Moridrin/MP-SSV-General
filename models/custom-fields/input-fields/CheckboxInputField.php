@@ -87,9 +87,11 @@ class CheckboxInputField extends InputField
     }
 
     /**
+     * @param string|null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
         $name      = 'name="' . $this->name . '"';
@@ -99,7 +101,7 @@ class CheckboxInputField extends InputField
         $required  = $this->required ? 'required' : '';
         $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
 
-        if (is_user_logged_in() && User::isBoard()) {
+        if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
             $required = '';
         }

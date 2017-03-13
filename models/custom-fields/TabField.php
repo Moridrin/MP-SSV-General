@@ -26,7 +26,7 @@ class TabField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
         $this->fields = $fields;
-        $this->name = strtolower(str_replace(' ', '_', $title));
+        $this->name   = strtolower(str_replace(' ', '_', $title));
     }
 
     /**
@@ -91,9 +91,11 @@ class TabField extends Field
     }
 
     /**
+     * @param null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'class="active"' : '';
         $class       = !empty($this->class) ? 'class="tab ' . $this->class . '"' : 'class="tab ' . $activeClass . '"';

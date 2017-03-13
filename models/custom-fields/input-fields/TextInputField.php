@@ -93,9 +93,11 @@ class TextInputField extends InputField
     }
 
     /**
+     * @param string|null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         if ($this->defaultValue == 'NOW') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
@@ -110,7 +112,7 @@ class TextInputField extends InputField
         $disabled    = $this->disabled ? 'disabled' : '';
         $required    = $this->required == "true" ? 'required' : '';
 
-        if (is_user_logged_in() && User::isBoard()) {
+        if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
             $required = '';
         }

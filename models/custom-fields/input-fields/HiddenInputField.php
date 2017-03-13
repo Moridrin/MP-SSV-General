@@ -79,9 +79,11 @@ class HiddenInputField extends InputField
     }
 
     /**
+     * @param null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         $name  = 'name="' . $this->name . '"';
         $value = 'value="' . $this->defaultValue . '"';

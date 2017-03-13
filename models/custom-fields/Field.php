@@ -120,9 +120,11 @@ abstract class Field
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
      *
+     * @param string|null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    abstract public function getHTML();
+    abstract public function getHTML($overrideRight = null);
     #endregion
 
     #region getMaxID($fields)

@@ -157,7 +157,7 @@ class SSV_General
     public static function getFormSecurityFields($adminReferrer, $saveButton = true, $resetButton = true)
     {
         ob_start();
-        ?><input type="hidden" name="admin_referrer" value="<?= $adminReferrer ?>"/><?php
+        ?><input type="hidden" name="admin_referrer" value="<?= esc_html($adminReferrer) ?>"/><?php
         wp_nonce_field($adminReferrer);
         if ($saveButton) {
             submit_button();

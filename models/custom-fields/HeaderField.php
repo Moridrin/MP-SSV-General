@@ -12,9 +12,8 @@ class HeaderField extends Field
 
     /**
      * HeaderField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $class
      * @param string $style
@@ -47,7 +46,7 @@ class HeaderField extends Field
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -65,9 +64,11 @@ class HeaderField extends Field
     }
 
     /**
+     * @param null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';

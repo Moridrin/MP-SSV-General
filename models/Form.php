@@ -17,6 +17,9 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
+    /** @var string $overrideRight */
+    public $overrideRight;
+
     #endregion
 
     #region Construct($fields)
@@ -226,9 +229,8 @@ class Form
     /**
      * @param string $adminReferrer is the admin referer for the form.
      * @param string $buttonText    is the text on the submit button (default = 'save').
-
      *
-*@return string the field as HTML object.
+     * @return string the field as HTML object.
      */
     public function getHTML($adminReferrer, $buttonText = 'save')
     {
@@ -239,7 +241,7 @@ class Form
             if ($field instanceof TabField) {
                 $tabs[] = $field;
             } elseif (empty($tabs)) {
-                $html .= $field->getHTML();
+                $html .= $field->getHTML($this->overrideRight);
             }
         }
         if (empty($tabs)) {
@@ -247,8 +249,8 @@ class Form
             ?>
             <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
-                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button>
-                <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
+                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
+                <?= SSV_General::getFormSecurityFields($adminReferrer, false, false) ?>
             </form>
             <?php
             $html = ob_get_clean();
@@ -257,16 +259,16 @@ class Form
             $tabsContentHTML = '';
             /** @var TabField $tab */
             foreach ($tabs as $tab) {
-                $tabsHTML .= $tab->getHTML();
+                $tabsHTML .= $tab->getHTML($this->overrideRight);
                 ob_start();
                 ?>
-                <div id="<?= $tab->name ?>">
+                <div id="<?= esc_html($tab->name) ?>">
                     <form action="#" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="tab" value="<?= $tab->id ?>">
+                        <input type="hidden" name="tab" value="<?= esc_html($tab->id) ?>">
                         <?php foreach ($tab->fields as $childField): ?>
                             <?= $childField->getHTML() ?>
                         <?php endforeach; ?>
-                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
+                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button
                         <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
                     </form>
                 </div>

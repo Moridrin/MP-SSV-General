@@ -15,9 +15,8 @@ class LabelField extends Field
 
     /**
      * TabField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $text
      * @param string $class
@@ -26,7 +25,7 @@ class LabelField extends Field
     protected function __construct($id, $title, $text, $class, $style)
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
-        $this->text = $text;
+        $this->text  = $text;
         $this->class = $class;
         $this->style = $style;
     }
@@ -55,7 +54,7 @@ class LabelField extends Field
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
@@ -74,9 +73,11 @@ class LabelField extends Field
     }
 
     /**
+     * @param null $overrideRight string with the right needed to override required and disabled.
+     *
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight = null)
     {
         $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
         $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
