@@ -65,10 +65,11 @@ class SSV_General
      */
     public static function redirect($location)
     {
-        $redirect_script = '<script type="text/javascript">';
-        $redirect_script .= 'window.location = "' . $location . '"';
-        $redirect_script .= '</script>';
-        echo $redirect_script;
+        ?>
+        <script type="text/javascript">
+            window.location = "<?= esc_url($location) ?>"
+        </script>
+        <?php
     }
     #endregion
 

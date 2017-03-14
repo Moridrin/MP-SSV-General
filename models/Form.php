@@ -149,14 +149,14 @@ class Form
             <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
         </div>
         <script>
-            i = <?= Field::getMaxID($this->fields) + 1 ?>;
+            i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
                 mp_ssv_add_new_field('input', 'text', i, null, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_new_field('<?= $field->fieldType ?>', '<?= isset($field->inputType) ? $field->inputType : '' ?>', <?= $field->id ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+            mp_ssv_add_new_field('<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
             <?php endforeach; ?>
         </script>
         <?php
