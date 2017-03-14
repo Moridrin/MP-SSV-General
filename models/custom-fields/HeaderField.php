@@ -70,11 +70,11 @@ class HeaderField extends Field
      */
     public function getHTML($overrideRight = null)
     {
-        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
+        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         ob_start();
         ?>
-        <h2 <?= $class ?> <?= $style ?>><?= $this->title ?></h2>
+        <h2 <?= $class ?> <?= $style ?>><?= esc_html($this->title) ?></h2>
         <?php
         return ob_get_clean();
     }

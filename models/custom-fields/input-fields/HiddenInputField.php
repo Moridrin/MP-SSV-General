@@ -85,10 +85,10 @@ class HiddenInputField extends InputField
      */
     public function getHTML($overrideRight = null)
     {
-        $name  = 'name="' . $this->name . '"';
-        $value = 'value="' . $this->defaultValue . '"';
-        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name  = 'name="' . esc_html($this->name) . '"';
+        $value = 'value="' . esc_html($this->defaultValue) . '"';
+        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
+        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
 
         ob_start();
         if (current_theme_supports('materialize')) {
@@ -106,7 +106,7 @@ class HiddenInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= $this->id ?>" type="text" name="<?= $this->name ?>"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

@@ -97,12 +97,12 @@ class TabField extends Field
      */
     public function getHTML($overrideRight = null)
     {
-        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'class="active"' : '';
-        $class       = !empty($this->class) ? 'class="tab ' . $this->class . '"' : 'class="tab ' . $activeClass . '"';
-        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'active' : '';
+        $class       = !empty($this->class) ? 'class="tab ' . esc_html($this->class) . '"' : 'class="tab ' . esc_html($activeClass) . '"';
+        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         ob_start();
         ?>
-        <li <?= $class ?> <?= $style ?>><a href="#<?= $this->name ?>" <?= $activeClass ?>><?= $this->title ?></a></li>
+        <li <?= $class ?> <?= $style ?>><a href="#<?= esc_html($this->name) ?>"><?= esc_html($this->title) ?></a></li>
         <?php
         return ob_get_clean();
     }
@@ -111,8 +111,8 @@ class TabField extends Field
     {
         ob_start();
         ?>
-        <input type="hidden" name="tab" value="<?= $this->id ?>">
-        <div id="<?= $this->name ?>">
+        <input type="hidden" name="tab" value="<?= esc_html($this->id) ?>">
+        <div id="<?= esc_html($this->name) ?>">
             <?php foreach ($this->fields as $field): ?>
                 <?= $field->getHTML() ?>
             <?php endforeach; ?>

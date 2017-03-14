@@ -99,12 +99,12 @@ class CustomInputField extends InputField
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
-        $inputType   = 'type="' . $this->inputType . '"';
-        $name        = 'name="' . $this->name . '"';
-        $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
-        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
-        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $inputType   = 'type="' . esc_html($this->inputType) . '"';
+        $name        = 'name="' . esc_html($this->name) . '"';
+        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
+        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
+        $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = $this->disabled ? 'disabled' : '';
         $required    = $this->required ? 'required' : '';
 
@@ -117,15 +117,15 @@ class CustomInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div>
-                <label for="<?= $this->id ?>"><?php echo $this->title; ?><?= $this->required ? '*' : '' ?></label>
-                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+                <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
             </div>
             <?php
             if ($this->inputType == 'date' && $this->required) {
                 ?>
                 <script>
                     jQuery(function ($) {
-                        var dateField = $('#<?= $this->id ?>');
+                        var dateField = $('#<?= esc_html($this->id) ?>');
                         dateField.change(function () {
                             if (dateField.val() == '') {
                                 dateField.addClass('invalid')
@@ -148,7 +148,7 @@ class CustomInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= $this->id ?>" type="<?= $this->inputType ?>" name="<?= $this->name ?>"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="<?= esc_html($this->inputType) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

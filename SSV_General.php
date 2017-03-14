@@ -200,11 +200,11 @@ class SSV_General
         $list = '<ul>';
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $list .= '<li>' . $key;
+                $list .= '<li>' . esc_html($key);
                 $list .= self::arrayToList($value);
                 $list .= '</li>';
             } else {
-                $list .= '<li>' . $value . '</li>';
+                $list .= '<li>' . esc_html($value) . '</li>';
             }
         }
         $list .= '</ul>';
@@ -308,6 +308,7 @@ class SSV_General
 
     public static function getListSelect($name, $options, $selected)
     {
+        $name = esc_html($name);
         ob_start();
         $optionCount = count($options);
         ?>
@@ -316,6 +317,7 @@ class SSV_General
             <br/>
             <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($options as $option): ?>
+                    <?php $option = esc_html($option); ?>
                     <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
@@ -325,13 +327,14 @@ class SSV_General
             <br/>
             <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($selected as $option): ?>
+                    <?php $option = esc_html($option); ?>
                     <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
         <script>
-            var options = <?= json_encode($selected) ?>;
+            var options = <?= esc_html(json_encode($selected)) ?>;
             document.getElementById('<?= $name ?>').value = options;
             function <?= $name ?>_add(val) {
                 options.push(val);

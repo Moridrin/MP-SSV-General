@@ -105,12 +105,12 @@ class InputField extends Field
         ob_start();
         ?>
         <td>
-            <label for="<?= $this->id ?>"><?= $this->title ?></label>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
         </td>
         <td>
             <label>
                 Filter
-                <input id="filter_<?= $this->id ?>" type="checkbox" name="filter_<?= $this->name ?>">
+                <input id="filter_<?= esc_html($this->id) ?>" type="checkbox" name="filter_<?= esc_html($this->name) ?>">
             </label>
         </td>
         <td>

@@ -84,9 +84,9 @@ class SelectInputField extends InputField
      */
     public function getHTML($overrideRight = null)
     {
-        $name     = 'name="' . $this->name . '"';
-        $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
-        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name     = 'name="' . esc_html($this->name) . '"';
+        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
+        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $disabled = $this->disabled ? 'disabled' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
@@ -97,12 +97,12 @@ class SelectInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <select id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= $this->value == $option ? 'selected' : '' ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
-                <label for="<?= $this->id ?>"><?= $this->title ?></label>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
         }
@@ -117,9 +117,9 @@ class SelectInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= $this->id ?>" name="<?= $this->name ?>">
+        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <?php foreach ($this->options as $option): ?>
-                <option value="<?= $option ?>"><?= $option ?></option>
+                <option value="<?= esc_html($option) ?>"><?= esc_html($option) ?></option>
             <?php endforeach; ?>
         </select>
         <?php

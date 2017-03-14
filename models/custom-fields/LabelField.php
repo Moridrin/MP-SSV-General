@@ -79,11 +79,11 @@ class LabelField extends Field
      */
     public function getHTML($overrideRight = null)
     {
-        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
+        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         ob_start();
         ?>
-        <p <?= $class ?> <?= $style ?>><?= $this->text ?></p><br/>
+        <p <?= $class ?> <?= $style ?>><?= esc_html($this->text) ?></p><br/>
         <?php
         return ob_get_clean();
     }

@@ -31,7 +31,7 @@ function ssv_settings_page()
         <h2 class="nav-tab-wrapper">
             <a href="" class="nav-tab nav-tab-active">General</a>
             <a href="http://bosso.nl/ssv-general/" target="_blank" class="nav-tab">
-                Help <img src="<?= SSV_Users::URL ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
+                Help <img src="<?= esc_url(SSV_Users::URL) ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
             </a>
         </h2>
     </div>
@@ -44,7 +44,7 @@ function ssv_settings_page()
                 </th>
                 <td>
                     <select id="board_role" name="board_role">
-                        <?php wp_dropdown_roles(get_option(SSV_General::OPTION_BOARD_ROLE)); ?>
+                        <?php wp_dropdown_roles(get_option(esc_html(SSV_General::OPTION_BOARD_ROLE))); ?>
                     </select>
                 </td>
             </tr>
@@ -54,7 +54,7 @@ function ssv_settings_page()
                 </th>
                 <td>
                     <?php
-                    $selected = json_decode(get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS));
+                    $selected = json_decode(get_option(esc_html(SSV_General::OPTION_CUSTOM_FIELD_FIELDS)));
                     $selected = $selected ?: array();
                     $fields   = array(
                         'display',
@@ -68,8 +68,8 @@ function ssv_settings_page()
                         <?php
                         foreach ($fields as $field) {
                             ?>
-                            <option value="<?= $field ?>" <?= in_array($field, $selected) ? 'selected' : '' ?>>
-                                <?= $field ?>
+                            <option value="<?= esc_html($field) ?>" <?= in_array($field, $selected) ? 'selected' : '' ?>>
+                                <?= esc_html($field) ?>
                             </option>
                             <?php
                         }

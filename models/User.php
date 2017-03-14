@@ -385,7 +385,8 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            return get_user_meta($this->ID, $meta_key, true);
+            $meta = get_user_meta($this->ID, $meta_key, true);
+            return !empty($meta) ? $meta : $default;
         }
     }
     #endregion
@@ -399,8 +400,8 @@ class User extends \WP_User
     public function getProfileLink($target = '')
     {
         $href   = esc_url($this->getProfileURL());
-        $target = empty($target) ? '' : 'target="' . $target . '"';
-        $label  = $this->display_name;
+        $target = empty($target) ? '' : 'target="' . esc_html($target) . '"';
+        $label  = esc_html($this->display_name);
         return "<a href='$href' $target>$label</a>";
     }
 

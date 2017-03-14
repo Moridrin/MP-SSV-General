@@ -94,9 +94,9 @@ class CheckboxInputField extends InputField
     public function getHTML($overrideRight = null)
     {
         $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
-        $name      = 'name="' . $this->name . '"';
-        $class     = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate filled-in"';
-        $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name      = 'name="' . esc_html($this->name) . '"';
+        $class     = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
+        $style     = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $disabled  = $this->disabled ? 'disabled' : '';
         $required  = $this->required ? 'required' : '';
         $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
@@ -109,10 +109,10 @@ class CheckboxInputField extends InputField
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div <?= $style; ?>>
-                <input type="hidden" id="<?= $this->id ?>_reset" <?= $name ?> value="false"/>
-                <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
-                <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
+            <div <?= $style ?>>
+                <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
+                <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
         }
@@ -127,7 +127,7 @@ class CheckboxInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= $this->id ?>" name="<?= $this->name ?>">
+        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="false">Not Checked</option>
             <option value="true">Checked</option>
         </select>

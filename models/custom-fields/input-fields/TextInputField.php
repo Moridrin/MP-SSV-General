@@ -103,14 +103,14 @@ class TextInputField extends InputField
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
-        $id          = !empty($this->id) ? 'id="' . $this->id . '"' : '';
+        $id          = !empty($this->id) ? 'id="' . esc_html($this->id) . '"' : '';
         $name        = 'name="' . $this->name . '"';
-        $class       = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
-        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
-        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
+        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
+        $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = $this->disabled ? 'disabled' : '';
-        $required    = $this->required == "true" ? 'required' : '';
+        $required    = $this->required ? 'required' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
@@ -121,8 +121,8 @@ class TextInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= $this->title ?>"/>
-                <label><?php echo $this->title; ?><?= $this->required == "yes" ? '*' : '' ?></label>
+                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
+                <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
         }
@@ -136,7 +136,7 @@ class TextInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= $this->id ?>" type="text" name="<?= $this->name ?>" class="field-filter"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>" class="field-filter" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

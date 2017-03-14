@@ -443,21 +443,21 @@ class Form
         $rows               = $this->loopRecursive(
             function ($field) {
                 if ($field instanceof TabField) {
-                    return '<tr><td colspan="2"><h1>' . $field->title . '</h1></td></tr>';
+                    return '<tr><td colspan="2"><h1>' . esc_html($field->title) . '</h1></td></tr>';
                 } elseif ($field instanceof HeaderField) {
-                    return '<tr><td colspan="2"><h3>' . $field->title . '</h3></td></tr>';
+                    return '<tr><td colspan="2"><h3>' . esc_html($field->title) . '</h3></td></tr>';
                 } elseif ($field instanceof InputField) {
                     if ($field->name == 'password_confirm') {
                         return null;
                     }
                     global $hidePasswordFields;
                     if ($hidePasswordFields && $field->name == 'password') {
-                        return '<tr><td>' . $field->title . '</td><td>********</td></tr>';
+                        return '<tr><td>' . esc_html($field->title) . '</td><td>********</td></tr>';
                     } else {
-                        return '<tr><td>' . $field->title . '</td><td>' . $field->value . '</td></tr>';
+                        return '<tr><td>' . esc_html($field->title) . '</td><td>' . esc_html($field->value) . '</td></tr>';
                     }
                 } elseif ($field instanceof LabelField) {
-                    return '<tr><td>' . $field->text . '</td></tr>';
+                    return '<tr><td>' . esc_html($field->text) . '</td></tr>';
                 }
                 return null;
             }

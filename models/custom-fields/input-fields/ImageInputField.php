@@ -87,9 +87,9 @@ class ImageInputField extends InputField
      */
     public function getHTML($overrideRight = null)
     {
-        $name     = 'name="' . $this->name . '"';
-        $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
-        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name     = 'name="' . esc_html($this->name) . '"';
+        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
+        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $required = $this->required && !empty($this->value) ? 'required' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
@@ -100,17 +100,17 @@ class ImageInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div style="padding-top: 10px;">
-                <label for="<?= $this->id ?>"><?= $this->title ?><?= $this->required ? '*' : '' ?></label><br/>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
                 <?php if ($this->preview): ?>
-                    <img src="<?= $this->value ?>" <?= $class ?> <?= $style ?>/>
+                    <img src="<?= esc_url($this->value) ?>" <?= $class ?> <?= $style ?>/>
                 <?php endif; ?>
                 <div class="file-field input-field">
                     <div class="btn">
                         <span>Image</span>
-                        <input type="file" id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
+                        <input type="file" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
                     </div>
                     <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text">
+                        <input class="file-path validate" type="text" title="<?= esc_html($this->title) ?>">
                     </div>
                 </div>
             </div>
@@ -127,7 +127,7 @@ class ImageInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= $this->id ?>" name="<?= $this->name ?>">
+        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="0">No Image</option>
             <option value="1">Has Image</option>
         </select>
