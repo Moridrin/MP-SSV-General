@@ -90,7 +90,7 @@ class ImageInputField extends InputField
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $required = $this->required && !empty($this->value) ? 'required' : '';
+        $required = $this->required && !empty($this->value) ? 'required="required"' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $required = '';

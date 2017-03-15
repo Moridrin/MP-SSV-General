@@ -99,7 +99,7 @@ class SelectInputField extends InputField
             <div class="input-field">
                 <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
-                        <option value="<?= $option ?>" <?= $this->value == $option ? 'selected' : '' ?>><?= $option ?></option>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
                 <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>

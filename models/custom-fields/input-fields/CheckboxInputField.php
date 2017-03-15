@@ -97,9 +97,9 @@ class CheckboxInputField extends InputField
         $name      = 'name="' . esc_html($this->name) . '"';
         $class     = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
         $style     = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $disabled  = $this->disabled ? 'disabled' : '';
-        $required  = $this->required ? 'required' : '';
-        $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
+        $required  = $this->required ? 'required="required"' : '';
+        $disabled  = disabled($this->disabled);
+        $checked   = checked($isChecked);
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
