@@ -25,10 +25,11 @@ class SelectInputField extends InputField
      * @param string $options
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $options, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $options, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->options  = explode(',', $options);
     }
@@ -78,11 +79,9 @@ class SelectInputField extends InputField
     }
 
     /**
-     * @param string|null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
@@ -133,7 +132,7 @@ class SelectInputField extends InputField
     {
         $errors = array();
         if (!$this->disabled && (empty($this->value) || !in_array($this->value, $this->options))) {
-            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

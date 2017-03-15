@@ -21,10 +21,11 @@ class LabelField extends Field
      * @param string $text
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $text, $class, $style)
+    protected function __construct($id, $title, $text, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->text  = $text;
         $this->class = $class;
         $this->style = $style;
@@ -73,11 +74,9 @@ class LabelField extends Field
     }
 
     /**
-     * @param null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';

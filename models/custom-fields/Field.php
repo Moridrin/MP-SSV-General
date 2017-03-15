@@ -29,9 +29,11 @@ abstract class Field
     public $class;
     /** @var string $style */
     public $style;
+    /** @var string $overrideRight */
+    public $overrideRight;
     #endregion
 
-    #region __construct($id, $title, $fieldType, $class, $style)
+    #region __construct($id, $title, $fieldType, $class, $style, $overrideRight)
     /**
      * Field constructor.
      *
@@ -40,14 +42,16 @@ abstract class Field
      * @param string $fieldType
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $fieldType, $class, $style)
+    protected function __construct($id, $title, $fieldType, $class, $style, $overrideRight)
     {
-        $this->id        = $id;
-        $this->title     = $title;
-        $this->fieldType = $fieldType;
-        $this->class     = $class;
-        $this->style     = $style;
+        $this->id            = $id;
+        $this->title         = $title;
+        $this->fieldType     = $fieldType;
+        $this->class         = $class;
+        $this->style         = $style;
+        $this->overrideRight = $overrideRight;
     }
     #endregion
 
@@ -120,11 +124,9 @@ abstract class Field
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
      *
-     * @param string|null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    abstract public function getHTML($overrideRight = null);
+    abstract public function getHTML();
     #endregion
 
     #region getMaxID($fields)

@@ -23,10 +23,11 @@ class HiddenInputField extends InputField
      * @param string $defaultValue
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $defaultValue, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $defaultValue, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style);
+        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
         $this->defaultValue = $defaultValue;
         if ($this->defaultValue == 'NOW') {
             $this->value = (new DateTime('NOW'))->format('Y-m-d');
@@ -79,11 +80,9 @@ class HiddenInputField extends InputField
     }
 
     /**
-     * @param null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         $name  = 'name="' . esc_html($this->name) . '"';
         $value = 'value="' . esc_html($this->defaultValue) . '"';

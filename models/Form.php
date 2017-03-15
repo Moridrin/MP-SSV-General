@@ -17,8 +17,6 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
-    /** @var string $overrideRight */
-    public $overrideRight;
 
     #endregion
 
@@ -31,7 +29,7 @@ class Form
     public function __construct($fields = array())
     {
         $this->fields = $fields;
-        if (isset($_GET['member']) && User::isBoard()) {
+        if (isset($_GET['member']) && current_user_can('edit_users')) {
             $this->user = User::getByID($_GET['member']);
         } else {
             $this->user = User::getCurrent();
@@ -58,7 +56,7 @@ class Form
             return $form;
         }
         if ($setValues) {
-            if (isset($_GET['member']) && User::isBoard()) {
+            if (isset($_GET['member']) && current_user_can('edit_users')) {
                 $user = User::getByID($_GET['member']);
                 if (!$user) {
                     echo (new Message('User not found.', Message::ERROR_MESSAGE))->getHTML();
@@ -342,7 +340,7 @@ class Form
                 if ($field instanceof ImageInputField) {
                     //Do Nothing
                 } elseif ($field instanceof InputField) {
-                    if (!$field->isDisabled() || User::isBoard()) {
+                    if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
                         if (is_bool($field->value)) {
                             $field->value = $field->value ? 'true' : 'false';
                         }
@@ -373,7 +371,7 @@ class Form
                 $this->user->updateMeta($name, $file_location["url"]);
                 $this->user->updateMeta($name . '_path', $file_location["file"]);
             } else {
-                $messages[] = new Message($file_location['error'], User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                $messages[] = new Message($file_location['error'], current_user_can($file->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
             }
         }
 

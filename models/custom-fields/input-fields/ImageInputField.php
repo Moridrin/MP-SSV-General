@@ -25,10 +25,11 @@ class ImageInputField extends InputField
      * @param string $required
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $preview, $required, $class, $style)
+    protected function __construct($id, $title, $name, $preview, $required, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->required = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->preview  = $preview;
     }
@@ -81,11 +82,9 @@ class ImageInputField extends InputField
     }
 
     /**
-     * @param string|null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
@@ -142,9 +141,9 @@ class ImageInputField extends InputField
     {
         $errors = array();
         if ($this->required && empty($this->value)) {
-            $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, SSV_General::BASE_URL)) {
-            $errors[] = new Message($this->title . ' has an incorrect url.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' has an incorrect url.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

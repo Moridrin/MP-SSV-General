@@ -17,10 +17,11 @@ class HeaderField extends Field
      * @param string $title
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $class, $style)
+    protected function __construct($id, $title, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
     }
 
     /**
@@ -64,11 +65,9 @@ class HeaderField extends Field
     }
 
     /**
-     * @param null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';

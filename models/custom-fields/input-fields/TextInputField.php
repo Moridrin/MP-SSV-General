@@ -31,10 +31,11 @@ class TextInputField extends InputField
      * @param string $placeholder
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -93,11 +94,9 @@ class TextInputField extends InputField
     }
 
     /**
-     * @param string|null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         if ($this->defaultValue == 'NOW') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
@@ -147,7 +146,7 @@ class TextInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && (empty($this->value))) {
-            $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

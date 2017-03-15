@@ -34,10 +34,11 @@ class InputField extends Field
      * @param string $name
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->inputType = $inputType;
         $this->name      = $name;
     }
@@ -78,12 +79,10 @@ class InputField extends Field
     }
 
     /**
-     * @param string|null $overrideRight string with the right needed to override required and disabled.
-     *
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function getHTML($overrideRight = null)
+    public function getHTML()
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
