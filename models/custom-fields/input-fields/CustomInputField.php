@@ -30,10 +30,11 @@ class CustomInputField extends InputField
      * @param string $placeholder
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style);
+        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -59,7 +60,8 @@ class CustomInputField extends InputField
             $values->default_value,
             $values->placeholder,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -71,17 +73,18 @@ class CustomInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'            => $this->id,
-            'title'         => $this->title,
-            'field_type'    => $this->fieldType,
-            'input_type'    => $this->inputType,
-            'name'          => $this->name,
-            'disabled'      => $this->disabled,
-            'required'      => $this->required,
-            'default_value' => $this->defaultValue,
-            'placeholder'   => $this->placeholder,
-            'class'         => $this->class,
-            'style'         => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'input_type'     => $this->inputType,
+            'name'           => $this->name,
+            'disabled'       => $this->disabled,
+            'required'       => $this->required,
+            'default_value'  => $this->defaultValue,
+            'placeholder'    => $this->placeholder,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

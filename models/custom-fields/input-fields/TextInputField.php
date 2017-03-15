@@ -63,7 +63,8 @@ class TextInputField extends InputField
             $values->default_value,
             $values->placeholder,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -75,17 +76,18 @@ class TextInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'            => $this->id,
-            'title'         => $this->title,
-            'field_type'    => $this->fieldType,
-            'input_type'    => $this->inputType,
-            'name'          => $this->name,
-            'disabled'      => $this->disabled,
-            'required'      => $this->required,
-            'default_value' => $this->defaultValue,
-            'placeholder'   => $this->placeholder,
-            'class'         => $this->class,
-            'style'         => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'input_type'     => $this->inputType,
+            'name'           => $this->name,
+            'disabled'       => $this->disabled,
+            'required'       => $this->required,
+            'default_value'  => $this->defaultValue,
+            'placeholder'    => $this->placeholder,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

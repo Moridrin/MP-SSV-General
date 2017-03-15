@@ -40,7 +40,8 @@ class HeaderField extends Field
             $values->id,
             $values->title,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -52,11 +53,12 @@ class HeaderField extends Field
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

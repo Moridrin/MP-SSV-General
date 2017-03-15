@@ -28,10 +28,11 @@ class CheckboxInputField extends InputField
      * @param string $defaultChecked
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled       = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
@@ -57,7 +58,8 @@ class CheckboxInputField extends InputField
             $values->required,
             $values->default_checked,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -79,6 +81,7 @@ class CheckboxInputField extends InputField
             'default_checked' => $this->defaultChecked,
             'class'           => $this->class,
             'style'           => $this->style,
+            'override_right'  => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

@@ -48,7 +48,8 @@ class LabelField extends Field
             $values->title,
             $values->text,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -60,12 +61,13 @@ class LabelField extends Field
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'text'       => $this->text,
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'text'           => $this->text,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

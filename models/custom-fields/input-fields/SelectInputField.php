@@ -50,7 +50,8 @@ class SelectInputField extends InputField
             $values->disabled,
             $values->options,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -62,15 +63,16 @@ class SelectInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'input_type' => $this->inputType,
-            'name'       => $this->name,
-            'disabled'   => $this->disabled,
-            'options'    => implode(',', $this->options),
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'input_type'     => $this->inputType,
+            'name'           => $this->name,
+            'disabled'       => $this->disabled,
+            'options'        => implode(',', $this->options),
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);

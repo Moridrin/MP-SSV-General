@@ -17,7 +17,8 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
-
+    /** @var string $overrideRight */
+    public $overrideRight;
     #endregion
 
     #region Construct($fields)
@@ -25,8 +26,9 @@ class Form
      * Form constructor.
      *
      * @param Field[] $fields
+     * @param string  $overrideRight
      */
-    public function __construct($fields = array())
+    public function __construct($fields = array(), $overrideRight = '')
     {
         $this->fields = $fields;
         if (isset($_GET['member']) && current_user_can('edit_users')) {
@@ -34,6 +36,7 @@ class Form
         } else {
             $this->user = User::getCurrent();
         }
+        $this->overrideRight = $overrideRight;
     }
     #endregion
 
@@ -41,14 +44,16 @@ class Form
     /**
      * This function gets all the Fields from the post metadata.
      *
+     * @param string       $overrideRight
      * @param bool         $setValues
      * @param WP_Post|null $post
      *
      * @return Form|Message
      */
-    public static function fromDatabase($setValues = true, $post = null)
+    public static function fromDatabase($overrideRight, $setValues = true, $post = null)
     {
         $form = new Form();
+        $form->overrideRight = $overrideRight;
         if ($post == null) {
             global $post;
         }
@@ -143,6 +148,7 @@ class Form
         ob_start();
         ?>
         <div style="overflow-x: auto;">
+            <input type="hidden" name="override_right" value="<?= esc_html($this->overrideRight) ?>">
             <table id="custom-fields-placeholder" class="sortable"></table>
             <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
         </div>
@@ -150,7 +156,7 @@ class Form
             i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_new_field('input', 'text', i, null, <?= $allowTabs ? 'true' : 'false' ?>);
+                mp_ssv_add_new_field('input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
@@ -173,7 +179,8 @@ class Form
         if (!$post) {
             return;
         }
-        $form              = new Form();
+        $form = new Form();
+        $form->overrideRight = SSV_General::sanitize($_POST['override_right']);
         $customFieldValues = array();
         $id                = 0;
         $fieldID           = 0;
@@ -189,6 +196,7 @@ class Form
                 $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
                 $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value);
                 if (strpos($key, '_end') !== false) {
+                    $customFieldValues['override_right'] = $form->overrideRight;
                     $field = Field::fromJSON(json_encode($customFieldValues));
                     if (!empty($field->title)) {
                         if ($field instanceof TabField) {
@@ -239,7 +247,7 @@ class Form
             if ($field instanceof TabField) {
                 $tabs[] = $field;
             } elseif (empty($tabs)) {
-                $html .= $field->getHTML($this->overrideRight);
+                $html .= $field->getHTML();
             }
         }
         if (empty($tabs)) {
@@ -257,7 +265,7 @@ class Form
             $tabsContentHTML = '';
             /** @var TabField $tab */
             foreach ($tabs as $tab) {
-                $tabsHTML .= $tab->getHTML($this->overrideRight);
+                $tabsHTML .= $tab->getHTML();
                 ob_start();
                 ?>
                 <div id="<?= esc_html($tab->name) ?>">

@@ -21,7 +21,7 @@ class TabField extends Field
      * @param string  $class
      * @param string  $style
      * @param Field[] $fields
-     * @param string $overrideRight
+     * @param string  $overrideRight
      */
     protected function __construct($id, $title, $class, $style, $overrideRight, $fields = array())
     {
@@ -62,6 +62,7 @@ class TabField extends Field
             $values->title,
             $values->class,
             $values->style,
+            $values->override_right,
             $fields
         );
     }
@@ -78,12 +79,13 @@ class TabField extends Field
             $jsonFields[] = $field->toJSON(false);
         }
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'class'      => $this->class,
-            'style'      => $this->style,
-            'fields'     => $jsonFields,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
+            'fields'         => $jsonFields,
         );
         if ($encode) {
             $values = json_encode($values);
