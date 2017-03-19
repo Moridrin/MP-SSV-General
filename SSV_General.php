@@ -188,6 +188,7 @@ class SSV_General
     }
     #endregion
 
+    #region arrayToList($array)
     /**
      * This function returns a HTML list generated from the array. This function supports multidimensional arrays.
      *
@@ -210,7 +211,9 @@ class SSV_General
         $list .= '</ul>';
         return $list;
     }
+    #endregion
 
+    #region var_export($variable, $die, $return, $newline)
     /**
      * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
      *
@@ -278,34 +281,42 @@ class SSV_General
             return false;
         }
     }
+    #endregion
 
+    #region Check Active SSV Plugins
+    #region eventsPluginActive()
     public static function eventsPluginActive()
     {
         require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         return is_plugin_active('ssv-events/ssv-events.php');
     }
+    #endregion
 
+    #region usersPluginActive()
     public static function usersPluginActive()
     {
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        if (is_plugin_active('ssv-users/ssv-users.php')) {
-            return true;
-        } else {
-            return false;
-        }
+        return is_plugin_active('ssv-users/ssv-users.php');
     }
+    #endregion
 
+    #region mailchimpPluginActive()
     public static function mailchimpPluginActive()
     {
         require_once(ABSPATH . 'wp-admin/includes/plugin.php');
         return is_plugin_active('ssv-mailchimp/ssv-mailchimp.php');
     }
+    #endregion
+    #endregion
 
+    #region getLoginURL()
     public static function getLoginURL()
     {
         return site_url() . '/login';
     }
+    #endregion
 
+    #region getListSelect($name, $options, $selected)
     public static function getListSelect($name, $options, $selected)
     {
         $name = esc_html($name);
@@ -365,6 +376,12 @@ class SSV_General
         <?php
         return ob_get_clean();
     }
+    #endregion
 
+    #region currentNavTab($object, $selected)
+    public static function currentNavTab($object, $selected) {
+        return __checked_selected_helper($object, $selected, false, 'nav-tab-active');
+    }
+    #endregion
     #endregion
 }
