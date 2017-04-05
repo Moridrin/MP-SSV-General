@@ -25,6 +25,11 @@ class SSV_General
     const OPTION_BOARD_ROLE = 'ssv_general__board_role';
     const OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
+
+    const SANITIZE_TYPE_TEXT = 'ssv_general__sanitize_text';
+    const SANITIZE_TYPE_EMAIL = 'ssv_general__sanitize_email';
+    const SANITIZE_TYPE_FILE_NAME = 'ssv_general__sanitize_file_name';
+    const SANITIZE_TYPE_HEX_COLOR = 'ssv_general__sanitize_hex_color';
     #endregion
 
     #region _init()
@@ -172,18 +177,33 @@ class SSV_General
 
     #region sanitize($value)
     /**
-     * @param $value
+     * @param string $value
+     * @param string $sanitizeType
      *
      * @return mixed
      */
-    public static function sanitize($value)
+    public static function sanitize($value, $sanitizeType = self::SANITIZE_TYPE_TEXT)
     {
         if (is_array($value)) {
             return $value;
         }
         $value = stripslashes($value);
         $value = esc_attr($value);
-        $value = sanitize_text_field($value);
+        switch ($sanitizeType) {
+            case self::SANITIZE_TYPE_EMAIL:
+                $value = sanitize_email($value);
+                break;
+            case self::SANITIZE_TYPE_FILE_NAME:
+                $value = sanitize_file_name($value);
+                break;
+            case self::SANITIZE_TYPE_HEX_COLOR:
+                $value = sanitize_hex_color($value);
+                break;
+            case self::SANITIZE_TYPE_TEXT:
+            default:
+                $value = sanitize_text_field($value);
+                break;
+        }
         return $value;
     }
     #endregion
@@ -237,7 +257,7 @@ class SSV_General
                 ob_start();
                 var_dump($variable);
                 $var_dump = ob_get_clean();
-                $print = highlight_string("<?php " . $var_dump, true);
+                $print    = highlight_string("<?php " . $var_dump, true);
             } else {
                 $print = highlight_string("<?php " . var_export($variable, true), true);
             }
@@ -379,7 +399,8 @@ class SSV_General
     #endregion
 
     #region currentNavTab($object, $selected)
-    public static function currentNavTab($object, $selected) {
+    public static function currentNavTab($object, $selected)
+    {
         return __checked_selected_helper($object, $selected, false, 'nav-tab-active');
     }
     #endregion

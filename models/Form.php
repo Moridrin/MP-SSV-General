@@ -52,7 +52,7 @@ class Form
      */
     public static function fromDatabase($overrideRight, $setValues = true, $post = null)
     {
-        $form = new Form();
+        $form                = new Form();
         $form->overrideRight = $overrideRight;
         if ($post == null) {
             global $post;
@@ -179,12 +179,12 @@ class Form
         if (!$post) {
             return;
         }
-        $form = new Form();
+        $form                = new Form();
         $form->overrideRight = SSV_General::sanitize($_POST['override_right']);
-        $customFieldValues = array();
-        $id                = 0;
-        $fieldID           = 0;
-        $prefix            = 'custom_field_';
+        $customFieldValues   = array();
+        $id                  = 0;
+        $fieldID             = 0;
+        $prefix              = 'custom_field_';
         /** @var TabField $currentTab */
         $currentTab = null;
         foreach ($_POST as $key => $value) {
@@ -197,7 +197,7 @@ class Form
                 $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value);
                 if (strpos($key, '_end') !== false) {
                     $customFieldValues['override_right'] = $form->overrideRight;
-                    $field = Field::fromJSON(json_encode($customFieldValues));
+                    $field                               = Field::fromJSON(json_encode($customFieldValues));
                     if (!empty($field->title)) {
                         if ($field instanceof TabField) {
                             $currentTab        = $field;
@@ -282,7 +282,7 @@ class Form
                 $tabsContentHTML .= ob_get_clean();
             }
             $tabsHTML .= '</ul>';
-            $html .= $tabsHTML . $tabsContentHTML;
+            $html     .= $tabsHTML . $tabsContentHTML;
         }
         return $html;
     }
