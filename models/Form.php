@@ -153,7 +153,7 @@ class Form
             <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
         </div>
         <script>
-            i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
+            var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
                 mp_ssv_add_new_field('input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
@@ -348,6 +348,9 @@ class Form
                 if ($field instanceof ImageInputField) {
                     //Do Nothing
                 } elseif ($field instanceof InputField) {
+                    if ($field->name == 'password' || $field->name == 'password_confirm') {
+                        return true;
+                    }
                     if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
                         if (is_bool($field->value)) {
                             $field->value = $field->value ? 'true' : 'false';

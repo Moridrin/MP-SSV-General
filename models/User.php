@@ -333,6 +333,9 @@ class User extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
+        if ($meta_key == 'password' || $meta_key == 'password_confirm') {
+            return new Message('Cannot put password fields in metadata.'); //Prevent passwords to be stored in metadata
+        }
         $value = SSV_General::sanitize($value);
         if ($this->getMeta($meta_key) == $value) {
             return true;
