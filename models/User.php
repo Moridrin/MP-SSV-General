@@ -445,8 +445,7 @@ class User extends \WP_User
     public function getPDFURL()
     {
         $url = get_edit_user_link($this->ID);
-        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
-        SSV_General::var_export($url, 1);
+        $url = apply_filters(SSV_General::HOOK_USER_PDF_URL, $url, $this);
         return $url;
     }
     #endregion
