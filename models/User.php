@@ -58,22 +58,6 @@ class User extends \WP_User
     #endregion
     #endregion
 
-    #region currentUserCan($permission)
-    /**
-     * @param string $permission
-     *
-     * @return bool
-     */
-    public static function currentUserCan($permission)
-    {
-        if (!is_user_logged_in()) {
-            return false;
-        }
-        $user = wp_get_current_user();
-        return $user->has_cap($permission);
-    }
-    #endregion
-
     #region register($user, $password, $email)
     /**
      * @param $username
@@ -307,6 +291,21 @@ class User extends \WP_User
     }
     #endregion
 
+    #region isBoard()
+    /**
+     * @return bool true if this user has the board role (and can edit other member profiles).
+     */
+    public static function isBoard()
+    {
+        $user = User::getCurrent();
+        if (!$user) {
+            return false;
+        }
+        $boardRole = get_option(SSV_General::OPTION_BOARD_ROLE);
+        return in_array($boardRole, $user->roles);
+    }
+    #endregion
+
     #region checkPassword($password)
     /**
      * @param string $password The plaintext new user password
@@ -349,9 +348,6 @@ class User extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
-        if ($meta_key == 'password' || $meta_key == 'password_confirm') {
-            return new Message('Cannot put password fields in metadata.'); //Prevent passwords to be stored in metadata
-        }
         $value = SSV_General::sanitize($value);
         if ($this->getMeta($meta_key) == $value) {
             return true;
@@ -404,8 +400,7 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            $meta = get_user_meta($this->ID, $meta_key, true);
-            return !empty($meta) ? $meta : $default;
+            return get_user_meta($this->ID, $meta_key, true);
         }
     }
     #endregion
@@ -419,8 +414,8 @@ class User extends \WP_User
     public function getProfileLink($target = '')
     {
         $href   = esc_url($this->getProfileURL());
-        $target = empty($target) ? '' : 'target="' . esc_html($target) . '"';
-        $label  = esc_html($this->display_name);
+        $target = empty($target) ? '' : 'target="' . $target . '"';
+        $label  = $this->display_name;
         return "<a href='$href' $target>$label</a>";
     }
 

@@ -12,16 +12,16 @@ class HeaderField extends Field
 
     /**
      * HeaderField constructor.
+
      *
-     * @param int    $id
+*@param int          $id
      * @param string $title
      * @param string $class
      * @param string $style
-     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $class, $style)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
     }
 
     /**
@@ -40,25 +40,23 @@ class HeaderField extends Field
             $values->id,
             $values->title,
             $values->class,
-            $values->style,
-            $values->override_right
+            $values->style
         );
     }
 
     /**
      * @param bool $encode
      *
-     * @return string the class as JSON object.
+*@return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'id'         => $this->id,
+            'title'      => $this->title,
+            'field_type' => $this->fieldType,
+            'class'      => $this->class,
+            'style'      => $this->style,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -71,11 +69,11 @@ class HeaderField extends Field
      */
     public function getHTML()
     {
-        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
+        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         ob_start();
         ?>
-        <h2 <?= $class ?> <?= $style ?>><?= esc_html($this->title) ?></h2>
+        <h2 <?= $class ?> <?= $style ?>><?= $this->title ?></h2>
         <?php
         return ob_get_clean();
     }

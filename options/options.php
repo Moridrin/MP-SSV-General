@@ -27,13 +27,11 @@ function ssv_settings_page()
     }
     ?>
     <div class="wrap">
+        <h1>SSV Plugins</h1>
+    </div>
+    <?php do_action(SSV_General::HOOK_GENERAL_OPTIONS_PAGE_CONTENT); ?>
+    <div class="wrap">
         <h1>General Options</h1>
-        <h2 class="nav-tab-wrapper">
-            <a href="" class="nav-tab nav-tab-active">General</a>
-            <a href="http://bosso.nl/ssv-general/" target="_blank" class="nav-tab">
-                Help <img src="<?= esc_url(SSV_Users::URL) ?>general/images/link-new-tab.png" width="14px" style="vertical-align:middle">
-            </a>
-        </h2>
     </div>
     <form method="post" action="#">
         <table class="form-table">
@@ -44,7 +42,7 @@ function ssv_settings_page()
                 </th>
                 <td>
                     <select id="board_role" name="board_role">
-                        <?php wp_dropdown_roles(get_option(esc_html(SSV_General::OPTION_BOARD_ROLE))); ?>
+                        <?php wp_dropdown_roles(get_option(SSV_General::OPTION_BOARD_ROLE)); ?>
                     </select>
                 </td>
             </tr>
@@ -54,7 +52,7 @@ function ssv_settings_page()
                 </th>
                 <td>
                     <?php
-                    $selected = json_decode(get_option(esc_html(SSV_General::OPTION_CUSTOM_FIELD_FIELDS)));
+                    $selected = json_decode(get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS));
                     $selected = $selected ?: array();
                     $fields   = array(
                         'display',
@@ -68,8 +66,8 @@ function ssv_settings_page()
                         <?php
                         foreach ($fields as $field) {
                             ?>
-                            <option value="<?= esc_html($field) ?>" <?= in_array($field, $selected) ? 'selected' : '' ?>>
-                                <?= esc_html($field) ?>
+                            <option value="<?= $field ?>" <?= in_array($field, $selected) ? 'selected' : '' ?>>
+                                <?= $field ?>
                             </option>
                             <?php
                         }

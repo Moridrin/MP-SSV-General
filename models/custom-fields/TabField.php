@@ -21,13 +21,12 @@ class TabField extends Field
      * @param string  $class
      * @param string  $style
      * @param Field[] $fields
-     * @param string  $overrideRight
      */
-    protected function __construct($id, $title, $class, $style, $overrideRight, $fields = array())
+    protected function __construct($id, $title, $class, $style, $fields = array())
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
         $this->fields = $fields;
-        $this->name   = strtolower(str_replace(' ', '_', $title));
+        $this->name = strtolower(str_replace(' ', '_', $title));
     }
 
     /**
@@ -62,7 +61,6 @@ class TabField extends Field
             $values->title,
             $values->class,
             $values->style,
-            $values->override_right,
             $fields
         );
     }
@@ -79,13 +77,12 @@ class TabField extends Field
             $jsonFields[] = $field->toJSON(false);
         }
         $values = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
-            'fields'         => $jsonFields,
+            'id'         => $this->id,
+            'title'      => $this->title,
+            'field_type' => $this->fieldType,
+            'class'      => $this->class,
+            'style'      => $this->style,
+            'fields'     => $jsonFields,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -98,12 +95,12 @@ class TabField extends Field
      */
     public function getHTML()
     {
-        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'active' : '';
-        $class       = !empty($this->class) ? 'class="tab ' . esc_html($this->class) . '"' : 'class="tab ' . esc_html($activeClass) . '"';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'class="active"' : '';
+        $class       = !empty($this->class) ? 'class="tab ' . $this->class . '"' : 'class="tab ' . $activeClass . '"';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
         ob_start();
         ?>
-        <li <?= $class ?> <?= $style ?>><a href="#<?= esc_html($this->name) ?>"><?= esc_html($this->title) ?></a></li>
+        <li <?= $class ?> <?= $style ?>><a href="#<?= $this->name ?>" <?= $activeClass ?>><?= $this->title ?></a></li>
         <?php
         return ob_get_clean();
     }
@@ -112,8 +109,8 @@ class TabField extends Field
     {
         ob_start();
         ?>
-        <input type="hidden" name="tab" value="<?= esc_html($this->id) ?>">
-        <div id="<?= esc_html($this->name) ?>">
+        <input type="hidden" name="tab" value="<?= $this->id ?>">
+        <div id="<?= $this->name ?>">
             <?php foreach ($this->fields as $field): ?>
                 <?= $field->getHTML() ?>
             <?php endforeach; ?>

@@ -51,8 +51,8 @@ class Message
         }
         ob_start();
         ?>
-        <div class="col s12 card-panel <?= esc_html($class) ?>" style="padding: 10px;">
-            <?= esc_html($this->message) ?>
+        <div class="col s12 card-panel <?php echo $class; ?>" style="padding: 10px;">
+            <?php echo $this->message; ?>
         </div>
         <?php
         return ob_get_clean();

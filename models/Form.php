@@ -17,8 +17,6 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
-    /** @var string $overrideRight */
-    public $overrideRight;
     #endregion
 
     #region Construct($fields)
@@ -26,17 +24,15 @@ class Form
      * Form constructor.
      *
      * @param Field[] $fields
-     * @param string  $overrideRight
      */
-    public function __construct($fields = array(), $overrideRight = '')
+    public function __construct($fields = array())
     {
         $this->fields = $fields;
-        if (isset($_GET['member']) && current_user_can('edit_users')) {
+        if (isset($_GET['member']) && User::isBoard()) {
             $this->user = User::getByID($_GET['member']);
         } else {
             $this->user = User::getCurrent();
         }
-        $this->overrideRight = $overrideRight;
     }
     #endregion
 
@@ -44,16 +40,14 @@ class Form
     /**
      * This function gets all the Fields from the post metadata.
      *
-     * @param string       $overrideRight
      * @param bool         $setValues
      * @param WP_Post|null $post
      *
      * @return Form|Message
      */
-    public static function fromDatabase($overrideRight, $setValues = true, $post = null)
+    public static function fromDatabase($setValues = true, $post = null)
     {
-        $form                = new Form();
-        $form->overrideRight = $overrideRight;
+        $form = new Form();
         if ($post == null) {
             global $post;
         }
@@ -61,7 +55,7 @@ class Form
             return $form;
         }
         if ($setValues) {
-            if (isset($_GET['member']) && current_user_can('edit_users')) {
+            if (isset($_GET['member']) && User::isBoard()) {
                 $user = User::getByID($_GET['member']);
                 if (!$user) {
                     echo (new Message('User not found.', Message::ERROR_MESSAGE))->getHTML();
@@ -148,19 +142,18 @@ class Form
         ob_start();
         ?>
         <div style="overflow-x: auto;">
-            <input type="hidden" name="override_right" value="<?= esc_html($this->overrideRight) ?>">
             <table id="custom-fields-placeholder" class="sortable"></table>
             <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
         </div>
         <script>
-            var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
+            i = <?= Field::getMaxID($this->fields) + 1 ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_new_field('input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
+                mp_ssv_add_new_field('input', 'text', i, null, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_new_field('<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+            mp_ssv_add_new_field('<?= $field->fieldType ?>', '<?= isset($field->inputType) ? $field->inputType : '' ?>', <?= $field->id ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
             <?php endforeach; ?>
         </script>
         <?php
@@ -179,12 +172,11 @@ class Form
         if (!$post) {
             return;
         }
-        $form                = new Form();
-        $form->overrideRight = SSV_General::sanitize($_POST['override_right']);
-        $customFieldValues   = array();
-        $id                  = 0;
-        $fieldID             = 0;
-        $prefix              = 'custom_field_';
+        $form              = new Form();
+        $customFieldValues = array();
+        $id                = 0;
+        $fieldID           = 0;
+        $prefix            = 'custom_field_';
         /** @var TabField $currentTab */
         $currentTab = null;
         foreach ($_POST as $key => $value) {
@@ -196,8 +188,7 @@ class Form
                 $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
                 $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value);
                 if (strpos($key, '_end') !== false) {
-                    $customFieldValues['override_right'] = $form->overrideRight;
-                    $field                               = Field::fromJSON(json_encode($customFieldValues));
+                    $field = Field::fromJSON(json_encode($customFieldValues));
                     if (!empty($field->title)) {
                         if ($field instanceof TabField) {
                             $currentTab        = $field;
@@ -233,12 +224,12 @@ class Form
 
     #region getHTML($adminReferer, $buttonText = 'save')
     /**
-     * @param string $adminReferrer is the admin referer for the form.
-     * @param string $buttonText    is the text on the submit button (default = 'save').
+     * @param string $adminReferer is the admin referer for the form.
+     * @param string $buttonText   is the text on the submit button (default = 'save').
      *
      * @return string the field as HTML object.
      */
-    public function getHTML($adminReferrer, $buttonText = 'save')
+    public function getHTML($adminReferer, $buttonText = 'save')
     {
         $tabs = array();
         $html = '';
@@ -255,8 +246,8 @@ class Form
             ?>
             <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
-                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
-                <?= SSV_General::getFormSecurityFields($adminReferrer, false, false) ?>
+                <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
+                <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
             </form>
             <?php
             $html = ob_get_clean();
@@ -268,21 +259,21 @@ class Form
                 $tabsHTML .= $tab->getHTML();
                 ob_start();
                 ?>
-                <div id="<?= esc_html($tab->name) ?>">
+                <div id="<?= $tab->name ?>">
                     <form action="#" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="tab" value="<?= esc_html($tab->id) ?>">
+                        <input type="hidden" name="tab" value="<?= $tab->id ?>">
                         <?php foreach ($tab->fields as $childField): ?>
                             <?= $childField->getHTML() ?>
                         <?php endforeach; ?>
-                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button
-                        <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
+                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= $buttonText ?></button
+                        <?= SSV_General::getFormSecurityFields($adminReferer, false, false); ?>
                     </form>
                 </div>
                 <?php
                 $tabsContentHTML .= ob_get_clean();
             }
             $tabsHTML .= '</ul>';
-            $html     .= $tabsHTML . $tabsContentHTML;
+            $html .= $tabsHTML . $tabsContentHTML;
         }
         return $html;
     }
@@ -348,10 +339,7 @@ class Form
                 if ($field instanceof ImageInputField) {
                     //Do Nothing
                 } elseif ($field instanceof InputField) {
-                    if ($field->name == 'password' || $field->name == 'password_confirm') {
-                        return true;
-                    }
-                    if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
+                    if (!$field->isDisabled() || User::isBoard()) {
                         if (is_bool($field->value)) {
                             $field->value = $field->value ? 'true' : 'false';
                         }
@@ -376,13 +364,13 @@ class Form
             if ($file_location && !isset($file_location['error'])) {
                 $currentURL      = $this->user->getMeta($name);
                 $currentLocation = $this->user->getMeta($name . '_path');
-                if ($currentURL != '' && mp_ssv_starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
+                if ($currentURL != '' && starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
                     unlink($currentLocation);
                 }
                 $this->user->updateMeta($name, $file_location["url"]);
                 $this->user->updateMeta($name . '_path', $file_location["file"]);
             } else {
-                $messages[] = new Message($file_location['error'], current_user_can($file->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                $messages[] = new Message($file_location['error'], User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
             }
         }
 
@@ -452,21 +440,21 @@ class Form
         $rows               = $this->loopRecursive(
             function ($field) {
                 if ($field instanceof TabField) {
-                    return '<tr><td colspan="2"><h1>' . esc_html($field->title) . '</h1></td></tr>';
+                    return '<tr><td colspan="2"><h1>' . $field->title . '</h1></td></tr>';
                 } elseif ($field instanceof HeaderField) {
-                    return '<tr><td colspan="2"><h3>' . esc_html($field->title) . '</h3></td></tr>';
+                    return '<tr><td colspan="2"><h3>' . $field->title . '</h3></td></tr>';
                 } elseif ($field instanceof InputField) {
                     if ($field->name == 'password_confirm') {
                         return null;
                     }
                     global $hidePasswordFields;
                     if ($hidePasswordFields && $field->name == 'password') {
-                        return '<tr><td>' . esc_html($field->title) . '</td><td>********</td></tr>';
+                        return '<tr><td>' . $field->title . '</td><td>********</td></tr>';
                     } else {
-                        return '<tr><td>' . esc_html($field->title) . '</td><td>' . esc_html($field->value) . '</td></tr>';
+                        return '<tr><td>' . $field->title . '</td><td>' . $field->value . '</td></tr>';
                     }
                 } elseif ($field instanceof LabelField) {
-                    return '<tr><td>' . esc_html($field->text) . '</td></tr>';
+                    return '<tr><td>' . $field->text . '</td></tr>';
                 }
                 return null;
             }

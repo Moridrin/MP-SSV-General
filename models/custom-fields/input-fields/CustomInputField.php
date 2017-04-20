@@ -30,11 +30,10 @@ class CustomInputField extends InputField
      * @param string $placeholder
      * @param string $class
      * @param string $style
-     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
+        parent::__construct($id, $title, $inputType, $name, $class, $style);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -60,8 +59,7 @@ class CustomInputField extends InputField
             $values->default_value,
             $values->placeholder,
             $values->class,
-            $values->style,
-            $values->override_right
+            $values->style
         );
     }
 
@@ -73,18 +71,17 @@ class CustomInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'input_type'     => $this->inputType,
-            'name'           => $this->name,
-            'disabled'       => $this->disabled,
-            'required'       => $this->required,
-            'default_value'  => $this->defaultValue,
-            'placeholder'    => $this->placeholder,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'id'            => $this->id,
+            'title'         => $this->title,
+            'field_type'    => $this->fieldType,
+            'input_type'    => $this->inputType,
+            'name'          => $this->name,
+            'disabled'      => $this->disabled,
+            'required'      => $this->required,
+            'default_value' => $this->defaultValue,
+            'placeholder'   => $this->placeholder,
+            'class'         => $this->class,
+            'style'         => $this->style,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -101,16 +98,16 @@ class CustomInputField extends InputField
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
-        $inputType   = 'type="' . esc_html($this->inputType) . '"';
-        $name        = 'name="' . esc_html($this->name) . '"';
-        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
-        $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
-        $disabled    = disabled($this->disabled);
-        $required    = $this->required ? 'required="required"' : '';
+        $inputType   = 'type="' . $this->inputType . '"';
+        $name = 'name="' . $this->name . '"';
+        $class       = !empty($this->class) ? 'class="' . $this->class . '"' : '';
+        $style       = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $placeholder = !empty($this->placeholder) ? 'placeholder="' . $this->placeholder . '"' : '';
+        $value       = !empty($value) ? 'value="' . $value . '"' : '';
+        $disabled    = $this->disabled ? 'disabled' : '';
+        $required    = $this->required ? 'required' : '';
 
-        if (isset($overrideRight) && current_user_can($overrideRight)) {
+        if (is_user_logged_in() && User::isBoard()) {
             $disabled = '';
             $required = '';
         }
@@ -119,15 +116,15 @@ class CustomInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+                <label for="<?= $this->id ?>"><?php echo $this->title; ?><?= $this->required ? '*' : '' ?></label>
+                <input <?= $inputType ?> id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
             </div>
             <?php
             if ($this->inputType == 'date' && $this->required) {
                 ?>
                 <script>
                     jQuery(function ($) {
-                        var dateField = $('#<?= esc_html($this->id) ?>');
+                        var dateField = $('#<?= $this->id ?>');
                         dateField.change(function () {
                             if (dateField.val() == '') {
                                 dateField.addClass('invalid')
@@ -145,39 +142,29 @@ class CustomInputField extends InputField
     }
 
     /**
-     * @return string the filter for this field as HTML object.
-     */
-    public function getFilterRow()
-    {
-        ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="<?= esc_html($this->inputType) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
-        return $this->getFilterRowBase(ob_get_clean());
-    }
-
-    /**
      * @return Message[]|bool array of errors or true if no errors.
      */
     public function isValid()
     {
         $errors = array();
         if (($this->required && !$this->disabled) && empty($this->value)) {
-            $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' field is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         switch (strtolower($this->inputType)) {
             case 'iban':
                 $this->value = str_replace(' ', '', strtoupper($this->value));
                 if (!empty($this->value) && !SSV_General::isValidIBAN($this->value)) {
-                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
             case 'email':
                 if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid email.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid email.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
             case 'url':
                 if (!filter_var($this->value, FILTER_VALIDATE_URL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid url.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid url.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
         }

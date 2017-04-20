@@ -29,11 +29,9 @@ abstract class Field
     public $class;
     /** @var string $style */
     public $style;
-    /** @var string $overrideRight */
-    public $overrideRight;
     #endregion
 
-    #region __construct($id, $title, $fieldType, $class, $style, $overrideRight)
+    #region __construct($id, $title, $fieldType, $class, $style)
     /**
      * Field constructor.
      *
@@ -42,46 +40,16 @@ abstract class Field
      * @param string $fieldType
      * @param string $class
      * @param string $style
-     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $fieldType, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $fieldType, $class, $style)
     {
-        $this->id            = $id;
-        $this->title         = $title;
-        $this->fieldType     = $fieldType;
-        $this->class         = $class;
-        $this->style         = $style;
-        $this->overrideRight = $overrideRight;
+        $this->id        = $id;
+        $this->title     = $title;
+        $this->fieldType = $fieldType;
+        $this->class     = $class;
+        $this->style     = $style;
     }
     #endregion
-
-    /**
-     * @param string $name
-     *
-     * @return string with the title for that field or empty if no match is found.
-     */
-    public static function fromDatabase($name)
-    {
-        global $wpdb;
-        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
-        $sql    = "SELECT customField FROM $table WHERE customField LIKE '%\"name\":\"$name\"%'";
-        $fields = $wpdb->get_results($sql);
-        foreach ($fields as $field) {
-            $field = self::fromJSON($field->customField);
-            if ($field instanceof TabField) {
-                foreach ($field->fields as $childField) {
-                    if ($childField instanceof InputField) {
-                        if ($childField->name == $name) {
-                            return $field->title;
-                        }
-                    }
-                }
-            } elseif ($field instanceof InputField && $field->name == $name) {
-                return $field->title;
-            }
-        }
-        return '';
-    }
 
     #region fromJSON($json)
     /**
@@ -152,13 +120,8 @@ abstract class Field
     }
     #endregion
 
-    #region __toString()
-    /**
-     * @return string HTML code for the field
-     */
-    public function __toString()
-    {
+
+    public function __toString() {
         return $this->getHTML();
     }
-    #endregion
 }
