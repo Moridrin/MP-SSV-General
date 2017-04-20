@@ -437,16 +437,4 @@ class User extends \WP_User
         return $url;
     }
     #endregion
-
-    #region getPDFURL()
-    /**
-     * @return string the url for the users Direct Debit PDF
-     */
-    public function getPDFURL()
-    {
-        $url = get_edit_user_link($this->ID);
-        $url = apply_filters(SSV_General::HOOK_USER_PDF_URL, $url, $this);
-        return $url;
-    }
-    #endregion
 }
