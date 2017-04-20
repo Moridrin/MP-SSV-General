@@ -58,6 +58,22 @@ class User extends \WP_User
     #endregion
     #endregion
 
+    #region currentUserCan($permission)
+    /**
+     * @param string $permission
+     *
+     * @return bool
+     */
+    public static function currentUserCan($permission)
+    {
+        if (!is_user_logged_in()) {
+            return false;
+        }
+        $user = wp_get_current_user();
+        return $user->has_cap($permission);
+    }
+    #endregion
+
     #region register($user, $password, $email)
     /**
      * @param $username
@@ -418,6 +434,19 @@ class User extends \WP_User
     {
         $url = get_edit_user_link($this->ID);
         $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
+        return $url;
+    }
+    #endregion
+
+    #region getPDFURL()
+    /**
+     * @return string the url for the users Direct Debit PDF
+     */
+    public function getPDFURL()
+    {
+        $url = get_edit_user_link($this->ID);
+        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
+        SSV_General::var_export($url, 1);
         return $url;
     }
     #endregion

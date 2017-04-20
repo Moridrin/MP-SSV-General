@@ -16,6 +16,7 @@ class SSV_General
     const BASE_URL = SSV_GENERAL_BASE_URL;
 
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
+    const HOOK_USER_PDF_URL = 'ssv_general__hook_pdf_url';
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
     const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
