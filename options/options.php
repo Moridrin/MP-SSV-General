@@ -1,4 +1,6 @@
 <?php
+use mp_ssv_general\SSV_General;
+
 if (!defined('ABSPATH')) {
     exit;
 }

@@ -1,4 +1,10 @@
 <?php
+namespace mp_ssv_general\custom_fields;
+use Exception;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.

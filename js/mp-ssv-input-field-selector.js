@@ -7,28 +7,28 @@ var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 
 function mp_ssv_add_new_field(fieldType, inputType, fieldID, values, allowTabs) {
-    if (typeof values == 'undefined' || values == null) {
+    if (typeof values === 'undefined' || values === null) {
         values = [];
     }
-    if (fieldType == 'tab') {
+    if (fieldType === 'tab') {
         getTabField(fieldID, values, allowTabs);
-    } else if (fieldType == 'header') {
+    } else if (fieldType === 'header') {
         getHeaderField(fieldID, values, allowTabs);
-    } else if (fieldType == 'input') {
-        if (inputType == 'text') {
+    } else if (fieldType === 'input') {
+        if (inputType === 'text') {
             getTextInputField(fieldID, values, allowTabs);
-        } else if (inputType == 'select') {
+        } else if (inputType === 'select') {
             getSelectInputField(fieldID, values, allowTabs);
-        } else if (inputType == 'checkbox') {
+        } else if (inputType === 'checkbox') {
             getCheckboxInputField(fieldID, values, allowTabs);
-        } else if (inputType == 'image') {
+        } else if (inputType === 'image') {
             getImageInputField(fieldID, values, allowTabs);
-        } else if (inputType == 'hidden') {
+        } else if (inputType === 'hidden') {
             getHiddenInputField(fieldID, values, allowTabs);
         } else {
             getCustomInputField(inputType, fieldID, values, allowTabs);
         }
-    } else if (fieldType == 'label') {
+    } else if (fieldType === 'label') {
         getLabelField(fieldID, values, allowTabs);
     }
 }
@@ -476,12 +476,12 @@ function getText(fieldID, value) {
 function getInputType(fieldID, value) {
     var options = ["Text", "Select", "Checkbox", "Image", "Hidden", "Custom"];
     var customValue = '';
-    if (["text", "select", "checkbox", "image", "hidden", "custom"].indexOf(value) == -1) {
+    if (["text", "select", "checkbox", "image", "hidden", "custom"].indexOf(value) === -1) {
         customValue = value;
         value = 'custom';
     }
     var inputType = createSelect(fieldID, "_input_type", options, value);
-    if (value == 'custom') {
+    if (value === 'custom') {
         inputType.setAttribute("style", "width: 48%;");
     } else {
         inputType.setAttribute("style", "width: 100%;");
@@ -498,7 +498,7 @@ function getInputType(fieldID, value) {
     inputTypeTD.appendChild(inputTypeLabel);
     inputTypeTD.appendChild(getBR());
     inputTypeTD.appendChild(inputType);
-    if (value == 'custom') {
+    if (value === 'custom') {
         var inputTypeCustom = document.createElement("input");
         inputTypeCustom.setAttribute("id", fieldID + "_input_type");
         inputTypeCustom.setAttribute("name", "custom_field_" + fieldID + "_input_type");
@@ -782,7 +782,7 @@ function fieldTypeChanged(fieldID) {
     removeField(document.getElementById(fieldID + "_style_td"));
     removeField(document.getElementById(fieldID + "_end_td"));
     removeFields(document.getElementsByClassName(fieldID + "_empty_td"));
-    if (fieldType == 'input') {
+    if (fieldType === 'input') {
         tr.appendChild(getInputType(fieldID, ""));
         tr.appendChild(getName(fieldID, ""));
         tr.appendChild(getDisabled(fieldID, ""));
@@ -792,7 +792,7 @@ function fieldTypeChanged(fieldID) {
         tr.appendChild(getClass(fieldID, ""));
         tr.appendChild(getStyle(fieldID, ""));
         tr.appendChild(getEnd(fieldID));
-    } else if (fieldType == 'label') {
+    } else if (fieldType === 'label') {
         tr.appendChild(getText(fieldID, ""));
         tr.appendChild(getClass(fieldID, ""));
         tr.appendChild(getStyle(fieldID, ""));
@@ -825,15 +825,15 @@ function inputTypeChanged(fieldID) {
     removeField(document.getElementById(fieldID + "_style_td"));
     removeField(document.getElementById(fieldID + "_end_td"));
     removeFields(document.getElementsByClassName(fieldID + "_empty_td"));
-    if (inputType == 'text') {
+    if (inputType === 'text') {
         getTextInputFields(tr, fieldID, "", "", "", "", "", "", "");
-    } else if (inputType == 'select') {
+    } else if (inputType === 'select') {
         getSelectInputFields(tr, fieldID, "", "", "", "", "");
-    } else if (inputType == 'checkbox') {
+    } else if (inputType === 'checkbox') {
         getCheckboxInputFields(tr, fieldID, "", "", "", "", "", "")
-    } else if (inputType == 'image') {
+    } else if (inputType === 'image') {
         getImageInputFields(tr, fieldID, "", "", "", "");
-    } else if (inputType == 'hidden') {
+    } else if (inputType === 'hidden') {
         getHiddenInputFields(tr, fieldID, "", "", "", "");
     } else {
         getCustomInputFields(tr, fieldID, "", "", "", "", "", "", "");
@@ -848,7 +848,7 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
     for (var i = 0; i < options.length; i++) {
         var option = document.createElement("option");
         option.setAttribute("value", options[i].toLowerCase());
-        if (options[i].toLowerCase() == selected) {
+        if (options[i].toLowerCase() === selected) {
             option.setAttribute("selected", "selected");
         }
         option.innerHTML = options[i];

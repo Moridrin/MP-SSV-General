@@ -1,4 +1,11 @@
 <?php
+namespace mp_ssv_general;
+use mp_ssv_general\custom_fields\Field;
+use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\custom_fields\InputField;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -400,7 +407,8 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            return get_user_meta($this->ID, $meta_key, true);
+            $value = get_user_meta($this->ID, $meta_key, true);
+            return $value === false ? $default : $value;
         }
     }
     #endregion

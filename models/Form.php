@@ -1,4 +1,16 @@
 <?php
+namespace mp_ssv_general;
+use mp_ssv_general\custom_fields\Field;
+use mp_ssv_general\custom_fields\HeaderField;
+use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\custom_fields\LabelField;
+use mp_ssv_general\custom_fields\TabField;
+use WP_Post;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.
@@ -146,7 +158,7 @@ class Form
             <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
         </div>
         <script>
-            i = <?= Field::getMaxID($this->fields) + 1 ?>;
+            var i = <?= Field::getMaxID($this->fields) + 1 ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
                 mp_ssv_add_new_field('input', 'text', i, null, <?= $allowTabs ? 'true' : 'false' ?>);
@@ -364,7 +376,7 @@ class Form
             if ($file_location && !isset($file_location['error'])) {
                 $currentURL      = $this->user->getMeta($name);
                 $currentLocation = $this->user->getMeta($name . '_path');
-                if ($currentURL != '' && starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
+                if ($currentURL != '' && mp_ssv_starts_with($currentURL, SSV_General::BASE_URL) && file_exists($currentLocation)) {
                     unlink($currentLocation);
                 }
                 $this->user->updateMeta($name, $file_location["url"]);

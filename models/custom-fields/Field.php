@@ -1,4 +1,10 @@
 <?php
+namespace mp_ssv_general\custom_fields;
+use Exception;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 require_once 'TabField.php';
 require_once 'HeaderField.php';

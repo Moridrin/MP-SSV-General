@@ -1,4 +1,14 @@
 <?php
+namespace mp_ssv_general\custom_fields\input_fields;
+use Exception;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.
@@ -108,7 +118,7 @@ class ImageInputField extends InputField
                         <input type="file" id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
                     </div>
                     <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text">
+                        <input class="file-path validate" type="text" title="<?= $this->title?>">
                     </div>
                 </div>
             </div>
@@ -126,7 +136,7 @@ class ImageInputField extends InputField
         $errors = array();
         if ($this->required && empty($this->value)) {
             $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-        } elseif (!empty($this->value) && !starts_with($this->value, SSV_General::BASE_URL)) {
+        } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, SSV_General::BASE_URL)) {
             $errors[] = new Message($this->title . ' has an incorrect url.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;

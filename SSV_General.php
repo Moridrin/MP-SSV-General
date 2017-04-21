@@ -1,4 +1,10 @@
 <?php
+namespace mp_ssv_general;
+use Exception;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.
@@ -210,11 +216,13 @@ class SSV_General
                 $print = highlight_string("<?php " . var_export($variable, true), true);
             }
             $print = trim($print);
+            /** @noinspection HtmlUnknownAttribute */
             $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print, 1);  // remove prefix
             $print = preg_replace("|\\</code\\>\$|", '', $print, 1);
             $print = trim($print);
             $print = preg_replace("|\\</span\\>\$|", '', $print, 1);
             $print = trim($print);
+            /** @noinspection HtmlUnknownAttribute */
             $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
             $print .= ';';
         }

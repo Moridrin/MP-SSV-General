@@ -1,4 +1,18 @@
 <?php
+namespace mp_ssv_general\custom_fields;
+use Exception;
+use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
+use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
+use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\input_fields\SelectInputField;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 require_once 'input-fields/TextInputField.php';
 require_once 'input-fields/CheckboxInputField.php';
