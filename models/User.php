@@ -1,4 +1,12 @@
 <?php
+namespace mp_ssv_general;
+
+use mp_ssv_general\custom_fields\Field;
+use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\custom_fields\InputField;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -288,6 +296,21 @@ class User extends \WP_User
         } else {
             return false;
         }
+    }
+    #endregion
+
+    #region currentUserCan()
+    /**
+     * @param $capability
+     *
+     * @return bool true if this user has the given capability.
+     */
+    public static function currentUserCan($capability)
+    {
+        if (!is_user_logged_in()) {
+            return false;
+        }
+        return self::getCurrent()->has_cap($capability);
     }
     #endregion
 

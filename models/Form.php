@@ -1,4 +1,16 @@
 <?php
+namespace mp_ssv_general;
+use mp_ssv_general\custom_fields\Field;
+use mp_ssv_general\custom_fields\HeaderField;
+use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\custom_fields\LabelField;
+use mp_ssv_general\custom_fields\TabField;
+use WP_Post;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.

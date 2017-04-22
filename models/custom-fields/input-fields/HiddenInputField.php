@@ -1,4 +1,13 @@
 <?php
+namespace mp_ssv_general\custom_fields\input_fields;
+use DateTime;
+use Exception;
+use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\Message;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 /**
  * Created by PhpStorm.
