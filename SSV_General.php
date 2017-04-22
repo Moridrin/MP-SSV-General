@@ -238,22 +238,6 @@ class SSV_General
     }
     #endregion
 
-    #region currentNavTab($selected, $current)
-    /**
-     * @param string $selected is the currently selected value
-     * @param string $tab      is the tab
-     *
-     * @return string
-     */
-    public static function currentNavTab($selected, $tab)
-    {
-        if ($selected == $tab) {
-            return 'active';
-        } else {
-            return '';
-        }
-    }
-
     #region _hasCircularReference($variable)
 
     /**
@@ -301,5 +285,73 @@ class SSV_General
     }
     #endregion
 
+    #region getListSelect($name, $options, $selected)
+    public static function getListSelect($name, $options, $selected)
+    {
+        $name = esc_html($name);
+        ob_start();
+        $optionCount = count($options);
+        ?>
+        <div style="float:left;margin-right:20px;">
+            <label for="non_selected_fields">Available</label>
+            <br/>
+            <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($options as $option): ?>
+                    <?php $option = esc_html($option); ?>
+                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div style="float:left;margin-right:20px;">
+            <label for="selected_fields">Selected</label>
+            <br/>
+            <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($selected as $option): ?>
+                    <?php $option = esc_html($option); ?>
+                    <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
+        <script>
+            var options = <?= esc_html(json_encode($selected)) ?>;
+            document.getElementById('<?= $name ?>').value = options;
+            function <?= $name ?>_add(val) {
+                options.push(val);
+                document.getElementById('<?= $name ?>').value = options;
+                var option = document.createElement("option");
+                option.id = '<?= $name ?>_selected_result_' + val;
+                option.text = val;
+                option.addEventListener("click", function () {
+                    <?= $name ?>_remove(val);
+                }, false);
+                document.getElementById('selected_fields').add(option);
+                option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.setAttribute("disabled", "disabled");
+            }
+
+            function <?= $name ?>_remove(val) {
+                var index = options.indexOf(val);
+                if (index > -1) {
+                    options.splice(index, 1);
+                }
+                document.getElementById('<?= $name ?>').value = options;
+                var option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.removeAttribute("disabled");
+                option = document.getElementById('<?= $name ?>_selected_result_' + val);
+                option.parentNode.removeChild(option);
+            }
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+    #endregion
+
+    #region currentNavTab($object, $selected)
+    public static function currentNavTab($object, $selected)
+    {
+        return __checked_selected_helper($object, $selected, false, 'nav-tab-active');
+    }
+    #endregion
     #endregion
 }
