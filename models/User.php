@@ -1,5 +1,4 @@
 <?php
-
 namespace mp_ssv_general;
 
 use mp_ssv_general\custom_fields\Field;
