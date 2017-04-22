@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -236,7 +238,24 @@ class SSV_General
     }
     #endregion
 
+    #region currentNavTab($selected, $current)
+    /**
+     * @param string $selected is the currently selected value
+     * @param string $tab      is the tab
+     *
+     * @return string
+     */
+    public static function currentNavTab($selected, $tab)
+    {
+        if ($selected == $tab) {
+            return 'active';
+        } else {
+            return '';
+        }
+    }
+
     #region _hasCircularReference($variable)
+
     /**
      * This function checks if the given $variable is recursive.
      *
