@@ -356,9 +356,6 @@ class User extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
-        if ($meta_key == 'password' || $meta_key == 'password_confirm') {
-            return new Message('Cannot put password fields in metadata.'); //Prevent passwords to be stored in metadata
-        }
         $value = SSV_General::sanitize($value);
         if ($this->getMeta($meta_key) == $value) {
             return true;
@@ -411,8 +408,8 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            $meta = get_user_meta($this->ID, $meta_key, true);
-            return !empty($meta) ? $meta : $default;
+            $value = get_user_meta($this->ID, $meta_key, true);
+            return $value === false ? $default : $value;
         }
     }
     #endregion
@@ -426,8 +423,8 @@ class User extends \WP_User
     public function getProfileLink($target = '')
     {
         $href   = esc_url($this->getProfileURL());
-        $target = empty($target) ? '' : 'target="' . esc_html($target) . '"';
-        $label  = esc_html($this->display_name);
+        $target = empty($target) ? '' : 'target="' . $target . '"';
+        $label  = $this->display_name;
         return "<a href='$href' $target>$label</a>";
     }
 

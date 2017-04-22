@@ -39,7 +39,6 @@ function getTabField(fieldID, values, allowTabs) {
     var fieldTitle = '';
     var fields = {};
     var fieldType = 'tab';
-    var overrideRight = values['override_right'];
     if (typeof values['title'] !== 'undefined') {
         fieldTitle = values['title'];
     }
@@ -47,7 +46,22 @@ function getTabField(fieldID, values, allowTabs) {
         fields = values['fields'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var startTR = document.createElement("tr");
+    startTR.setAttribute("id", fieldID + "_tr");
+    startTR.setAttribute("id", fieldID + "_tab_end");
+    var startLabel = document.createTextNode("Start of Tab");
+    startTR.appendChild(getStart(fieldID, true));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(startLabel);
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEmpty(fieldID));
+    startTR.appendChild(getEnd(fieldID));
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
@@ -57,6 +71,21 @@ function getTabField(fieldID, values, allowTabs) {
     tr.appendChild(getClass(fieldID, ""));
     tr.appendChild(getStyle(fieldID, ""));
     tr.appendChild(getEnd(fieldID));
+    var endTR = document.createElement("tr");
+    endTR.setAttribute("id", fieldID + "_tr");
+    endTR.setAttribute("id", fieldID + "_tab_end");
+    var endLabel = document.createTextNode("End of Tab");
+    endTR.appendChild(getStart(fieldID, true));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(endLabel);
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEmpty(fieldID));
+    endTR.appendChild(getEnd(fieldID));
 
     container.appendChild(tr);
     // container.appendChild(startTR);
@@ -73,14 +102,14 @@ function getHeaderField(fieldID, values, allowTabs) {
     var fieldType = 'header';
     var classValue = '';
     var style = '';
-    var overrideRight = values['override_right'];
-    if (Object.keys(values).length > 1) {
+
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         classValue = values['class'];
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID));
@@ -106,7 +135,7 @@ function getTextInputField(fieldID, values, allowTabs) {
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -117,7 +146,7 @@ function getTextInputField(fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getTextInputFields(tr, fieldID, name, required, disabled, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
@@ -132,7 +161,7 @@ function getSelectInputField(fieldID, values, allowTabs) {
     var disabled = false;
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         options = values['options'];
@@ -141,7 +170,7 @@ function getSelectInputField(fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getSelectInputFields(tr, fieldID, name, options, disabled, classValue, style);
     container.appendChild(tr);
 }
@@ -156,7 +185,7 @@ function getCheckboxInputField(fieldID, values, allowTabs) {
     var defaultChecked = '';
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -166,7 +195,7 @@ function getCheckboxInputField(fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getCheckboxInputFields(tr, fieldID, name, required, disabled, defaultChecked, classValue, style);
     container.appendChild(tr);
 }
@@ -180,7 +209,7 @@ function getImageInputField(fieldID, values, allowTabs) {
     var required = false;
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -188,7 +217,7 @@ function getImageInputField(fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getImageInputFields(tr, fieldID, name, required, classValue, style);
     container.appendChild(tr);
 }
@@ -202,7 +231,7 @@ function getHiddenInputField(fieldID, values, allowTabs) {
     var defaultValue = '';
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         defaultValue = values['default_value'];
@@ -210,7 +239,7 @@ function getHiddenInputField(fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getHiddenInputFields(tr, fieldID, name, defaultValue, classValue, style);
     container.appendChild(tr);
 }
@@ -227,7 +256,7 @@ function getCustomInputField(inputType, fieldID, values, allowTabs) {
     var placeholder = '';
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (Object.keys(values).length > 0) {
         fieldTitle = values['title'];
         name = values['name'];
         required = values['required'];
@@ -238,7 +267,7 @@ function getCustomInputField(inputType, fieldID, values, allowTabs) {
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr = getCustomInputFields(tr, fieldID, inputType, name, required, disabled, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
@@ -251,14 +280,14 @@ function getLabelField(fieldID, values, allowTabs) {
     var text = '';
     var classValue = '';
     var style = '';
-    if (Object.keys(values).length > 1) {
+    if (typeof values !== 'undefined') {
         fieldTitle = values['title'];
         text = values['text'];
         classValue = values['class'];
         style = values['style'];
     }
 
-    var tr = getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs);
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
     tr.appendChild(getText(fieldID, text));
     tr.appendChild(getClass(fieldID, classValue));
     tr.appendChild(getStyle(fieldID, style));
@@ -267,13 +296,12 @@ function getLabelField(fieldID, values, allowTabs) {
     container.appendChild(tr);
 }
 
-function getBaseFields(fieldID, overrideRight, fieldTitle, fieldType, allowTabs) {
+function getBaseFields(fieldID, fieldTitle, fieldType, allowTabs) {
     var tr = document.createElement("tr");
     tr.setAttribute("id", fieldID + "_tr");
     tr.appendChild(getStart(fieldID));
     tr.appendChild(getFieldID(fieldID));
     tr.appendChild(getDraggable(fieldID));
-    tr.appendChild(getOverrideRight(fieldID, overrideRight));
     tr.appendChild(getFieldTitle(fieldID, fieldTitle));
     tr.appendChild(getFieldType(fieldID, fieldType, allowTabs));
     return tr;
@@ -359,13 +387,16 @@ function getEmpty(fieldID) {
     td.setAttribute("class", fieldID + "_empty_td");
     return td;
 }
-function getStart(fieldID) {
+function getStart(fieldID, isTab) {
     var start = document.createElement("input");
     start.setAttribute("type", "hidden");
     start.setAttribute("id", fieldID + "_start");
     start.setAttribute("name", "custom_field_" + fieldID + "_start");
     start.setAttribute("value", "start");
     var startTD = document.createElement("td");
+    if (isTab) {
+        startTD.setAttribute("style", "border-left: solid;");
+    }
     startTD.setAttribute("id", fieldID + "_start_td");
     startTD.appendChild(start);
     return startTD;
@@ -390,17 +421,6 @@ function getDraggable(fieldID) {
     draggableIconTD.setAttribute("style", "vertical-align: middle; cursor: move;");
     draggableIconTD.appendChild(draggableIcon);
     return draggableIconTD;
-}
-function getOverrideRight(fieldID, overrideRight) {
-    var overrideRightField = document.createElement("input");
-    overrideRightField.setAttribute("type", "hidden");
-    overrideRightField.setAttribute("id", fieldID + "_override_right");
-    overrideRightField.setAttribute("name", "custom_field_" + fieldID + "_override_right");
-    overrideRightField.setAttribute("value", overrideRight);
-    var overrideRightTD = document.createElement("td");
-    overrideRightTD.setAttribute("id", fieldID + "_override_right_td");
-    overrideRightTD.appendChild(overrideRightField);
-    return overrideRightTD;
 }
 function getFieldTitle(fieldID, value) {
     var fieldTitle = document.createElement("input");
@@ -464,7 +484,7 @@ function getText(fieldID, value) {
 function getInputType(fieldID, value) {
     var options = ["Text", "Select", "Checkbox", "Image", "Hidden", "Custom"];
     var customValue = '';
-    if (["text", "select", "checkbox", "image", "hidden", "custom"].indexOf(value) == -1) {
+    if (["text", "select", "checkbox", "image", "hidden", "custom"].indexOf(value) === -1) {
         customValue = value;
         value = 'custom';
     }
@@ -738,13 +758,16 @@ function getStyle(fieldID, value) {
     styleTD.appendChild(style);
     return styleTD;
 }
-function getEnd(fieldID) {
+function getEnd(fieldID, isTab) {
     var stop = document.createElement("input");
     stop.setAttribute("type", "hidden");
     stop.setAttribute("id", fieldID + "_end");
     stop.setAttribute("name", "custom_field_" + fieldID + "_end");
     stop.setAttribute("value", "end");
     var stopTD = document.createElement("td");
+    if (isTab) {
+        stopTD.setAttribute("style", "border-right: solid;");
+    }
     stopTD.setAttribute("id", fieldID + "_end_td");
     stopTD.appendChild(stop);
     return stopTD;
