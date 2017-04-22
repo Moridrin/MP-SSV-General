@@ -21,18 +21,18 @@ class LabelField extends Field
 
     /**
      * TabField constructor.
-
      *
-*@param int          $id
+     * @param int    $id
      * @param string $title
      * @param string $text
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $text, $class, $style)
+    protected function __construct($id, $title, $text, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
-        $this->text = $text;
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
+        $this->text  = $text;
         $this->class = $class;
         $this->style = $style;
     }
@@ -54,24 +54,26 @@ class LabelField extends Field
             $values->title,
             $values->text,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
     /**
      * @param bool $encode
      *
-*@return string the class as JSON object.
+     * @return string the class as JSON object.
      */
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'text'       => $this->text,
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'text'           => $this->text,
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -84,11 +86,11 @@ class LabelField extends Field
      */
     public function getHTML()
     {
-        $class = !empty($this->class) ? 'class="' . $this->class . '"' : '';
-        $style = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
+        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         ob_start();
         ?>
-        <p <?= $class ?> <?= $style ?>><?= $this->text ?></p><br/>
+        <p <?= $class ?> <?= $style ?>><?= esc_html($this->text) ?></p><br/>
         <?php
         return ob_get_clean();
     }

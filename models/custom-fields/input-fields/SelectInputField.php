@@ -34,10 +34,11 @@ class SelectInputField extends InputField
      * @param string $options
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $options, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $options, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->options  = explode(',', $options);
     }
@@ -58,7 +59,8 @@ class SelectInputField extends InputField
             $values->disabled,
             $values->options,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -70,15 +72,16 @@ class SelectInputField extends InputField
     public function toJSON($encode = true)
     {
         $values = array(
-            'id'         => $this->id,
-            'title'      => $this->title,
-            'field_type' => $this->fieldType,
-            'input_type' => $this->inputType,
-            'name'       => $this->name,
-            'disabled'   => $this->disabled,
-            'options'    => implode(',', $this->options),
-            'class'      => $this->class,
-            'style'      => $this->style,
+            'id'             => $this->id,
+            'title'          => $this->title,
+            'field_type'     => $this->fieldType,
+            'input_type'     => $this->inputType,
+            'name'           => $this->name,
+            'disabled'       => $this->disabled,
+            'options'        => implode(',', $this->options),
+            'class'          => $this->class,
+            'style'          => $this->style,
+            'override_right' => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -91,12 +94,12 @@ class SelectInputField extends InputField
      */
     public function getHTML()
     {
-        $name     = 'name="' . $this->name . '"';
-        $class    = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate"';
-        $style    = !empty($this->style) ? 'style="' . $this->style . '"' : '';
+        $name     = 'name="' . esc_html($this->name) . '"';
+        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
+        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $disabled = $this->disabled ? 'disabled' : '';
 
-        if (is_user_logged_in() && User::isBoard()) {
+        if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
         }
 
@@ -104,17 +107,33 @@ class SelectInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <select id="<?= $this->id ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
-                        <option value="<?= $option ?>" <?= $this->value == $option ? 'selected' : '' ?>><?= $option ?></option>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
-                <label for="<?= $this->id ?>"><?= $this->title ?></label>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?>
+        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+            <?php foreach ($this->options as $option): ?>
+                <option value="<?= esc_html($option) ?>"><?= esc_html($option) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <?php
+        return $this->getFilterRowBase(ob_get_clean());
     }
 
     /**
@@ -124,7 +143,7 @@ class SelectInputField extends InputField
     {
         $errors = array();
         if (!$this->disabled && (empty($this->value) || !in_array($this->value, $this->options))) {
-            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

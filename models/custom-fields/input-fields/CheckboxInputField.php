@@ -37,10 +37,11 @@ class CheckboxInputField extends InputField
      * @param string $defaultChecked
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled       = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
@@ -66,7 +67,8 @@ class CheckboxInputField extends InputField
             $values->required,
             $values->default_checked,
             $values->class,
-            $values->style
+            $values->style,
+            $values->override_right
         );
     }
 
@@ -88,6 +90,7 @@ class CheckboxInputField extends InputField
             'default_checked' => $this->defaultChecked,
             'class'           => $this->class,
             'style'           => $this->style,
+            'override_right'  => $this->overrideRight,
         );
         if ($encode) {
             $values = json_encode($values);
@@ -101,14 +104,14 @@ class CheckboxInputField extends InputField
     public function getHTML()
     {
         $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
-        $name      = 'name="' . $this->name . '"';
-        $class     = !empty($this->class) ? 'class="' . $this->class . '"' : 'class="validate filled-in"';
-        $style     = !empty($this->style) ? 'style="' . $this->style . '"' : '';
-        $disabled  = $this->disabled ? 'disabled' : '';
-        $required  = $this->required ? 'required' : '';
-        $checked   = filter_var($isChecked, FILTER_VALIDATE_BOOLEAN) ? 'checked' : '';
+        $name      = 'name="' . esc_html($this->name) . '"';
+        $class     = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
+        $style     = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $required  = $this->required ? 'required="required"' : '';
+        $disabled  = disabled($this->disabled);
+        $checked   = checked($isChecked);
 
-        if (is_user_logged_in() && User::isBoard()) {
+        if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
             $required = '';
         }
@@ -116,15 +119,30 @@ class CheckboxInputField extends InputField
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div <?= $style; ?>>
-                <input type="hidden" id="<?= $this->id ?>_reset" <?= $name ?> value="false"/>
-                <input type="checkbox" id="<?= $this->id ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
-                <label for="<?= $this->id ?>"><?= $this->title ?><?= $required ? '*' : '' ?></label>
+            <div <?= $style ?>>
+                <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
+                <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
+    }
+
+    /**
+     * @return string the filter for this field as HTML object.
+     */
+    public function getFilterRow()
+    {
+        ob_start();
+        ?>
+        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+            <option value="false">Not Checked</option>
+            <option value="true">Checked</option>
+        </select>
+        <?php
+        return $this->getFilterRowBase(ob_get_clean());
     }
 
     /**
@@ -134,7 +152,7 @@ class CheckboxInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && (empty($this->value) || !is_bool($this->value) || !$this->value)) {
-            $errors[] = new Message($this->title . ' is required but not set.', User::isBoard() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

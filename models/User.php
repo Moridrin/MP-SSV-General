@@ -299,21 +299,6 @@ class User extends \WP_User
     }
     #endregion
 
-    #region isBoard()
-    /**
-     * @return bool true if this user has the board role (and can edit other member profiles).
-     */
-    public static function isBoard()
-    {
-        $user = User::getCurrent();
-        if (!$user) {
-            return false;
-        }
-        $boardRole = get_option(SSV_General::OPTION_BOARD_ROLE);
-        return in_array($boardRole, $user->roles);
-    }
-    #endregion
-
     #region currentUserCan()
     /**
      * @param $capability
