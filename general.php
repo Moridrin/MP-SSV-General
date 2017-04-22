@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!class_exists('SSV_General')) {
+if (!class_exists('mp_ssv_general\SSV_General')) {
     require_once 'models/custom-fields/Field.php';
 
     #region Register Scripts
