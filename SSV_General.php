@@ -348,9 +348,9 @@ class SSV_General
     #endregion
 
     #region currentNavTab($object, $selected)
-    public static function currentNavTab($object, $selected)
+    public static function currentNavTab($current, $selected)
     {
-        return __checked_selected_helper($object, $selected, false, 'nav-tab-active');
+        return $current == $selected ? 'nav-tab-active' : '';
     }
     #endregion
     #endregion
