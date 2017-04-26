@@ -97,7 +97,7 @@ class SelectInputField extends InputField
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
         $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $disabled = $this->disabled ? 'disabled' : '';
+        $disabled = disabled($this->disabled, true, false);
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';

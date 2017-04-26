@@ -120,8 +120,8 @@ class TextInputField extends InputField
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
-        $disabled    = $this->disabled ? 'disabled' : '';
-        $required    = $this->required ? 'required' : '';
+        $disabled    = disabled($this->disabled, true, false);
+        $required    = $this->required ? 'required="required"' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';

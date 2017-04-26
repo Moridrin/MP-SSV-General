@@ -118,7 +118,7 @@ class CustomInputField extends InputField
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
-        $disabled    = disabled($this->disabled);
+        $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
@@ -140,7 +140,7 @@ class CustomInputField extends InputField
                     jQuery(function ($) {
                         var dateField = $('#<?= esc_html($this->id) ?>');
                         dateField.change(function () {
-                            if (dateField.val() == '') {
+                            if (dateField.val() === '') {
                                 dateField.addClass('invalid')
                             } else {
                                 dateField.removeClass('invalid')
