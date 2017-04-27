@@ -26,7 +26,6 @@ class SSV_General
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
     const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
-    const HOOK_DIRECT_DEBIT_PDF_URL = 'ssv_general__hook_direct_debit_pdf_url';
 
     const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
     const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
