@@ -133,7 +133,7 @@ abstract class Field
      *
      * @return string the field as HTML object.
      */
-    abstract public function getHTML();
+    abstract public function getHTML($overrideRight);
     #endregion
 
     #region getMaxID($fields)

@@ -75,7 +75,7 @@ class HeaderField extends Field
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';

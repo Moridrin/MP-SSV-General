@@ -93,7 +93,7 @@ class HiddenInputField extends InputField
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         $name  = 'name="' . esc_html($this->name) . '"';
         $value = 'value="' . esc_html($this->defaultValue) . '"';

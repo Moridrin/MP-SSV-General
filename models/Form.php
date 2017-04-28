@@ -259,7 +259,7 @@ class Form
             if ($field instanceof TabField) {
                 $tabs[] = $field;
             } elseif (empty($tabs)) {
-                $html .= $field->getHTML();
+                $html .= $field->getHTML($this->overrideRight);
             }
         }
         if (empty($tabs)) {
@@ -277,14 +277,14 @@ class Form
             $tabsContentHTML = '';
             /** @var TabField $tab */
             foreach ($tabs as $tab) {
-                $tabsHTML .= $tab->getHTML();
+                $tabsHTML .= $tab->getHTML($this->overrideRight);
                 ob_start();
                 ?>
                 <div id="<?= esc_html($tab->name) ?>">
                     <form action="#" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="tab" value="<?= esc_html($tab->id) ?>">
                         <?php foreach ($tab->fields as $childField): ?>
-                            <?= $childField->getHTML() ?>
+                            <?= $childField->getHTML($this->overrideRight) ?>
                         <?php endforeach; ?>
                         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button
                         <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>

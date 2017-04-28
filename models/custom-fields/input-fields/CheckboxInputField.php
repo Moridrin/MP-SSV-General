@@ -101,7 +101,7 @@ class CheckboxInputField extends InputField
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
         $name      = 'name="' . esc_html($this->name) . '"';

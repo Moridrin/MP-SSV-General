@@ -102,7 +102,7 @@ class TabField extends Field
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'active' : '';
         $class       = !empty($this->class) ? 'class="tab ' . esc_html($this->class) . '"' : 'class="tab ' . esc_html($activeClass) . '"';

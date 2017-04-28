@@ -92,7 +92,7 @@ class SelectInputField extends InputField
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';

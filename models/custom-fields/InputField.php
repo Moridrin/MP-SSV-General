@@ -96,7 +96,7 @@ class InputField extends Field
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
