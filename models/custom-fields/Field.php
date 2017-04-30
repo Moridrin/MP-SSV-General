@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 use mp_ssv_general\SSV_General;
 
@@ -91,6 +93,7 @@ abstract class Field
     }
 
     #region fromJSON($json)
+
     /**
      * This function extracts a Field from the JSON string.
      *
@@ -165,7 +168,7 @@ abstract class Field
      */
     public function __toString()
     {
-        return $this->getHTML();
+        return $this->getHTML('');
     }
     #endregion
 }
