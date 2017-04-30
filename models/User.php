@@ -1,4 +1,5 @@
 <?php
+
 namespace mp_ssv_general;
 
 use mp_ssv_general\custom_fields\Field;
@@ -356,6 +357,9 @@ class User extends \WP_User
      */
     function updateMeta($meta_key, $value)
     {
+        if (strpos($meta_key, 'password') !== false || strpos($meta_key, 'pwd') !== false) {
+            return true;
+        }
         $value = SSV_General::sanitize($value);
         if ($this->getMeta($meta_key) == $value) {
             return true;
