@@ -89,6 +89,9 @@ class SSV_General
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return false;
         }
+        if (!isset($_POST['admin_referer']) || $_POST['admin_referer'] != $adminReferer) {
+            return false;
+        }
         if (!check_admin_referer($adminReferer)) {
             return false;
         }
@@ -287,6 +290,13 @@ class SSV_General
     #region getListSelect($name, $options, $selected)
     public static function getListSelect($name, $options, $selected)
     {
+        if (is_array($selected)) {
+            foreach ($selected as &$item) {
+                $item = esc_html($item);
+            }
+        } else {
+            $selected = esc_html($selected);
+        }
         $name = esc_html($name);
         ob_start();
         $optionCount = count($options);
@@ -314,7 +324,7 @@ class SSV_General
         <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
         <!--suppress JSUnusedAssignment -->
         <script>
-            var options = <?= esc_html(json_encode($selected)) ?>;
+            var options = <?= json_encode($selected) ?>;
             document.getElementById('<?= $name ?>').value = options;
             function <?= $name ?>_add(val) {
                 options.push(val);
