@@ -1,5 +1,6 @@
 <?php
 use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -8,8 +9,8 @@ if (!defined('ABSPATH')) {
 #region Menu Items
 function ssv_add_ssv_menu()
 {
-    add_menu_page('SSV Options', 'SSV Options', 'manage_options', 'ssv_settings', 'ssv_settings_page');
-    add_submenu_page('ssv_settings', 'General', 'General', 'manage_options', 'ssv_settings');
+    add_menu_page('SSV Options', 'SSV Options', 'edit_posts', 'ssv_settings', 'ssv_settings_page');
+    add_submenu_page('ssv_settings', 'General', 'General', 'edit_posts', 'ssv_settings');
 }
 
 add_action('admin_menu', 'ssv_add_ssv_menu', 9);
@@ -22,9 +23,8 @@ function ssv_settings_page()
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            update_option(SSV_General::OPTION_BOARD_ROLE, SSV_General::sanitize($_POST['board_role']));
-            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields']) : null;
-            update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields));
+            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields']) : array();
+            User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
         }
     }
     ?>
@@ -37,24 +37,13 @@ function ssv_settings_page()
     </div>
     <form method="post" action="#">
         <table class="form-table">
-
-            <tr valign="top">
-                <th scope="row">
-                    <label for="board_role">Board Role</label>
-                </th>
-                <td>
-                    <select id="board_role" name="board_role">
-                        <?php wp_dropdown_roles(get_option(SSV_General::OPTION_BOARD_ROLE)); ?>
-                    </select>
-                </td>
-            </tr>
             <tr>
                 <th scope="row">
                     <label for="custom_field_fields">Custom Field Fields</label>
                 </th>
                 <td>
                     <?php
-                    $selected = json_decode(get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS));
+                    $selected = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))));
                     $selected = $selected ?: array();
                     $fields   = array(
                         'display',
@@ -78,7 +67,7 @@ function ssv_settings_page()
                 </td>
             </tr>
         </table>
-        <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER); ?>
+        <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER, true, 'Reset Preference'); ?>
     </form>
     <?php
 }

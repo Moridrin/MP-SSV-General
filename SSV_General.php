@@ -30,8 +30,7 @@ class SSV_General
     const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
     const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
 
-    const OPTION_BOARD_ROLE = 'ssv_general__board_role';
-    const OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
+    const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
     #endregion
 
@@ -57,9 +56,8 @@ class SSV_General
      */
     public static function resetOptions()
     {
-        update_option(self::OPTION_BOARD_ROLE, 'administrator');
         $defaultSelected = json_encode(array('display', 'default', 'placeholder'));
-        update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, SSV_General::sanitize($defaultSelected));
+        User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, $defaultSelected, false);
     }
     #endregion
 
@@ -153,9 +151,9 @@ class SSV_General
 
     #region getFormSecurityFields($adminReferer, $save, $reset)
     /**
-     * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
-     * @param bool   $saveButton   set to false if you don't want the save button to be displayed.
-     * @param bool   $resetButton  set to false if you don't want the reset button to be displayed.
+     * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
+     * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
+     * @param bool|string $resetButton  set to false if you don't want the reset button to be displayed or give string to set custom button text.
      *
      * @return string HTML
      */
@@ -164,11 +162,13 @@ class SSV_General
         ob_start();
         ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
         wp_nonce_field($adminReferer);
-        if ($saveButton) {
+        if (is_string($saveButton)) {
+            submit_button($saveButton);
+        } elseif ($saveButton === true) {
             submit_button();
         }
         if ($resetButton) {
-            ?><input type="submit" name="reset" id="reset" class="button button-primary" value="Reset to Default"><?php
+            ?><input type="submit" name="reset" id="reset" class="button button-primary" value="<?= is_string($resetButton) ? $resetButton : 'Reset to Default' ?>"><?php
         }
         return ob_get_clean();
     }
@@ -176,7 +176,7 @@ class SSV_General
 
     #region sanitize($value)
     /**
-     * @param $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -312,6 +312,7 @@ class SSV_General
             </select>
         </div>
         <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
+        <!--suppress JSUnusedAssignment -->
         <script>
             var options = <?= esc_html(json_encode($selected)) ?>;
             document.getElementById('<?= $name ?>').value = options;

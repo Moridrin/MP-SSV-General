@@ -352,15 +352,18 @@ class User extends \WP_User
      *
      * @param string $meta_key the key that defines which metadata to set.
      * @param string $value    the value to set.
+     * @param bool   $sanitize set false if the value is already sanitized.
      *
      * @return bool|Message true if success, else it provides an object consisting of a message and a type (notification or error).
      */
-    function updateMeta($meta_key, $value)
+    function updateMeta($meta_key, $value, $sanitize = true)
     {
         if (strpos($meta_key, 'password') !== false || strpos($meta_key, 'pwd') !== false) {
             return true;
         }
-        $value = SSV_General::sanitize($value);
+        if ($sanitize) {
+            $value = SSV_General::sanitize($value);
+        }
         if ($this->getMeta($meta_key) == $value) {
             return true;
         }
@@ -413,7 +416,7 @@ class User extends \WP_User
             return $this->user_login;
         } else {
             $value = get_user_meta($this->ID, $meta_key, true);
-            return $value === false ? $default : $value;
+            return $value ?: $default;
         }
     }
     #endregion

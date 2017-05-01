@@ -1,5 +1,6 @@
 <?php
 use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -15,7 +16,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
         wp_localize_script(
             'mp-ssv-input-field-selector',
             'settings',
-            array('custom_field_fields' => get_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS))
+            array('custom_field_fields' => User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))))
         );
         wp_enqueue_script('mp-ssv-sortable-tables', SSV_General::URL . '/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
     }
