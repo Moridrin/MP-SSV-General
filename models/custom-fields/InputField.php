@@ -176,4 +176,10 @@ class InputField extends Field
             return false;
         }
     }
+
+    function __toString()
+    {
+        return $this->name;
+    }
+
 }
