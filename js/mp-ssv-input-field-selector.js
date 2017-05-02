@@ -24,6 +24,8 @@ function mp_ssv_add_new_field(fieldType, inputType, fieldID, values, allowTabs) 
             getCheckboxInputField(fieldID, values, allowTabs);
         } else if (inputType === 'role') {
             getRoleInputField(fieldID, values, allowTabs);
+        } else if (inputType === 'date') {
+            getDateInputField(fieldID, values, allowTabs);
         } else if (inputType === 'image') {
             getImageInputField(fieldID, values, allowTabs);
         } else if (inputType === 'hidden') {
@@ -293,6 +295,34 @@ function getCustomInputField(inputType, fieldID, values, allowTabs) {
     tr = getCustomInputFields(tr, fieldID, inputType, name, required, disabled, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
+function getDateInputField(fieldID, values, allowTabs) {
+    var container = document.getElementById("custom-fields-placeholder");
+
+    var overrideRight = values['override_right'];
+    var fieldTitle = '';
+    var fieldType = 'input';
+    var name = '';
+    var required = false;
+    var disabled = false;
+    var defaultValue = '';
+    var placeholder = '';
+    var classValue = '';
+    var style = '';
+    if (Object.keys(values).length > 1) {
+        fieldTitle = values['title'];
+        name = values['name'];
+        required = values['required'];
+        disabled = values['disabled'];
+        defaultValue = values['default_value'];
+        placeholder = values['placeholder'];
+        classValue = values['class'];
+        style = values['style'];
+    }
+
+    var tr = getBaseFields(fieldID, fieldTitle, fieldType, allowTabs);
+    tr = getDateInputFields(tr, fieldID, name, required, disabled, defaultValue, placeholder, classValue, style);
+    container.appendChild(tr);
+}
 function getLabelField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
@@ -410,6 +440,18 @@ function getCustomInputFields(tr, fieldID, inputType, name, required, disabled, 
     tr.appendChild(getEnd(fieldID));
     return tr;
 }
+function getDateInputFields(tr, fieldID, name, required, disabled, defaultValue, placeholder, classValue, style) {
+    tr.appendChild(getInputType(fieldID, 'date'));
+    tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getDisabled(fieldID, disabled));
+    tr.appendChild(getRequired(fieldID, required));
+    tr.appendChild(getDefaultValue(fieldID, defaultValue));
+    tr.appendChild(getPlaceholder(fieldID, placeholder));
+    tr.appendChild(getClass(fieldID, classValue));
+    tr.appendChild(getStyle(fieldID, style));
+    tr.appendChild(getEnd(fieldID));
+    return tr;
+}
 
 function getBR() {
     var br = document.createElement("div");
@@ -516,9 +558,9 @@ function getText(fieldID, value) {
     return fieldTitleTD;
 }
 function getInputType(fieldID, value) {
-    var options = ["Text", "Select", "Checkbox", "Role", "Image", "Hidden", "Custom"];
+    var options = ["Text", "Select", "Checkbox", "Role", "Date", "Image", "Hidden", "Custom"];
     var customValue = '';
-    if (["text", "select", "checkbox", "role", "image", "hidden", "custom"].indexOf(value) === -1) {
+    if (["text", "select", "checkbox", "role", "date", "image", "hidden", "custom"].indexOf(value) === -1) {
         customValue = value;
         value = 'custom';
     }
@@ -887,6 +929,8 @@ function inputTypeChanged(fieldID) {
         getSelectInputFields(tr, fieldID, "", "", "", "", "");
     } else if (inputType === 'checkbox') {
         getCheckboxInputFields(tr, fieldID, "", "", "", "", "", "")
+    } else if (inputType === 'date') {
+        getDateInputFields(tr, fieldID, "", "", "", "", "", "");
     } else if (inputType === 'role') {
         getRoleInputFields(tr, fieldID, "", "", "")
     } else if (inputType === 'image') {
