@@ -570,7 +570,7 @@ function getName(fieldID, value) {
     return nameTD;
 }
 function getRole(fieldID, value) {
-    var inputType = createSelect(fieldID, "_name", roles, value);
+    var inputType = createMultiSelect(fieldID, "_name", roles, value);
     inputType.setAttribute("style", "width: 100%;");
     var inputTypeLabel = document.createElement("label");
     inputTypeLabel.setAttribute("style", "white-space: nowrap;");
@@ -899,7 +899,6 @@ function inputTypeChanged(fieldID) {
 }
 
 function createSelect(fieldID, fieldNameExtension, options, selected) {
-    console.log(options);
     var select = document.createElement("select");
     select.setAttribute("id", fieldID + fieldNameExtension);
     select.setAttribute("name", "custom_field_" + fieldID + fieldNameExtension);
@@ -908,6 +907,29 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
         var option = document.createElement("option");
         option.setAttribute("value", options[i].toLowerCase());
         if (options[i].toLowerCase() === selected) {
+            option.setAttribute("selected", "selected");
+        }
+        option.innerHTML = options[i];
+        select.appendChild(option);
+    }
+
+    return select;
+}
+function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
+    if (selected !== null) {
+        selected = selected.split("__");
+    } else {
+        selected = [];
+    }
+    var select = document.createElement("select");
+    select.setAttribute("id", fieldID + fieldNameExtension);
+    select.setAttribute("name", "custom_field_" + fieldID + fieldNameExtension + "[]");
+    select.setAttribute("multiple", "multiple");
+
+    for (var i = 0; i < options.length; i++) {
+        var option = document.createElement("option");
+        option.setAttribute("value", options[i].toLowerCase());
+        if (jQuery.inArray(options[i].toLowerCase(), selected) !== -1) {
             option.setAttribute("selected", "selected");
         }
         option.innerHTML = options[i];

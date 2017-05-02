@@ -138,8 +138,7 @@ class Form
     public function setValues($values = null)
     {
         if ($values == null) {
-            $values = $this->user;
-            $values = $values ?: array();
+            $values = $this->user ?: array();
         }
         $this->values = $values;
         $this->loopRecursive(
@@ -368,11 +367,7 @@ class Form
                     }
                     if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
                         if ($field instanceof RoleInputField) {
-                            if ($field->value) {
-                                $this->user->add_role($field->name);
-                            } else {
-                                $this->user->remove_role($field->name);
-                            }
+                            $field->saveValue($this->user);
                         }
                         if (is_bool($field->value)) {
                             $field->value = $field->value ? 'true' : 'false';

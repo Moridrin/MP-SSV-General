@@ -186,6 +186,9 @@ class SSV_General
     public static function sanitize($value)
     {
         if (is_array($value)) {
+            foreach ($value as &$item) {
+                self::sanitize($item);
+            }
             return $value;
         }
         $value = stripslashes($value);
