@@ -3,6 +3,7 @@
 namespace mp_ssv_general;
 
 use Exception;
+use mp_ssv_users\SSV_Users;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -286,7 +287,13 @@ class SSV_General
 
     public static function getLoginURL()
     {
-        return site_url() . '/login';
+        if (self::usersPluginActive()) {
+            $loginPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_LOGIN_FIELDS);
+            if (count($loginPages) > 0) {
+                return add_query_arg('redirect_to', get_permalink(), get_permalink($loginPages[0]));
+            }
+        }
+        return site_url() . '/wp-login.php?redirect_to=' . site_url();
     }
     #endregion
 
