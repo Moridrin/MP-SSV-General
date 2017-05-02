@@ -1,14 +1,18 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleInputField;
 use mp_ssv_general\custom_fields\input_fields\SelectInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
+use mp_ssv_users\SSV_Users;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -20,6 +24,7 @@ require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
 require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
+require_once 'input-fields/RoleInputField.php';
 
 /**
  * Created by PhpStorm.
@@ -72,6 +77,8 @@ class InputField extends Field
                 return SelectInputField::fromJSON($json);
             case CheckboxInputField::INPUT_TYPE:
                 return CheckboxInputField::fromJSON($json);
+            case RoleInputField::INPUT_TYPE:
+                return RoleInputField::fromJSON($json);
             case ImageInputField::INPUT_TYPE:
                 return ImageInputField::fromJSON($json);
             case HiddenInputField::INPUT_TYPE:
@@ -147,7 +154,7 @@ class InputField extends Field
      */
     public function setValue($value)
     {
-        if ($this instanceof HiddenInputField) {
+        if (get_class($this) == HiddenInputField::class) {
             return; //Can't change the value of hidden fields.
         }
         if ($value instanceof User) { //User values can always be set (even if isDisabled())

@@ -1,8 +1,11 @@
 <?php
+
 namespace mp_ssv_general;
+
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\HeaderField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleInputField;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\custom_fields\LabelField;
 use mp_ssv_general\custom_fields\TabField;
@@ -286,7 +289,7 @@ class Form
                         <?php foreach ($tab->fields as $childField): ?>
                             <?= $childField->getHTML($this->overrideRight) ?>
                         <?php endforeach; ?>
-                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button
+                        <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
                         <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
                     </form>
                 </div>
@@ -364,6 +367,13 @@ class Form
                         return true;
                     }
                     if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
+                        if ($field instanceof RoleInputField) {
+                            if ($field->value) {
+                                $this->user->add_role($field->name);
+                            } else {
+                                $this->user->remove_role($field->name);
+                            }
+                        }
                         if (is_bool($field->value)) {
                             $field->value = $field->value ? 'true' : 'false';
                         }
