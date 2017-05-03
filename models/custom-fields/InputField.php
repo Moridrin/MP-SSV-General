@@ -7,7 +7,8 @@ use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
-use mp_ssv_general\custom_fields\input_fields\RoleInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
 use mp_ssv_general\custom_fields\input_fields\SelectInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
 use mp_ssv_general\SSV_General;
@@ -24,7 +25,8 @@ require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
 require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
-require_once 'input-fields/RoleInputField.php';
+require_once 'input-fields/RoleCheckboxInputField.php';
+require_once 'input-fields/RoleSelectInputField.php';
 
 /**
  * Created by PhpStorm.
@@ -77,8 +79,10 @@ class InputField extends Field
                 return SelectInputField::fromJSON($json);
             case CheckboxInputField::INPUT_TYPE:
                 return CheckboxInputField::fromJSON($json);
-            case RoleInputField::INPUT_TYPE:
-                return RoleInputField::fromJSON($json);
+            case RoleCheckboxInputField::INPUT_TYPE:
+                return RoleCheckboxInputField::fromJSON($json);
+            case RoleSelectInputField::INPUT_TYPE:
+                return RoleSelectInputField::fromJSON($json);
             case ImageInputField::INPUT_TYPE:
                 return ImageInputField::fromJSON($json);
             case HiddenInputField::INPUT_TYPE:

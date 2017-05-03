@@ -18,9 +18,9 @@ if (!defined('ABSPATH')) {
  * Date: 10-1-17
  * Time: 12:03
  */
-class RoleInputField extends InputField
+class RoleSelectInputField extends InputField
 {
-    const INPUT_TYPE = 'role';
+    const INPUT_TYPE = 'role_select';
 
     /** @var array $options */
     private $options;
@@ -31,20 +31,21 @@ class RoleInputField extends InputField
      * @param int          $id
      * @param string       $title
      * @param string|array $name
+     * @param string       $options
      * @param string       $class
      * @param string       $style
      * @param string       $overrideRight
      */
-    protected function __construct($id, $title, $name, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $name, $options, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, is_array($name) ? implode('__', $name) : $name, $class, $style, $overrideRight);
-        $this->options = explode('__', $name);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        $this->options = $options;
     }
 
     /**
      * @param string $json
      *
-     * @return RoleInputField
+     * @return RoleSelectInputField
      * @throws Exception
      */
     public static function fromJSON($json)
@@ -53,10 +54,11 @@ class RoleInputField extends InputField
         if ($values->input_type != self::INPUT_TYPE) {
             throw new Exception('Incorrect input type');
         }
-        return new RoleInputField(
+        return new RoleSelectInputField(
             $values->id,
             $values->title,
             $values->name,
+            $values->options,
             $values->class,
             $values->style,
             $values->override_right
@@ -76,6 +78,7 @@ class RoleInputField extends InputField
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
             'name'           => $this->name,
+            'options'        => $this->options,
             'class'          => $this->class,
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
@@ -95,33 +98,20 @@ class RoleInputField extends InputField
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
         $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $disabled = disabled(!current_user_can('edit_roles'), true, false);
-        $checked  = checked($this->value, true, false);
 
         ob_start();
-        if (count($this->options) > 1) {
-            if (current_theme_supports('materialize')) {
-                global $wp_roles;
-                ?>
-                <div class="input-field">
-                    <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
-                        <?php foreach ($this->options as $option): ?>
-                            <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
-                </div>
-                <?php
-            }
-        } else {
-            if (current_theme_supports('materialize')) {
-                ?>
-                <div <?= $style ?>>
-                    <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
-                    <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
-                    <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
-                </div>
-                <?php
-            }
+        if (current_theme_supports('materialize')) {
+            global $wp_roles;
+            ?>
+            <div class="input-field">
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                    <?php foreach ($this->options as $option): ?>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+            </div>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
@@ -134,6 +124,7 @@ class RoleInputField extends InputField
     {
         ob_start();
         ?>
+        //TODO
         <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="false">Not Checked</option>
             <option value="true">Checked</option>
@@ -154,33 +145,13 @@ class RoleInputField extends InputField
     }
 
     /**
-     * @param string|array|User|mixed $value
-     */
-    public function setValue($value)
-    {
-        parent::setValue($value);
-        $new_value = filter_var($this->value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        if ($new_value !== null) {
-            $this->value = $new_value;
-        }
-    }
-
-    /**
      * @param User $user
      */
     public function saveValue($user)
     {
-        if (count($this->options) > 1) {
-            foreach ($this->options as $option) {
-                $user->remove_role($option);
-            }
-            $user->add_role($this->value);
-        } else {
-            if ($this->value) {
-                $user->add_role($this->options[0]);
-            } else {
-                $user->remove_role($this->options[0]);
-            }
+        foreach ($this->options as $option) {
+            $user->remove_role($option);
         }
+        $user->add_role($this->value);
     }
 }

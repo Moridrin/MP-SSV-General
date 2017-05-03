@@ -5,7 +5,8 @@ namespace mp_ssv_general;
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\HeaderField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
-use mp_ssv_general\custom_fields\input_fields\RoleInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\custom_fields\LabelField;
 use mp_ssv_general\custom_fields\TabField;
@@ -226,7 +227,6 @@ class Form
                 }
             }
         }
-
         $wpdb->delete(
             SSV_General::CUSTOM_FIELDS_TABLE,
             array(
@@ -366,7 +366,7 @@ class Form
                         return true;
                     }
                     if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
-                        if ($field instanceof RoleInputField) {
+                        if ($field instanceof RoleCheckboxInputField || $field instanceof RoleSelectInputField) {
                             $field->saveValue($this->user);
                         }
                         if (is_bool($field->value)) {
