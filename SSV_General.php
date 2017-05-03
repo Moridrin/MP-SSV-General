@@ -304,6 +304,11 @@ class SSV_General
             foreach ($selected as &$item) {
                 $item = esc_html($item);
             }
+        } elseif (strpos($selected, ',') !== false) {
+            $selected = explode(',', $selected);
+            foreach ($selected as &$item) {
+                $item = esc_html($item);
+            }
         } else {
             $selected = esc_html($selected);
         }

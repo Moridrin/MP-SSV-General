@@ -69,7 +69,7 @@ abstract class Field
      *
      * @return string with the title for that field or empty if no match is found.
      */
-    public static function fromDatabase($name)
+    public static function titleFromDatabase($name)
     {
         global $wpdb;
         $table  = SSV_General::CUSTOM_FIELDS_TABLE;
@@ -81,7 +81,7 @@ abstract class Field
                 foreach ($field->fields as $childField) {
                     if ($childField instanceof InputField) {
                         if ($childField->name == $name) {
-                            return $field->title;
+                            return $childField->title;
                         }
                     }
                 }
