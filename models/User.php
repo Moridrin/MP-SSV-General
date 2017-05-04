@@ -1,4 +1,13 @@
 <?php
+
+namespace mp_ssv_general;
+
+use mp_ssv_general\custom_fields\Field;
+use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\custom_fields\InputField;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -291,18 +300,18 @@ class User extends \WP_User
     }
     #endregion
 
-    #region isBoard()
+    #region currentUserCan()
     /**
-     * @return bool true if this user has the board role (and can edit other member profiles).
+     * @param $capability
+     *
+     * @return bool true if this user has the given capability.
      */
-    public static function isBoard()
+    public static function currentUserCan($capability)
     {
-        $user = User::getCurrent();
-        if (!$user) {
+        if (!is_user_logged_in()) {
             return false;
         }
-        $boardRole = get_option(SSV_General::OPTION_BOARD_ROLE);
-        return in_array($boardRole, $user->roles);
+        return self::getCurrent()->has_cap($capability);
     }
     #endregion
 
@@ -343,12 +352,18 @@ class User extends \WP_User
      *
      * @param string $meta_key the key that defines which metadata to set.
      * @param string $value    the value to set.
+     * @param bool   $sanitize set false if the value is already sanitized.
      *
      * @return bool|Message true if success, else it provides an object consisting of a message and a type (notification or error).
      */
-    function updateMeta($meta_key, $value)
+    function updateMeta($meta_key, $value, $sanitize = true)
     {
-        $value = SSV_General::sanitize($value);
+        if (strpos($meta_key, 'password') !== false || strpos($meta_key, 'pwd') !== false) {
+            return true;
+        }
+        if ($sanitize) {
+            $value = SSV_General::sanitize($value);
+        }
         if ($this->getMeta($meta_key) == $value) {
             return true;
         }
@@ -400,7 +415,8 @@ class User extends \WP_User
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         } else {
-            return get_user_meta($this->ID, $meta_key, true);
+            $value = get_user_meta($this->ID, $meta_key, true);
+            return $value ?: $default;
         }
     }
     #endregion

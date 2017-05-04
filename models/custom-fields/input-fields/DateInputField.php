@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields\input_fields;
+
 use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
@@ -17,8 +19,10 @@ if (!defined('ABSPATH')) {
  * Date: 10-1-17
  * Time: 12:03
  */
-class CustomInputField extends InputField
+class DateInputField extends InputField
 {
+    const INPUT_TYPE = 'datetime';
+
     /** @var bool $disabled */
     public $disabled;
     /** @var array $required */
@@ -29,7 +33,7 @@ class CustomInputField extends InputField
     public $placeholder;
 
     /**
-     * CustomInputField constructor.
+     * DateTimeInputField constructor.
      *
      * @param int    $id
      * @param string $title
@@ -43,9 +47,9 @@ class CustomInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
+        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -55,16 +59,18 @@ class CustomInputField extends InputField
     /**
      * @param string $json
      *
-     * @return CustomInputField
+     * @return DateInputField
      * @throws Exception
      */
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        return new CustomInputField(
+        if ($values->input_type != self::INPUT_TYPE) {
+            throw new Exception('Incorrect input type');
+        }
+        return new DateInputField(
             $values->id,
             $values->title,
-            $values->input_type,
             $values->name,
             $values->disabled,
             $values->required,
@@ -112,7 +118,6 @@ class CustomInputField extends InputField
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
         $value       = isset($this->value) ? $this->value : $this->defaultValue;
-        $inputType   = 'type="' . esc_html($this->inputType) . '"';
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
@@ -131,10 +136,10 @@ class CustomInputField extends InputField
             ?>
             <div>
                 <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+                <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
             </div>
             <?php
-            if ($this->inputType == 'date' && $this->required) {
+            if ($this->required) {
                 ?>
                 <script>
                     jQuery(function ($) {
@@ -161,7 +166,7 @@ class CustomInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="<?= esc_html($this->inputType) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="date" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 
@@ -174,24 +179,12 @@ class CustomInputField extends InputField
         if (($this->required && !$this->disabled) && empty($this->value)) {
             $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
-        switch (strtolower($this->inputType)) {
-            case 'iban':
-                $this->value = str_replace(' ', '', strtoupper($this->value));
-                if (!empty($this->value) && !SSV_General::isValidIBAN($this->value)) {
-                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-                }
-                break;
-            case 'email':
-                if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid email.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-                }
-                break;
-            case 'url':
-                if (!filter_var($this->value, FILTER_VALIDATE_URL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid url.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-                }
-                break;
+
+        $date = DateTime::createFromFormat('Y-m-d', $this->value);
+        if (!empty($this->value) && (!$date || $date->format('Y-m-d') !== $this->value)) {
+            $errors[] = new Message($this->value . ' field is not a valid date.', Message::ERROR_MESSAGE);
         }
+
         return empty($errors) ? true : $errors;
     }
 }

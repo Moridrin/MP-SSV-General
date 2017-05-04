@@ -1,4 +1,8 @@
 <?php
+namespace mp_ssv_general;
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * SQL Formatter is a collection of utilities for debugging SQL queries.
  * It includes methods for formatting, syntax highlighting, removing comments, etc.
@@ -159,7 +163,7 @@ class SqlFormatter
 
     /**
      * Get stats about the token cache
-     * @return Array An array containing the keys 'hits', 'misses', 'entries', and 'size' in bytes
+     * @return array An array containing the keys 'hits', 'misses', 'entries', and 'size' in bytes
      */
     public static function getCacheStats()
     {
@@ -201,7 +205,7 @@ class SqlFormatter
      * @param String $string   The SQL string
      * @param array  $previous The result of the previous getNextToken() call
      *
-     * @return Array An associative array containing the type and value of the token.
+     * @return array An associative array containing the type and value of the token.
      */
     protected static function getNextToken($string, $previous = null)
     {
@@ -351,16 +355,13 @@ class SqlFormatter
      *
      * @param String $string The SQL string
      *
-     * @return Array An array of tokens.
+     * @return array An array of tokens.
      */
     protected static function tokenize($string)
     {
         self::init();
 
         $tokens = array();
-
-        // Used for debugging if there is an error while tokenizing the string
-        $original_length = strlen($string);
 
         // Used to make sure the string keeps shrinking on each iteration
         $old_string_len = strlen($string) + 1;
@@ -440,7 +441,6 @@ class SqlFormatter
         $increase_special_indent = false;
         $increase_block_indent = false;
         $indent_types = array();
-        $added_newline = false;
         $inline_count = 0;
         $inline_indented = false;
         $clause_limit = false;
@@ -746,7 +746,7 @@ class SqlFormatter
      *
      * @param String $string The SQL string
      *
-     * @return Array An array of individual query strings without trailing semicolons
+     * @return array An array of individual query strings without trailing semicolons
      */
     public static function splitQuery($string)
     {
@@ -854,7 +854,7 @@ class SqlFormatter
     /**
      * Highlights a token depending on its type.
      *
-     * @param Array $token An associative array containing type and value.
+     * @param array $token An associative array containing type and value.
      *
      * @return String HTML code of the highlighted token.
      */

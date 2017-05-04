@@ -1,5 +1,14 @@
 <?php
 
+namespace mp_ssv_general\custom_fields;
+
+use Exception;
+use mp_ssv_general\SSV_General;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 require_once 'TabField.php';
 require_once 'HeaderField.php';
 require_once 'InputField.php';
@@ -29,9 +38,11 @@ abstract class Field
     public $class;
     /** @var string $style */
     public $style;
+    /** @var string $overrideRight */
+    public $overrideRight;
     #endregion
 
-    #region __construct($id, $title, $fieldType, $class, $style)
+    #region __construct($id, $title, $fieldType, $class, $style, $overrideRight)
     /**
      * Field constructor.
      *
@@ -40,18 +51,49 @@ abstract class Field
      * @param string $fieldType
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $fieldType, $class, $style)
+    protected function __construct($id, $title, $fieldType, $class, $style, $overrideRight)
     {
-        $this->id        = $id;
-        $this->title     = $title;
-        $this->fieldType = $fieldType;
-        $this->class     = $class;
-        $this->style     = $style;
+        $this->id            = $id;
+        $this->title         = $title;
+        $this->fieldType     = $fieldType;
+        $this->class         = $class;
+        $this->style         = $style;
+        $this->overrideRight = $overrideRight;
     }
     #endregion
 
+    /**
+     * @param string $name
+     *
+     * @return string with the title for that field or empty if no match is found.
+     */
+    public static function titleFromDatabase($name)
+    {
+        global $wpdb;
+        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
+        $sql    = "SELECT customField FROM $table WHERE customField LIKE '%\"name\":\"$name\"%'";
+        $fields = $wpdb->get_results($sql);
+        foreach ($fields as $field) {
+            $field = self::fromJSON($field->customField);
+            if ($field instanceof TabField) {
+                foreach ($field->fields as $childField) {
+                    if ($childField instanceof InputField) {
+                        if ($childField->name == $name) {
+                            return $childField->title;
+                        }
+                    }
+                }
+            } elseif ($field instanceof InputField && $field->name == $name) {
+                return $field->title;
+            }
+        }
+        return '';
+    }
+
     #region fromJSON($json)
+
     /**
      * This function extracts a Field from the JSON string.
      *
@@ -94,7 +136,7 @@ abstract class Field
      *
      * @return string the field as HTML object.
      */
-    abstract public function getHTML();
+    abstract public function getHTML($overrideRight);
     #endregion
 
     #region getMaxID($fields)
@@ -120,8 +162,13 @@ abstract class Field
     }
     #endregion
 
-
-    public function __toString() {
-        return $this->getHTML();
+    #region __toString()
+    /**
+     * @return string HTML code for the field
+     */
+    public function __toString()
+    {
+        return $this->getHTML('');
     }
+    #endregion
 }

@@ -1,5 +1,14 @@
 <?php
 
+namespace mp_ssv_general;
+
+use Exception;
+use mp_ssv_users\SSV_Users;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 /**
  * Created by PhpStorm.
  * User: moridrin
@@ -22,8 +31,7 @@ class SSV_General
     const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
     const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
 
-    const OPTION_BOARD_ROLE = 'ssv_general__board_role';
-    const OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
+    const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
     #endregion
 
@@ -49,9 +57,8 @@ class SSV_General
      */
     public static function resetOptions()
     {
-        update_option(self::OPTION_BOARD_ROLE, 'administrator');
         $defaultSelected = json_encode(array('display', 'default', 'placeholder'));
-        update_option(SSV_General::OPTION_CUSTOM_FIELD_FIELDS, SSV_General::sanitize($defaultSelected));
+        User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, $defaultSelected, false);
     }
     #endregion
 
@@ -81,6 +88,9 @@ class SSV_General
     public static function isValidPOST($adminReferer)
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+            return false;
+        }
+        if (!isset($_POST['admin_referer']) || $_POST['admin_referer'] != $adminReferer) {
             return false;
         }
         if (!check_admin_referer($adminReferer)) {
@@ -145,9 +155,9 @@ class SSV_General
 
     #region getFormSecurityFields($adminReferer, $save, $reset)
     /**
-     * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
-     * @param bool   $saveButton   set to false if you don't want the save button to be displayed.
-     * @param bool   $resetButton  set to false if you don't want the reset button to be displayed.
+     * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
+     * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
+     * @param bool|string $resetButton  set to false if you don't want the reset button to be displayed or give string to set custom button text.
      *
      * @return string HTML
      */
@@ -156,11 +166,13 @@ class SSV_General
         ob_start();
         ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
         wp_nonce_field($adminReferer);
-        if ($saveButton) {
+        if (is_string($saveButton)) {
+            submit_button($saveButton);
+        } elseif ($saveButton === true) {
             submit_button();
         }
         if ($resetButton) {
-            ?><input type="submit" name="reset" id="reset" class="button button-primary" value="Reset to Default"><?php
+            ?><input type="submit" name="reset" id="reset" class="button button-primary" value="<?= is_string($resetButton) ? $resetButton : 'Reset to Default' ?>"><?php
         }
         return ob_get_clean();
     }
@@ -168,13 +180,16 @@ class SSV_General
 
     #region sanitize($value)
     /**
-     * @param $value
+     * @param mixed $value
      *
      * @return string
      */
     public static function sanitize($value)
     {
         if (is_array($value)) {
+            foreach ($value as &$item) {
+                self::sanitize($item);
+            }
             return $value;
         }
         $value = stripslashes($value);
@@ -209,11 +224,13 @@ class SSV_General
                 $print = highlight_string("<?php " . var_export($variable, true), true);
             }
             $print = trim($print);
+            /** @noinspection HtmlUnknownAttribute */
             $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print, 1);  // remove prefix
             $print = preg_replace("|\\</code\\>\$|", '', $print, 1);
             $print = trim($print);
             $print = preg_replace("|\\</span\\>\$|", '', $print, 1);
             $print = trim($print);
+            /** @noinspection HtmlUnknownAttribute */
             $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
             $print .= ';';
         }
@@ -228,6 +245,7 @@ class SSV_General
     #endregion
 
     #region _hasCircularReference($variable)
+
     /**
      * This function checks if the given $variable is recursive.
      *
@@ -269,9 +287,96 @@ class SSV_General
 
     public static function getLoginURL()
     {
-        return site_url() . '/login';
+        if (self::usersPluginActive()) {
+            $loginPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_LOGIN_FIELDS);
+            if (count($loginPages) > 0) {
+                return add_query_arg('redirect_to', get_permalink(), get_permalink($loginPages[0]));
+            }
+        }
+        return site_url() . '/wp-login.php?redirect_to=' . site_url();
     }
     #endregion
 
+    #region getListSelect($name, $options, $selected)
+    public static function getListSelect($name, $options, $selected)
+    {
+        if (is_array($selected)) {
+            foreach ($selected as &$item) {
+                $item = esc_html($item);
+            }
+        } elseif (strpos($selected, ',') !== false) {
+            $selected = explode(',', $selected);
+            foreach ($selected as &$item) {
+                $item = esc_html($item);
+            }
+        } else {
+            $selected = esc_html($selected);
+        }
+        $name = esc_html($name);
+        ob_start();
+        $optionCount = count($options);
+        ?>
+        <div style="float:left;margin-right:20px;">
+            <label for="non_selected_fields">Available</label>
+            <br/>
+            <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($options as $option): ?>
+                    <?php $option = esc_html($option); ?>
+                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div style="float:left;margin-right:20px;">
+            <label for="selected_fields">Selected</label>
+            <br/>
+            <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+                <?php foreach ($selected as $option): ?>
+                    <?php $option = esc_html($option); ?>
+                    <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
+        <!--suppress JSUnusedAssignment -->
+        <script>
+            var options = <?= json_encode($selected) ?>;
+            document.getElementById('<?= $name ?>').value = options;
+            function <?= $name ?>_add(val) {
+                options.push(val);
+                document.getElementById('<?= $name ?>').value = options;
+                var option = document.createElement("option");
+                option.id = '<?= $name ?>_selected_result_' + val;
+                option.text = val;
+                option.addEventListener("click", function () {
+                    <?= $name ?>_remove(val);
+                }, false);
+                document.getElementById('selected_fields').add(option);
+                option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.setAttribute("disabled", "disabled");
+            }
+
+            function <?= $name ?>_remove(val) {
+                var index = options.indexOf(val);
+                if (index > -1) {
+                    options.splice(index, 1);
+                }
+                document.getElementById('<?= $name ?>').value = options;
+                var option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                option.removeAttribute("disabled");
+                option = document.getElementById('<?= $name ?>_selected_result_' + val);
+                option.parentNode.removeChild(option);
+            }
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+    #endregion
+
+    #region currentNavTab($object, $selected)
+    public static function currentNavTab($current, $selected)
+    {
+        return $current == $selected ? 'nav-tab-active' : '';
+    }
+    #endregion
     #endregion
 }

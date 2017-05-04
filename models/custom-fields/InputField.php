@@ -1,11 +1,32 @@
 <?php
 
+namespace mp_ssv_general\custom_fields;
+
+use Exception;
+use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
+use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
+use mp_ssv_general\custom_fields\input_fields\ImageInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
+use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
+use mp_ssv_general\custom_fields\input_fields\SelectInputField;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\SSV_General;
+use mp_ssv_general\User;
+use mp_ssv_users\SSV_Users;
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 require_once 'input-fields/TextInputField.php';
 require_once 'input-fields/CheckboxInputField.php';
 require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
 require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
+require_once 'input-fields/RoleCheckboxInputField.php';
+require_once 'input-fields/RoleSelectInputField.php';
 
 /**
  * Created by PhpStorm.
@@ -34,10 +55,11 @@ class InputField extends Field
      * @param string $name
      * @param string $class
      * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $class, $style)
+    protected function __construct($id, $title, $inputType, $name, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->inputType = $inputType;
         $this->name      = $name;
     }
@@ -57,6 +79,10 @@ class InputField extends Field
                 return SelectInputField::fromJSON($json);
             case CheckboxInputField::INPUT_TYPE:
                 return CheckboxInputField::fromJSON($json);
+            case RoleCheckboxInputField::INPUT_TYPE:
+                return RoleCheckboxInputField::fromJSON($json);
+            case RoleSelectInputField::INPUT_TYPE:
+                return RoleSelectInputField::fromJSON($json);
             case ImageInputField::INPUT_TYPE:
                 return ImageInputField::fromJSON($json);
             case HiddenInputField::INPUT_TYPE:
@@ -81,9 +107,41 @@ class InputField extends Field
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function getHTML()
+    public function getHTML($overrideRight)
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
+    }
+
+    /**
+     * @return string the field as HTML object.
+     * @throws Exception if the method is not implemented by a sub class.
+     */
+    public function getFilterRow()
+    {
+        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
+    }
+
+    /**
+     * @return string the field as HTML object.
+     */
+    public function getFilterRowBase($filter)
+    {
+        ob_start();
+        ?>
+        <td>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+        </td>
+        <td>
+            <label>
+                Filter
+                <input id="filter_<?= esc_html($this->id) ?>" type="checkbox" name="filter_<?= esc_html($this->name) ?>">
+            </label>
+        </td>
+        <td>
+            <?= $filter ?>
+        </td>
+        <?php
+        return ob_get_clean();
     }
 
     /**
@@ -100,7 +158,7 @@ class InputField extends Field
      */
     public function setValue($value)
     {
-        if ($this instanceof HiddenInputField) {
+        if (get_class($this) == HiddenInputField::class) {
             return; //Can't change the value of hidden fields.
         }
         if ($value instanceof User) { //User values can always be set (even if isDisabled())
@@ -129,4 +187,10 @@ class InputField extends Field
             return false;
         }
     }
+
+    function __toString()
+    {
+        return $this->name;
+    }
+
 }
