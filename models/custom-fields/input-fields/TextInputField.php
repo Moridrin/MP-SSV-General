@@ -114,7 +114,7 @@ class TextInputField extends InputField
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $value       = isset($this->value) ? $this->value : $this->defaultValue;
+        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->id) ? 'id="' . esc_html($this->id) . '"' : '';
         $name        = 'name="' . $this->name . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';

@@ -95,6 +95,9 @@ class HiddenInputField extends InputField
      */
     public function getHTML($overrideRight)
     {
+        if (strtolower($this->defaultValue) == 'now') {
+            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
+        }
         $name  = 'name="' . esc_html($this->name) . '"';
         $value = 'value="' . esc_html($this->defaultValue) . '"';
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';

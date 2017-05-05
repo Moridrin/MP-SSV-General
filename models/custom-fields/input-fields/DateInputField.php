@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
  */
 class DateInputField extends InputField
 {
-    const INPUT_TYPE = 'datetime';
+    const INPUT_TYPE = 'date';
 
     /** @var bool $disabled */
     public $disabled;
@@ -37,7 +37,6 @@ class DateInputField extends InputField
      *
      * @param int    $id
      * @param string $title
-     * @param string $inputType
      * @param string $name
      * @param bool   $disabled
      * @param string $required
@@ -114,10 +113,10 @@ class DateInputField extends InputField
      */
     public function getHTML($overrideRight)
     {
-        if ($this->defaultValue == 'NOW') {
+        if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $value       = isset($this->value) ? $this->value : $this->defaultValue;
+        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';

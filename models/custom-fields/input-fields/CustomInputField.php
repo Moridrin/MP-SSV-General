@@ -108,10 +108,7 @@ class CustomInputField extends InputField
      */
     public function getHTML($overrideRight)
     {
-        if ($this->defaultValue == 'NOW') {
-            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
-        }
-        $value       = isset($this->value) ? $this->value : $this->defaultValue;
+        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . esc_html($this->inputType) . '"';
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';

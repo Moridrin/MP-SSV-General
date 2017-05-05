@@ -5,6 +5,7 @@ namespace mp_ssv_general\custom_fields;
 use Exception;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\DateInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
 use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
@@ -25,6 +26,7 @@ require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
 require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
+require_once 'input-fields/DateInputField.php';
 require_once 'input-fields/RoleCheckboxInputField.php';
 require_once 'input-fields/RoleSelectInputField.php';
 
@@ -79,6 +81,8 @@ class InputField extends Field
                 return SelectInputField::fromJSON($json);
             case CheckboxInputField::INPUT_TYPE:
                 return CheckboxInputField::fromJSON($json);
+            case DateInputField::INPUT_TYPE:
+                return DateInputField::fromJSON($json);
             case RoleCheckboxInputField::INPUT_TYPE:
                 return RoleCheckboxInputField::fromJSON($json);
             case RoleSelectInputField::INPUT_TYPE:
@@ -162,7 +166,7 @@ class InputField extends Field
             return; //Can't change the value of hidden fields.
         }
         if ($value instanceof User) { //User values can always be set (even if isDisabled())
-            $this->value = SSV_General::sanitize($value->getMeta($this->name));
+            $this->value = $value->getMeta($this->name);
         } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
                 $this->value = SSV_General::sanitize($value[$this->name]);
