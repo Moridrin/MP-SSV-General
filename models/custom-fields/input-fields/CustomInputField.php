@@ -158,7 +158,7 @@ class CustomInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="<?= esc_html($this->inputType) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

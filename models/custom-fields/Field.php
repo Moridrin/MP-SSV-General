@@ -115,7 +115,7 @@ abstract class Field
             case LabelField::FIELD_TYPE:
                 return LabelField::fromJSON($json);
         }
-        throw new Exception('Unknown field type');
+        throw new Exception($values->field_type . ' is an unknown field type');
     }
     #endregion
 
