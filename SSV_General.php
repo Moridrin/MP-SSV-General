@@ -29,6 +29,7 @@ class SSV_General
     const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
     const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
+    const HOOK_USERS_NEW_EVENT = 'ssv_events__hook_new_event';
     const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
 
     const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
