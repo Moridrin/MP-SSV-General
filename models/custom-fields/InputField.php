@@ -169,10 +169,10 @@ class InputField extends Field
             $this->value = $value->getMeta($this->name);
         } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
-                $this->value = SSV_General::sanitize($value[$this->name]);
+                $this->value = SSV_General::sanitize($value[$this->name], $this->name);
             }
         } else {
-            $this->value = SSV_General::sanitize($value);
+            $this->value = SSV_General::sanitize($value, $this->name);
         }
     }
 

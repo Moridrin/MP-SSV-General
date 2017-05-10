@@ -181,21 +181,32 @@ class SSV_General
 
     #region sanitize($value)
     /**
-     * @param mixed $value
+     * @param mixed  $value
+     * @param string $sanitationType
      *
      * @return string
      */
-    public static function sanitize($value)
+    public static function sanitize($value, $sanitationType = 'text')
     {
         if (is_array($value)) {
             foreach ($value as &$item) {
-                self::sanitize($item);
+                self::sanitize($item, $sanitationType);
             }
             return $value;
         }
-        $value = stripslashes($value);
-        $value = esc_attr($value);
-        $value = sanitize_text_field($value);
+        if (strpos($sanitationType, 'email') !== false) {
+            $value = sanitize_email($value);
+        } elseif (strpos($sanitationType, 'file') !== false) {
+            $value = sanitize_file_name($value);
+        } elseif (strpos($sanitationType, 'color') !== false) {
+            $value = sanitize_hex_color($value);
+        } elseif (strpos($sanitationType, 'class') !== false) {
+            $value = sanitize_html_class($value);
+        } elseif (strpos($sanitationType, 'option') !== false) {
+            $value = sanitize_option($sanitationType, $value);
+        } else {
+            $value = sanitize_text_field($value);
+        }
         return $value;
     }
     #endregion

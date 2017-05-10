@@ -87,9 +87,9 @@ class User extends \WP_User
             return new Message('This email address already exists. Try resetting your password.', Message::ERROR_MESSAGE);
         }
         $id = wp_create_user(
-            SSV_General::sanitize($username),
-            SSV_General::sanitize($password),
-            SSV_General::sanitize($email)
+            SSV_General::sanitize($username, 'text'),
+            SSV_General::sanitize($password, 'text'),
+            SSV_General::sanitize($email, 'email')
         );
 
         return self::getByID($id);
@@ -362,7 +362,7 @@ class User extends \WP_User
             return true;
         }
         if ($sanitize) {
-            $value = SSV_General::sanitize($value);
+            $value = SSV_General::sanitize($value, $meta_key);
         }
         if ($this->getMeta($meta_key) == $value) {
             return true;

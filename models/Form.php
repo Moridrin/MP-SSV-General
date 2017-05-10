@@ -195,7 +195,7 @@ class Form
             return;
         }
         $form                = new Form();
-        $form->overrideRight = SSV_General::sanitize($_POST['override_right']);
+        $form->overrideRight = SSV_General::sanitize($_POST['override_right'], 'text');
         $customFieldValues   = array();
         $id                  = 0;
         $fieldID             = 0;
@@ -209,7 +209,7 @@ class Form
                     $fieldID           = str_replace($prefix, '', str_replace('_start', '', $key));
                 }
                 $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
-                $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value);
+                $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value, $fieldKey);
                 if (strpos($key, '_end') !== false) {
                     $customFieldValues['override_right'] = $form->overrideRight;
                     $field                               = Field::fromJSON(json_encode($customFieldValues));

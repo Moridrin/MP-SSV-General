@@ -23,7 +23,7 @@ function ssv_settings_page()
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields']) : array();
+            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields'], 'text') : array();
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
         }
     }
