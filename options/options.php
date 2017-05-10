@@ -19,11 +19,19 @@ add_action('admin_menu', 'ssv_add_ssv_menu', 9);
 #region Page Content
 function ssv_settings_page()
 {
+    $fields   = array(
+        'display',
+        'default',
+        'placeholder',
+        'class',
+        'style',
+    );
+
     if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields'], 'text') : array();
+            $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields'], $fields) : array();
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
         }
     }
@@ -45,13 +53,6 @@ function ssv_settings_page()
                     <?php
                     $selected = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))));
                     $selected = $selected ?: array();
-                    $fields   = array(
-                        'display',
-                        'default',
-                        'placeholder',
-                        'class',
-                        'style',
-                    );
                     ?>
                     <select id="custom_field_fields" size="<?= count($fields) ?>" name="custom_field_fields[]" multiple>
                         <?php

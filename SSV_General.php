@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general;
 
+use DateTime;
 use Exception;
 use mp_ssv_users\SSV_Users;
 
@@ -182,11 +183,11 @@ class SSV_General
     #region sanitize($value)
     /**
      * @param mixed  $value
-     * @param string $sanitationType
+     * @param string|array $sanitationType
      *
      * @return string
      */
-    public static function sanitize($value, $sanitationType = 'text')
+    public static function sanitize($value, $sanitationType)
     {
         if (is_array($value)) {
             foreach ($value as &$item) {
@@ -194,7 +195,11 @@ class SSV_General
             }
             return $value;
         }
-        if (strpos($sanitationType, 'email') !== false) {
+        if (is_array($sanitationType)) {
+            if (!in_array($value, $sanitationType)) {
+                $value = sanitize_text_field(array_values($sanitationType)[0]);
+            }
+        } elseif (strpos($sanitationType, 'email') !== false) {
             $value = sanitize_email($value);
         } elseif (strpos($sanitationType, 'file') !== false) {
             $value = sanitize_file_name($value);
@@ -204,6 +209,16 @@ class SSV_General
             $value = sanitize_html_class($value);
         } elseif (strpos($sanitationType, 'option') !== false) {
             $value = sanitize_option($sanitationType, $value);
+        } elseif (strpos($sanitationType, 'date') !== false && strpos($sanitationType, 'time') !== false) {
+            $value = (new DateTime(sanitize_text_field($value)))->format('Y-m-d H:i');
+        } elseif (strpos($sanitationType, 'date') !== false) {
+            $value = (new DateTime(sanitize_text_field($value)))->format('Y-m-d');
+        } elseif (strpos($sanitationType, 'time') !== false) {
+            $value = (new DateTime(sanitize_text_field($value)))->format('H:i');
+        } elseif ($sanitationType == 'boolean') {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } elseif ($sanitationType == 'int') {
+            $value = intval($value);
         } else {
             $value = sanitize_text_field($value);
         }
