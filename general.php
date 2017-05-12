@@ -49,8 +49,11 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 		CREATE TABLE IF NOT EXISTS $table_name (
 			ID bigint(20) NOT NULL AUTO_INCREMENT,
 			postID bigint(20) NOT NULL,
+			fieldName VARCHAR(50) NOT NULL,
+			fieldTitle VARCHAR(50) NOT NULL,
 			customField TEXT NOT NULL,
-			PRIMARY KEY (ID)
+            UNIQUE (postID, fieldName),
+			PRIMARY KEY (ID, postID)
 		) $charset_collate;";
         $wpdb->query($sql);
     }

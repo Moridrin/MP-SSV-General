@@ -60,11 +60,11 @@ class LabelField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -75,9 +75,10 @@ class LabelField extends Field
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
         }
+        $values = json_encode($values);
         return $values;
     }
 

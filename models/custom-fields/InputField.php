@@ -63,7 +63,7 @@ class InputField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->inputType = $inputType;
-        $this->name      = $name;
+        $this->name      = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '_', strtolower($name)));
     }
 
     /**
@@ -97,12 +97,12 @@ class InputField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         throw new Exception('This should be implemented in a sub class.');
     }
@@ -190,6 +190,40 @@ class InputField extends Field
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param int $id     is the new ID for the field (it currently has the old ID to find the old row).
+     * @param int $postID is the ID of the post.
+     */
+    public function updateName($id, $postID)
+    {
+        global $wpdb;
+        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
+        $json  = $wpdb->get_var($sql);
+        if (empty($json)) {
+            return;
+        }
+        $field = Field::fromJSON($json);
+        if (!$field instanceof InputField) {
+            return;
+        }
+        $wpdb->update(
+            $wpdb->usermeta,
+            array(
+                'meta_key' => $this->name,
+            ),
+            array(
+                'meta_key' => $field->name,
+            ),
+            array(
+                '%s',
+            ),
+            array(
+                '%s',
+            )
+        );
     }
 
     function __toString()

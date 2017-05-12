@@ -92,9 +92,13 @@ class Form
         global $wpdb;
         $table  = SSV_General::CUSTOM_FIELDS_TABLE;
         $postID = $post->ID;
-        $fields = $wpdb->get_results("SELECT customField FROM $table WHERE postID = $postID");
+        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID");
         foreach ($fields as $field) {
-            $field = Field::fromJSON($field->customField);
+            $values = json_decode($field->customField);
+            $values->id = $field->ID;
+            $values->name = $field->fieldName;
+            $values->title = $field->fieldTitle;
+            $field = Field::fromJSON(json_encode($values));
             if ($user) {
                 if ($field instanceof TabField) {
                     foreach ($field->fields as $childField) {
@@ -209,10 +213,14 @@ class Form
                     $fieldID           = str_replace($prefix, '', str_replace('_start', '', $key));
                 }
                 $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
-                $customFieldValues[$fieldKey] = $fieldKey == 'id' ? $id : SSV_General::sanitize($value, $fieldKey);
+                $customFieldValues[$fieldKey] = SSV_General::sanitize($value, $fieldKey);
                 if (strpos($key, '_end') !== false) {
                     $customFieldValues['override_right'] = $form->overrideRight;
                     $field                               = Field::fromJSON(json_encode($customFieldValues));
+                    if ($field instanceof InputField) {
+                        $field->updateName($id, $post->ID);
+                    }
+                    $field->id = $id;
                     if (!empty($field->title)) {
                         if ($field instanceof TabField) {
                             $currentTab        = $field;
@@ -234,13 +242,48 @@ class Form
             )
         );
         foreach ($form->fields as $field) {
+            if ($field instanceof TabField) {
+                foreach ($field->fields as $childField) {
+                    $wpdb->insert(
+                        SSV_General::CUSTOM_FIELDS_TABLE,
+                        array(
+                            'ID'          => $childField->id,
+                            'postID'      => $post->ID,
+                            'fieldName'   => $childField instanceof InputField ? $childField->name : $childField->id,
+                            'fieldTitle'  => $childField->title,
+                            'customField' => $childField->toJSON(true),
+                        )
+                    );
+                    if ($childField instanceof InputField) {
+                        $wpdb->update(
+                            SSV_General::CUSTOM_FIELDS_TABLE,
+                            array('fieldTitle' => $childField->title),
+                            array('fieldName' => $childField->name),
+                            array('%s'),
+                            array('%s')
+                        );
+                    }
+                }
+            }
             $wpdb->insert(
                 SSV_General::CUSTOM_FIELDS_TABLE,
                 array(
+                    'ID'          => $field->id,
                     'postID'      => $post->ID,
-                    'customField' => $field->toJSON(),
+                    'fieldName'   => $field instanceof InputField ? $field->name : $field->id,
+                    'fieldTitle'  => $field->title,
+                    'customField' => $field->toJSON(true),
                 )
             );
+            if ($field instanceof InputField) {
+                $wpdb->update(
+                    SSV_General::CUSTOM_FIELDS_TABLE,
+                    array('fieldTitle' => $field->title),
+                    array('fieldName' => $field->name),
+                    array('%s'),
+                    array('%s')
+                );
+            }
         }
     }
     #endregion

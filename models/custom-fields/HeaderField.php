@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -52,23 +54,23 @@ class HeaderField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
-            'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'class'          => $this->class,
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
         }
+        $values = json_encode($values);
         return $values;
     }
 

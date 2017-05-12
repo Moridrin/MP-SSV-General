@@ -117,17 +117,36 @@ abstract class Field
         }
         throw new Exception($values->field_type . ' is an unknown field type');
     }
+
+    /**
+     * @param int $fieldID
+     *
+     * @return Field
+     */
+    public static function getByID($fieldID)
+    {
+        global $post;
+        global $wpdb;
+        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
+        $postID = $post->ID;
+        $field  = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
+        if (!empty($field)) {
+            return self::fromJSON($field);
+        } else {
+            return null;
+        }
+    }
     #endregion
 
     #region toJSON($encode = true)
     /**
      * This function creates an array containing all variables of this Field.
      *
-     * @param bool $encode can be set to false if it is important not to json_encode the array.
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    abstract public function toJSON($encode = true);
+    abstract public function toJSON($forDatabase = false);
     #endregion
 
     #region getHTML()
