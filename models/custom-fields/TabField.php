@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -81,7 +83,7 @@ class TabField extends Field
     public function toJSON($forDatabase = false)
     {
         $fieldIDs = array_column($this->fields, 'id');
-        $values = array(
+        $values   = array(
             'id'             => $this->id,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
@@ -98,6 +100,8 @@ class TabField extends Field
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -108,20 +112,6 @@ class TabField extends Field
         ob_start();
         ?>
         <li <?= $class ?> <?= $style ?>><a href="#<?= esc_html($this->name) ?>"><?= esc_html($this->title) ?></a></li>
-        <?php
-        return ob_get_clean();
-    }
-
-    public function getFieldsHTML()
-    {
-        ob_start();
-        ?>
-        <input type="hidden" name="tab" value="<?= esc_html($this->id) ?>">
-        <div id="<?= esc_html($this->name) ?>">
-            <?php foreach ($this->fields as $field): ?>
-                <?= $field->getHTML() ?>
-            <?php endforeach; ?>
-        </div>
         <?php
         return ob_get_clean();
     }

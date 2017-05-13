@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -83,6 +85,8 @@ class LabelField extends Field
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)

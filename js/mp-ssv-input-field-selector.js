@@ -132,6 +132,7 @@ function getHeaderField(fieldID, values, allowTabs) {
 function getTextInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -160,6 +161,7 @@ function getTextInputField(fieldID, values, allowTabs) {
 function getSelectInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -183,6 +185,7 @@ function getSelectInputField(fieldID, values, allowTabs) {
 }
 function getCheckboxInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -208,6 +211,7 @@ function getCheckboxInputField(fieldID, values, allowTabs) {
 }
 function getRoleCheckboxInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -227,6 +231,7 @@ function getRoleCheckboxInputField(fieldID, values, allowTabs) {
 }
 function getRoleSelectInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -248,6 +253,7 @@ function getRoleSelectInputField(fieldID, values, allowTabs) {
 function getImageInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -270,6 +276,7 @@ function getImageInputField(fieldID, values, allowTabs) {
 function getHiddenInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -292,6 +299,7 @@ function getHiddenInputField(fieldID, values, allowTabs) {
 function getCustomInputField(inputType, fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -320,6 +328,7 @@ function getCustomInputField(inputType, fieldID, values, allowTabs) {
 function getDateInputField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
     var fieldType = 'input';
@@ -350,6 +359,7 @@ function getDateInputField(fieldID, values, allowTabs) {
 function getLabelField(fieldID, values, allowTabs) {
     var container = document.getElementById("custom-fields-placeholder");
 
+    //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldType = 'label';
     var fieldTitle = '';

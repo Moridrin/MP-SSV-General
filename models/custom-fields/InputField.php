@@ -14,7 +14,6 @@ use mp_ssv_general\custom_fields\input_fields\SelectInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
-use mp_ssv_users\SSV_Users;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -108,6 +107,8 @@ class InputField extends Field
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
@@ -126,6 +127,8 @@ class InputField extends Field
     }
 
     /**
+     * @param string $filter HTML string with the filter rows.
+     *
      * @return string the field as HTML object.
      */
     public function getFilterRowBase($filter)

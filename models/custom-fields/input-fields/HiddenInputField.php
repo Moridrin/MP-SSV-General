@@ -95,6 +95,8 @@ class HiddenInputField extends InputField
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)

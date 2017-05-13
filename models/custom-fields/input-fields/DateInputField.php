@@ -6,8 +6,6 @@ use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
-use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -37,15 +35,17 @@ class DateInputField extends InputField
     /**
      * DateTimeInputField constructor.
      *
-     * @param int    $id
-     * @param string $title
-     * @param string $name
-     * @param bool   $disabled
-     * @param string $required
-     * @param string $defaultValue
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
+     * @param int      $id
+     * @param string   $title
+     * @param string   $name
+     * @param bool     $disabled
+     * @param string   $required
+     * @param string   $defaultValue
+     * @param DateTime $dateRangeAfter
+     * @param DateTime $dateRangeBefore
+     * @param string   $class
+     * @param string   $style
+     * @param string   $overrideRight
      */
     protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $dateRangeAfter, $dateRangeBefore, $class, $style, $overrideRight)
     {
@@ -115,6 +115,8 @@ class DateInputField extends InputField
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -130,8 +132,8 @@ class DateInputField extends InputField
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
-        $dateAfter   = 'dateAfter="' . $this->dateRangeAfter . '"';
-        $dateBefore  = 'dateBefore="' . $this->dateRangeBefore . '"';
+        $dateAfter   = 'dateAfter="' . $this->dateRangeAfter->format('Y-m-d') . '"';
+        $dateBefore  = 'dateBefore="' . $this->dateRangeBefore->format('Y-m-d') . '"';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';

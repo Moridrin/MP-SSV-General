@@ -5,7 +5,6 @@ namespace mp_ssv_general\custom_fields\input_fields;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -85,6 +84,8 @@ class RoleCheckboxInputField extends InputField
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)

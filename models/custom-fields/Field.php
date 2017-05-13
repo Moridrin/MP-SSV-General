@@ -153,6 +153,8 @@ abstract class Field
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
      *
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     abstract public function getHTML($overrideRight);
