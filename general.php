@@ -57,6 +57,5 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 		) $charset_collate;";
         $wpdb->query($sql);
     }
-    register_activation_hook(__FILE__, 'mp_ssv_general_register_plugin');
     #endregion
 }
