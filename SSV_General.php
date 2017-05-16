@@ -215,7 +215,7 @@ class SSV_General
             $value = (new DateTime(sanitize_text_field($value)))->format('Y-m-d');
         } elseif (strpos($sanitationType, 'time') !== false) {
             $value = (new DateTime(sanitize_text_field($value)))->format('H:i');
-        } elseif ($sanitationType == 'boolean') {
+        } elseif ($sanitationType == 'boolean' || $sanitationType == 'bool') {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } elseif ($sanitationType == 'int') {
             $value = intval($value);
