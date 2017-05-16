@@ -47,7 +47,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
         $sql
                     = "
 		CREATE TABLE IF NOT EXISTS $table_name (
-			ID bigint(20) NOT NULL AUTO_INCREMENT,
+			ID bigint(20) NOT NULL,
 			postID bigint(20) NOT NULL,
 			fieldName VARCHAR(50) NOT NULL,
 			fieldTitle VARCHAR(50) NOT NULL,

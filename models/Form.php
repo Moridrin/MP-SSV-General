@@ -92,13 +92,13 @@ class Form
         global $wpdb;
         $table  = SSV_General::CUSTOM_FIELDS_TABLE;
         $postID = $post->ID;
-        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID");
+        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID ORDER BY ID DESC");
         foreach ($fields as $field) {
-            $values = json_decode($field->customField);
-            $values->id = $field->ID;
-            $values->name = $field->fieldName;
+            $values        = json_decode($field->customField);
+            $values->id    = $field->ID;
+            $values->name  = $field->fieldName;
             $values->title = $field->fieldTitle;
-            $field = Field::fromJSON(json_encode($values));
+            $field         = Field::fromJSON(json_encode($values));
             if ($user) {
                 if ($field instanceof TabField) {
                     foreach ($field->fields as $childField) {
@@ -235,36 +235,21 @@ class Form
                 }
             }
         }
+        //Remove All old fields for post
         $wpdb->delete(
             SSV_General::CUSTOM_FIELDS_TABLE,
             array(
                 'postID' => $post->ID,
             )
         );
+        $fields = $form->fields; //All Fields
         foreach ($form->fields as $field) {
             if ($field instanceof TabField) {
-                foreach ($field->fields as $childField) {
-                    $wpdb->insert(
-                        SSV_General::CUSTOM_FIELDS_TABLE,
-                        array(
-                            'ID'          => $childField->id,
-                            'postID'      => $post->ID,
-                            'fieldName'   => $childField instanceof InputField ? $childField->name : $childField->id,
-                            'fieldTitle'  => $childField->title,
-                            'customField' => $childField->toJSON(true),
-                        )
-                    );
-                    if ($childField instanceof InputField) {
-                        $wpdb->update(
-                            SSV_General::CUSTOM_FIELDS_TABLE,
-                            array('fieldTitle' => $childField->title),
-                            array('fieldName' => $childField->name),
-                            array('%s'),
-                            array('%s')
-                        );
-                    }
-                }
+                $fields = $fields + $field->fields;
             }
+        }
+        foreach ($fields as $field) {
+            //Insert new fields for post
             $wpdb->insert(
                 SSV_General::CUSTOM_FIELDS_TABLE,
                 array(
@@ -275,6 +260,7 @@ class Form
                     'customField' => $field->toJSON(true),
                 )
             );
+            //Update all fields with the same name (set same title)
             if ($field instanceof InputField) {
                 $wpdb->update(
                     SSV_General::CUSTOM_FIELDS_TABLE,

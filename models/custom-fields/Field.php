@@ -183,6 +183,34 @@ abstract class Field
     }
     #endregion
 
+    #region __compare($field)
+    /**
+     * @param Field $a
+     * @param Field $b
+     *
+     * @return int -1 / 0 / 1
+     */
+    public function compare($a, $b)
+    {
+        return $a->__compare($b);
+    }
+    #endregion
+
+    #region __compare($field)
+    /**
+     * @param Field $field
+     *
+     * @return int -1 / 0 / 1
+     */
+    public function __compare($field)
+    {
+        if ($this->id == $field->id) {
+            return 0;
+        }
+        return ($this->id < $field->id) ? -1 : 1;
+    }
+    #endregion
+
     #region __toString()
     /**
      * @return string HTML code for the field
