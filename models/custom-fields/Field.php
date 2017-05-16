@@ -190,7 +190,7 @@ abstract class Field
      *
      * @return int -1 / 0 / 1
      */
-    public function compare($a, $b)
+    public static function compare($a, $b)
     {
         return $a->__compare($b);
     }

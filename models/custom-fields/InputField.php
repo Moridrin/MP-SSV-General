@@ -62,7 +62,7 @@ class InputField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->inputType = $inputType;
-        $this->name      = preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '_', strtolower($name)));
+        $this->name      = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
     }
 
     /**

@@ -110,12 +110,7 @@ class HiddenInputField extends InputField
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
 
         ob_start();
-        if (current_theme_supports('materialize')) {
-            ?>
-            <input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> />
-            <?php
-        }
-
+        ?><input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> /><?php
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
