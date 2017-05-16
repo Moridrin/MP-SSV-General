@@ -120,6 +120,17 @@ class SelectInputField extends InputField
                 <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
+        } else {
+            ?>
+            <div class="input-field">
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label><br/>
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                    <?php foreach ($this->options as $option): ?>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= $option ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

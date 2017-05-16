@@ -131,6 +131,14 @@ class ImageInputField extends InputField
                 </div>
             </div>
             <?php
+        } else {
+            ?>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+            <?php if ($this->preview): ?>
+                <img src="<?= esc_url($this->value) ?>" <?= $class ?> <?= $style ?>/>
+            <?php endif; ?>
+            <input type="file" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>><br/>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

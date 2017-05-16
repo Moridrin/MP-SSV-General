@@ -115,6 +115,18 @@ class RoleSelectInputField extends InputField
                 <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
+        } else {
+            global $wp_roles;
+            ?>
+            <div class="input-field">
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label><br/>
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                    <?php foreach ($this->options as $option): ?>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

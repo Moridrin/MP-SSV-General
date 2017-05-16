@@ -126,30 +126,12 @@ class CustomInputField extends InputField
         }
 
         ob_start();
-        if (current_theme_supports('materialize')) {
-            ?>
-            <div>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
-            </div>
-            <?php
-            if ($this->inputType == 'date' && $this->required) {
-                ?>
-                <script>
-                    jQuery(function ($) {
-                        var dateField = $('#<?= esc_html($this->id) ?>');
-                        dateField.change(function () {
-                            if (dateField.val() === '') {
-                                dateField.addClass('invalid')
-                            } else {
-                                dateField.removeClass('invalid')
-                            }
-                        });
-                    });
-                </script>
-                <?php
-            }
-        }
+        ?>
+        <div>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+        </div>
+        <?php
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }

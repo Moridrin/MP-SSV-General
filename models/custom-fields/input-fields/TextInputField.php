@@ -141,6 +141,11 @@ class TextInputField extends InputField
                 <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
+        } else {
+            ?>
+            <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

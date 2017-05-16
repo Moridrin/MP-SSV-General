@@ -92,7 +92,7 @@ class Form
         global $wpdb;
         $table  = SSV_General::CUSTOM_FIELDS_TABLE;
         $postID = $post->ID;
-        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID ORDER BY ID DESC");
+        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID ORDER BY ID ASC");
         foreach ($fields as $field) {
             $values        = json_decode($field->customField);
             $values->id    = $field->ID;

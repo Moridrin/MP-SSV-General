@@ -53,8 +53,8 @@ class DateInputField extends InputField
         $this->disabled        = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required        = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue    = $defaultValue;
-        $this->dateRangeAfter  = $dateRangeAfter;
-        $this->dateRangeBefore = $dateRangeBefore;
+        $this->dateRangeAfter  = $dateRangeAfter instanceof DateTime ? $dateRangeAfter : new DateTime($dateRangeAfter);
+        $this->dateRangeBefore = $dateRangeBefore instanceof DateTime ? $dateRangeBefore : new DateTime($dateRangeBefore);
     }
 
     /**
@@ -141,29 +141,27 @@ class DateInputField extends InputField
         }
 
         ob_start();
-        if (current_theme_supports('materialize')) {
+        ?>
+        <div>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> <?= $dateAfter ?> <?= $dateBefore ?>/>
+        </div>
+        <?php
+        if (current_theme_supports('materialize') && $this->required) {
             ?>
-            <div>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> <?= $dateAfter ?> <?= $dateBefore ?>/>
-            </div>
-            <?php
-            if ($this->required) {
-                ?>
-                <script>
-                    jQuery(function ($) {
-                        var dateField = $('#<?= esc_html($this->id) ?>');
-                        dateField.change(function () {
-                            if (dateField.val() === '') {
-                                dateField.addClass('invalid')
-                            } else {
-                                dateField.removeClass('invalid')
-                            }
-                        });
+            <script>
+                jQuery(function ($) {
+                    var dateField = $('#<?= esc_html($this->id) ?>');
+                    dateField.change(function () {
+                        if (dateField.val() === '') {
+                            dateField.addClass('invalid')
+                        } else {
+                            dateField.removeClass('invalid')
+                        }
                     });
-                </script>
-                <?php
-            }
+                });
+            </script>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

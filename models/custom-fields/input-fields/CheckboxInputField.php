@@ -121,15 +121,13 @@ class CheckboxInputField extends InputField
         }
 
         ob_start();
-        if (current_theme_supports('materialize')) {
-            ?>
-            <div <?= $style ?>>
-                <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
-                <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-            </div>
-            <?php
-        }
+        ?>
+        <div <?= $style ?>>
+            <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
+            <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+        </div>
+        <?php
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
