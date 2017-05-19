@@ -126,10 +126,17 @@ abstract class Field
     public static function getByID($fieldID)
     {
         global $post;
+        if ($post != null) {
+            $postID = $post->ID;
+        }
+
         global $wpdb;
-        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
-        $postID = $post->ID;
-        $field  = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
+        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        if (isset($postID)) {
+            $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
+        } else {
+            $field = $wpdb->get_var("SELECT customField FROM $table WHERE ID = $fieldID");
+        }
         if (!empty($field)) {
             return self::fromJSON($field);
         } else {
