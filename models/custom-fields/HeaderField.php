@@ -46,7 +46,7 @@ class HeaderField extends Field
         }
         return new HeaderField(
             $values->id,
-            $values->title,
+            isset($values->title) ? $values->title : 'test',
             $values->class,
             $values->style,
             $values->override_right
@@ -62,6 +62,7 @@ class HeaderField extends Field
     {
         $values = array(
             'id'             => $this->id,
+            'title'           => $this->title,
             'field_type'     => $this->fieldType,
             'class'          => $this->class,
             'style'          => $this->style,

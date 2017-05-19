@@ -83,8 +83,10 @@ class CheckboxInputField extends InputField
     {
         $values = array(
             'id'              => $this->id,
+            'title'           => $this->title,
             'field_type'      => $this->fieldType,
             'input_type'      => $this->inputType,
+            'name'            => $this->name,
             'disabled'        => $this->disabled,
             'required'        => $this->required,
             'default_checked' => $this->defaultChecked,

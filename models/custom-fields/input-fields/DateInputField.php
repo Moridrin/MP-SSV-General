@@ -6,6 +6,7 @@ use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -27,9 +28,9 @@ class DateInputField extends InputField
     public $required;
     /** @var string $defaultValue */
     public $defaultValue;
-    /** @var DateTime $dateRangeBefore */
+    /** @var string $dateRangeBefore */
     public $dateRangeBefore;
-    /** @var DateTime $dateRangeAfter */
+    /** @var string $dateRangeAfter */
     public $dateRangeAfter;
 
     /**
@@ -41,8 +42,8 @@ class DateInputField extends InputField
      * @param bool     $disabled
      * @param string   $required
      * @param string   $defaultValue
-     * @param DateTime $dateRangeAfter
-     * @param DateTime $dateRangeBefore
+     * @param string $dateRangeAfter
+     * @param string $dateRangeBefore
      * @param string   $class
      * @param string   $style
      * @param string   $overrideRight
@@ -53,8 +54,8 @@ class DateInputField extends InputField
         $this->disabled        = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required        = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue    = $defaultValue;
-        $this->dateRangeAfter  = $dateRangeAfter instanceof DateTime ? $dateRangeAfter : new DateTime($dateRangeAfter);
-        $this->dateRangeBefore = $dateRangeBefore instanceof DateTime ? $dateRangeBefore : new DateTime($dateRangeBefore);
+        $this->dateRangeAfter  = $dateRangeAfter;
+        $this->dateRangeBefore = $dateRangeBefore;
     }
 
     /**
@@ -132,8 +133,8 @@ class DateInputField extends InputField
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
-        $dateAfter   = 'dateAfter="' . $this->dateRangeAfter->format('Y-m-d') . '"';
-        $dateBefore  = 'dateBefore="' . $this->dateRangeBefore->format('Y-m-d') . '"';
+        $dateAfter   = 'dateAfter="' . $this->dateRangeAfter . '"';
+        $dateBefore  = 'dateBefore="' . $this->dateRangeBefore . '"';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
