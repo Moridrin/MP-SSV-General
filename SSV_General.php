@@ -210,14 +210,26 @@ class SSV_General
         } elseif (strpos($sanitationType, 'option') !== false) {
             $value = sanitize_option($sanitationType, $value);
         } elseif (strpos($sanitationType, 'date') !== false && strpos($sanitationType, 'time') !== false) {
-            //TODO Filter if value is in format.
-            $value = (new DateTime(sanitize_text_field($value)))->format('Y-m-d H:i');
+            $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
+            if ($dateTime) {
+                $value = $dateTime->format('Y-m-d H:i');
+            } else {
+                $value = '';
+            }
         } elseif (strpos($sanitationType, 'date') !== false) {
-            //TODO Filter if value is in format.
-            $value = (new DateTime(sanitize_text_field($value)))->format('Y-m-d');
+            $date = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
+            if ($date) {
+                $value = $date->format('Y-m-d');
+            } else {
+                $value = '';
+            }
         } elseif (strpos($sanitationType, 'time') !== false) {
-            //TODO Filter if value is in format.
-            $value = (new DateTime(sanitize_text_field($value)))->format('H:i');
+            $time = DateTime::createFromFormat('H:i', sanitize_text_field($value));
+            if ($time) {
+                $value = $time->format('H:i');
+            } else {
+                $value = '';
+            }
         } elseif ($sanitationType == 'boolean' || $sanitationType == 'bool') {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
         } elseif ($sanitationType == 'int') {
