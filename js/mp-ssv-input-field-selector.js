@@ -988,6 +988,7 @@ function fieldTypeChanged(fieldID) {
     removeField(document.getElementById(fieldID + "_disabled_td"));
     removeField(document.getElementById(fieldID + "_default_value_td"));
     removeField(document.getElementById(fieldID + "_default_checked_td"));
+    removeField(document.getElementById(fieldID + "_date_range_td"));
     removeField(document.getElementById(fieldID + "_placeholder_td"));
     removeField(document.getElementById(fieldID + "_class_td"));
     removeField(document.getElementById(fieldID + "_style_td"));
@@ -1031,6 +1032,7 @@ function inputTypeChanged(fieldID) {
     removeField(document.getElementById(fieldID + "_disabled_td"));
     removeField(document.getElementById(fieldID + "_default_value_td"));
     removeField(document.getElementById(fieldID + "_default_checked_td"));
+    removeField(document.getElementById(fieldID + "_date_range_td"));
     removeField(document.getElementById(fieldID + "_placeholder_td"));
     removeField(document.getElementById(fieldID + "_class_td"));
     removeField(document.getElementById(fieldID + "_style_td"));
@@ -1075,7 +1077,6 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
     return select;
 }
 function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
-    console.log(selected);
     if (selected === null) {
         selected = [];
     }
