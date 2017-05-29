@@ -4,7 +4,6 @@ namespace mp_ssv_general;
 
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\HeaderField;
-use mp_ssv_general\custom_fields\input_fields\DateInputField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
 use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
