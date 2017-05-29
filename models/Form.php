@@ -219,7 +219,7 @@ class Form
                     $customFieldValues['override_right'] = $form->overrideRight;
                     $field                               = Field::fromJSON(json_encode($customFieldValues));
                     if ($field instanceof InputField) {
-                        $field->updateName($id, $post->ID);
+//                        $field->updateName($id, $post->ID);
                     }
                     $field->id = $id;
                     if (!empty($field->title)) {
