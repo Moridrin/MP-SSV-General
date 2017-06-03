@@ -7,7 +7,6 @@ use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
-use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -21,7 +20,7 @@ if (!defined('ABSPATH')) {
  */
 class DateInputField extends InputField
 {
-    const INPUT_TYPE = 'datetime';
+    const INPUT_TYPE = 'date';
 
     /** @var bool $disabled */
     public $disabled;
@@ -29,31 +28,34 @@ class DateInputField extends InputField
     public $required;
     /** @var string $defaultValue */
     public $defaultValue;
-    /** @var string $placeholder */
-    public $placeholder;
+    /** @var string $dateRangeBefore */
+    public $dateRangeBefore;
+    /** @var string $dateRangeAfter */
+    public $dateRangeAfter;
 
     /**
      * DateTimeInputField constructor.
      *
-     * @param int    $id
-     * @param string $title
-     * @param string $inputType
-     * @param string $name
-     * @param bool   $disabled
-     * @param string $required
-     * @param string $defaultValue
-     * @param string $placeholder
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
+     * @param int      $id
+     * @param string   $title
+     * @param string   $name
+     * @param bool     $disabled
+     * @param string   $required
+     * @param string   $defaultValue
+     * @param string $dateRangeAfter
+     * @param string $dateRangeBefore
+     * @param string   $class
+     * @param string   $style
+     * @param string   $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
+    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $dateRangeAfter, $dateRangeBefore, $class, $style, $overrideRight)
     {
         parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
-        $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
-        $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
-        $this->defaultValue = $defaultValue;
-        $this->placeholder  = $placeholder;
+        $this->disabled        = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
+        $this->required        = filter_var($required, FILTER_VALIDATE_BOOLEAN);
+        $this->defaultValue    = $defaultValue;
+        $this->dateRangeAfter  = $dateRangeAfter;
+        $this->dateRangeBefore = $dateRangeBefore;
     }
 
     /**
@@ -75,7 +77,8 @@ class DateInputField extends InputField
             $values->disabled,
             $values->required,
             $values->default_value,
-            $values->placeholder,
+            $values->date_range_after,
+            $values->date_range_before,
             $values->class,
             $values->style,
             $values->override_right
@@ -83,48 +86,55 @@ class DateInputField extends InputField
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'input_type'     => $this->inputType,
-            'name'           => $this->name,
-            'disabled'       => $this->disabled,
-            'required'       => $this->required,
-            'default_value'  => $this->defaultValue,
-            'placeholder'    => $this->placeholder,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'id'                => $this->id,
+            'title'             => $this->title,
+            'field_type'        => $this->fieldType,
+            'input_type'        => $this->inputType,
+            'name'              => $this->name,
+            'disabled'          => $this->disabled,
+            'required'          => $this->required,
+            'default_value'     => $this->defaultValue,
+            'date_range_after'  => $this->dateRangeAfter,
+            'date_range_before' => $this->dateRangeBefore,
+            'class'             => $this->class,
+            'style'             => $this->style,
+            'override_right'    => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
+            $values['name']  = $this->name;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
     {
-        if ($this->defaultValue == 'NOW') {
+        if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $value       = isset($this->value) ? $this->value : $this->defaultValue;
+        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
+        $placeholder = 'placeholder="yyyy-mm-dd"';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
+        $dateAfter   = 'dateAfter="' . $this->dateRangeAfter . '"';
+        $dateBefore  = 'dateBefore="' . $this->dateRangeBefore . '"';
 
         if (isset($overrideRight) && current_user_can($overrideRight)) {
             $disabled = '';
@@ -132,29 +142,27 @@ class DateInputField extends InputField
         }
 
         ob_start();
-        if (current_theme_supports('materialize')) {
+        ?>
+        <div>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> <?= $dateAfter ?> <?= $dateBefore ?>/>
+        </div>
+        <?php
+        if (current_theme_supports('materialize') && $this->required) {
             ?>
-            <div>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
-            </div>
-            <?php
-            if ($this->required) {
-                ?>
-                <script>
-                    jQuery(function ($) {
-                        var dateField = $('#<?= esc_html($this->id) ?>');
-                        dateField.change(function () {
-                            if (dateField.val() === '') {
-                                dateField.addClass('invalid')
-                            } else {
-                                dateField.removeClass('invalid')
-                            }
-                        });
+            <script>
+                jQuery(function ($) {
+                    var dateField = $('#<?= esc_html($this->id) ?>');
+                    dateField.change(function () {
+                        if (dateField.val() === '') {
+                            dateField.addClass('invalid')
+                        } else {
+                            dateField.removeClass('invalid')
+                        }
                     });
-                </script>
-                <?php
-            }
+                });
+            </script>
+            <?php
         }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
@@ -166,7 +174,8 @@ class DateInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="date" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>_after" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
+        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>_before" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

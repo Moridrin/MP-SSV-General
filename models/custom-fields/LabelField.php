@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -60,11 +62,11 @@ class LabelField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -75,13 +77,16 @@ class LabelField extends Field
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)

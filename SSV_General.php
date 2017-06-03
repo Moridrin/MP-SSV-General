@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general;
 
+use DateTime;
 use Exception;
 use mp_ssv_users\SSV_Users;
 
@@ -29,6 +30,7 @@ class SSV_General
     const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
 
     const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
+    const HOOK_USERS_NEW_EVENT = 'ssv_events__hook_new_event';
     const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
 
     const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
@@ -180,21 +182,61 @@ class SSV_General
 
     #region sanitize($value)
     /**
-     * @param mixed $value
+     * @param mixed  $value
+     * @param string|array $sanitationType
      *
      * @return string
      */
-    public static function sanitize($value)
+    public static function sanitize($value, $sanitationType)
     {
         if (is_array($value)) {
             foreach ($value as &$item) {
-                self::sanitize($item);
+                self::sanitize($item, $sanitationType);
             }
             return $value;
         }
-        $value = stripslashes($value);
-        $value = esc_attr($value);
-        $value = sanitize_text_field($value);
+        if (is_array($sanitationType)) {
+            if (!in_array($value, $sanitationType)) {
+                $value = sanitize_text_field(array_values($sanitationType)[0]);
+            }
+        } elseif (strpos($sanitationType, 'email') !== false) {
+            $value = sanitize_email($value);
+        } elseif (strpos($sanitationType, 'file') !== false) {
+            $value = sanitize_file_name($value);
+        } elseif (strpos($sanitationType, 'color') !== false) {
+            $value = sanitize_hex_color($value);
+        } elseif (strpos($sanitationType, 'class') !== false) {
+            $value = sanitize_html_class($value);
+        } elseif (strpos($sanitationType, 'option') !== false) {
+            $value = sanitize_option($sanitationType, $value);
+        } elseif (strpos($sanitationType, 'date') !== false && strpos($sanitationType, 'time') !== false) {
+            $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
+            if ($dateTime) {
+                $value = $dateTime->format('Y-m-d H:i');
+            } else {
+                $value = '';
+            }
+        } elseif (strpos($sanitationType, 'date') !== false) {
+            $date = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
+            if ($date) {
+                $value = $date->format('Y-m-d');
+            } else {
+                $value = '';
+            }
+        } elseif (strpos($sanitationType, 'time') !== false) {
+            $time = DateTime::createFromFormat('H:i', sanitize_text_field($value));
+            if ($time) {
+                $value = $time->format('H:i');
+            } else {
+                $value = '';
+            }
+        } elseif ($sanitationType == 'boolean' || $sanitationType == 'bool') {
+            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        } elseif ($sanitationType == 'int') {
+            $value = intval($value);
+        } else {
+            $value = sanitize_text_field($value);
+        }
         return $value;
     }
     #endregion

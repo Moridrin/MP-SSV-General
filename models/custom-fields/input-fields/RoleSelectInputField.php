@@ -5,7 +5,6 @@ namespace mp_ssv_general\custom_fields\input_fields;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -66,11 +65,11 @@ class RoleSelectInputField extends InputField
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -83,13 +82,17 @@ class RoleSelectInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
+            $values['name']  = $this->name;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -110,6 +113,18 @@ class RoleSelectInputField extends InputField
                     <?php endforeach; ?>
                 </select>
                 <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+            </div>
+            <?php
+        } else {
+            global $wp_roles;
+            ?>
+            <div class="input-field">
+                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label><br/>
+                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                    <?php foreach ($this->options as $option): ?>
+                        <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <?php
         }

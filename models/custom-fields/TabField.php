@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -57,10 +59,10 @@ class TabField extends Field
         if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
-        $fields = array();
-        if (isset($values->fields)) {
-            foreach ($values->fields as $field) {
-                $fields[] = Field::fromJSON(json_encode($field));
+        $fieldIDs = array();
+        if (isset($values->fieldIDs)) {
+            foreach ($values->fieldIDs as $fieldID) {
+                $fieldIDs[] = Field::getByID($fieldID);
             }
         }
         return new TabField(
@@ -69,37 +71,37 @@ class TabField extends Field
             $values->class,
             $values->style,
             $values->override_right,
-            $fields
+            $fieldIDs
         );
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
-        $jsonFields = array();
-        foreach ($this->fields as $field) {
-            $jsonFields[] = $field->toJSON(false);
-        }
-        $values = array(
+        $fieldIDs = array_column($this->fields, 'id');
+        $values   = array(
             'id'             => $this->id,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'class'          => $this->class,
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
-            'fields'         => $jsonFields,
+            'fieldIDs'       => $fieldIDs,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -110,20 +112,6 @@ class TabField extends Field
         ob_start();
         ?>
         <li <?= $class ?> <?= $style ?>><a href="#<?= esc_html($this->name) ?>"><?= esc_html($this->title) ?></a></li>
-        <?php
-        return ob_get_clean();
-    }
-
-    public function getFieldsHTML()
-    {
-        ob_start();
-        ?>
-        <input type="hidden" name="tab" value="<?= esc_html($this->id) ?>">
-        <div id="<?= esc_html($this->name) ?>">
-            <?php foreach ($this->fields as $field): ?>
-                <?= $field->getHTML() ?>
-            <?php endforeach; ?>
-        </div>
         <?php
         return ob_get_clean();
     }

@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields\input_fields;
+
 use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
@@ -67,11 +69,11 @@ class HiddenInputField extends InputField
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -84,29 +86,31 @@ class HiddenInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
+            $values['name']  = $this->name;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
     {
+        if (strtolower($this->defaultValue) == 'now') {
+            $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
+        }
         $name  = 'name="' . esc_html($this->name) . '"';
         $value = 'value="' . esc_html($this->defaultValue) . '"';
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
 
         ob_start();
-        if (current_theme_supports('materialize')) {
-            ?>
-            <input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> />
-            <?php
-        }
-
+        ?><input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> /><?php
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 

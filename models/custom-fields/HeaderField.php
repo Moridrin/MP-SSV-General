@@ -1,5 +1,7 @@
 <?php
+
 namespace mp_ssv_general\custom_fields;
+
 use Exception;
 
 if (!defined('ABSPATH')) {
@@ -44,7 +46,7 @@ class HeaderField extends Field
         }
         return new HeaderField(
             $values->id,
-            $values->title,
+            isset($values->title) ? $values->title : 'test',
             $values->class,
             $values->style,
             $values->override_right
@@ -52,27 +54,30 @@ class HeaderField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
-            'title'          => $this->title,
+            'title'           => $this->title,
             'field_type'     => $this->fieldType,
             'class'          => $this->class,
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)

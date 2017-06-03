@@ -115,7 +115,33 @@ abstract class Field
             case LabelField::FIELD_TYPE:
                 return LabelField::fromJSON($json);
         }
-        throw new Exception('Unknown field type');
+        throw new Exception($values->field_type . ' is an unknown field type');
+    }
+
+    /**
+     * @param int $fieldID
+     *
+     * @return Field
+     */
+    public static function getByID($fieldID)
+    {
+        global $post;
+        if ($post != null) {
+            $postID = $post->ID;
+        }
+
+        global $wpdb;
+        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        if (isset($postID)) {
+            $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
+        } else {
+            $field = $wpdb->get_var("SELECT customField FROM $table WHERE ID = $fieldID");
+        }
+        if (!empty($field)) {
+            return self::fromJSON($field);
+        } else {
+            return null;
+        }
     }
     #endregion
 
@@ -123,16 +149,18 @@ abstract class Field
     /**
      * This function creates an array containing all variables of this Field.
      *
-     * @param bool $encode can be set to false if it is important not to json_encode the array.
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    abstract public function toJSON($encode = true);
+    abstract public function toJSON($forDatabase = false);
     #endregion
 
     #region getHTML()
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
+     *
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
      *
      * @return string the field as HTML object.
      */
@@ -159,6 +187,34 @@ abstract class Field
             }
         }
         return $maxID;
+    }
+    #endregion
+
+    #region __compare($field)
+    /**
+     * @param Field $a
+     * @param Field $b
+     *
+     * @return int -1 / 0 / 1
+     */
+    public static function compare($a, $b)
+    {
+        return $a->__compare($b);
+    }
+    #endregion
+
+    #region __compare($field)
+    /**
+     * @param Field $field
+     *
+     * @return int -1 / 0 / 1
+     */
+    public function __compare($field)
+    {
+        if ($this->id == $field->id) {
+            return 0;
+        }
+        return ($this->id < $field->id) ? -1 : 1;
     }
     #endregion
 

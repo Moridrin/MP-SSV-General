@@ -5,6 +5,7 @@ namespace mp_ssv_general\custom_fields;
 use Exception;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
+use mp_ssv_general\custom_fields\input_fields\DateInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\ImageInputField;
 use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
@@ -13,7 +14,6 @@ use mp_ssv_general\custom_fields\input_fields\SelectInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
-use mp_ssv_users\SSV_Users;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -25,6 +25,7 @@ require_once 'input-fields/SelectInputField.php';
 require_once 'input-fields/ImageInputField.php';
 require_once 'input-fields/HiddenInputField.php';
 require_once 'input-fields/CustomInputField.php';
+require_once 'input-fields/DateInputField.php';
 require_once 'input-fields/RoleCheckboxInputField.php';
 require_once 'input-fields/RoleSelectInputField.php';
 
@@ -61,7 +62,7 @@ class InputField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
         $this->inputType = $inputType;
-        $this->name      = $name;
+        $this->name      = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
     }
 
     /**
@@ -79,6 +80,8 @@ class InputField extends Field
                 return SelectInputField::fromJSON($json);
             case CheckboxInputField::INPUT_TYPE:
                 return CheckboxInputField::fromJSON($json);
+            case DateInputField::INPUT_TYPE:
+                return DateInputField::fromJSON($json);
             case RoleCheckboxInputField::INPUT_TYPE:
                 return RoleCheckboxInputField::fromJSON($json);
             case RoleSelectInputField::INPUT_TYPE:
@@ -93,17 +96,19 @@ class InputField extends Field
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         throw new Exception('This should be implemented in a sub class.');
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
@@ -122,6 +127,8 @@ class InputField extends Field
     }
 
     /**
+     * @param string $filter HTML string with the filter rows.
+     *
      * @return string the field as HTML object.
      */
     public function getFilterRowBase($filter)
@@ -162,13 +169,13 @@ class InputField extends Field
             return; //Can't change the value of hidden fields.
         }
         if ($value instanceof User) { //User values can always be set (even if isDisabled())
-            $this->value = SSV_General::sanitize($value->getMeta($this->name));
+            $this->value = $value->getMeta($this->name);
         } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
-                $this->value = SSV_General::sanitize($value[$this->name]);
+                $this->value = SSV_General::sanitize($value[$this->name], $this->name);
             }
         } else {
-            $this->value = SSV_General::sanitize($value);
+            $this->value = SSV_General::sanitize($value, $this->name);
         }
     }
 
@@ -186,6 +193,40 @@ class InputField extends Field
         } else {
             return false;
         }
+    }
+
+    /**
+     * @param int $id     is the new ID for the field (it currently has the old ID to find the old row).
+     * @param int $postID is the ID of the post.
+     */
+    public function updateName($id, $postID)
+    {
+        global $wpdb;
+        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
+        $json  = $wpdb->get_var($sql);
+        if (empty($json)) {
+            return;
+        }
+        $field = Field::fromJSON($json);
+        if (!$field instanceof InputField) {
+            return;
+        }
+        $wpdb->update(
+            $wpdb->usermeta,
+            array(
+                'meta_key' => $this->name,
+            ),
+            array(
+                'meta_key' => $field->name,
+            ),
+            array(
+                '%s',
+            ),
+            array(
+                '%s',
+            )
+        );
     }
 
     function __toString()

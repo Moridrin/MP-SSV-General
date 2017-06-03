@@ -1,10 +1,11 @@
 <?php
+
 namespace mp_ssv_general\custom_fields\input_fields;
+
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
-use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -69,11 +70,11 @@ class ImageInputField extends InputField
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -87,13 +88,17 @@ class ImageInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
+            $values['name']  = $this->name;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -125,6 +130,14 @@ class ImageInputField extends InputField
                     </div>
                 </div>
             </div>
+            <?php
+        } else {
+            ?>
+            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+            <?php if ($this->preview): ?>
+                <img src="<?= esc_url($this->value) ?>" <?= $class ?> <?= $style ?>/>
+            <?php endif; ?>
+            <input type="file" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>><br/>
             <?php
         }
 

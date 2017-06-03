@@ -1,11 +1,11 @@
 <?php
+
 namespace mp_ssv_general\custom_fields\input_fields;
+
 use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
-use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -80,11 +80,11 @@ class TextInputField extends InputField
     }
 
     /**
-     * @param bool $encode
+     * @param bool $forDatabase
      *
      * @return string the class as JSON object.
      */
-    public function toJSON($encode = true)
+    public function toJSON($forDatabase = false)
     {
         $values = array(
             'id'             => $this->id,
@@ -100,13 +100,17 @@ class TextInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if ($encode) {
-            $values = json_encode($values);
+        if (!$forDatabase) {
+            $values['title'] = $this->title;
+            $values['name']  = $this->name;
         }
+        $values = json_encode($values);
         return $values;
     }
 
     /**
+     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
+     *
      * @return string the field as HTML object.
      */
     public function getHTML($overrideRight)
@@ -114,7 +118,7 @@ class TextInputField extends InputField
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $value       = isset($this->value) ? $this->value : $this->defaultValue;
+        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->id) ? 'id="' . esc_html($this->id) . '"' : '';
         $name        = 'name="' . $this->name . '"';
         $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
@@ -136,6 +140,11 @@ class TextInputField extends InputField
                 <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
                 <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
             </div>
+            <?php
+        } else {
+            ?>
+            <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
             <?php
         }
 
