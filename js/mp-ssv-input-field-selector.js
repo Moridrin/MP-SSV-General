@@ -6,43 +6,44 @@ var custom_field_fields = settings.custom_field_fields;
 var roles = JSON.parse(settings.roles);
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
+var containerID = -1;
 
-function mp_ssv_add_new_field(fieldType, inputType, fieldID, values, allowTabs) {
+function mp_ssv_add_new_field(container, fieldType, inputType, fieldID, values, allowTabs) {
+    container = document.getElementById(container);
+    containerID = container.getAttribute("container_id") ? container.getAttribute("container_id") : 0;
     if (typeof values === 'undefined' || values === null) {
         values = [];
     }
     if (fieldType === 'tab') {
-        getTabField(fieldID, values, allowTabs);
+        getTabField(container, fieldID, values, allowTabs);
     } else if (fieldType === 'header') {
-        getHeaderField(fieldID, values, allowTabs);
+        getHeaderField(container, fieldID, values, allowTabs);
     } else if (fieldType === 'input') {
         if (inputType === 'text') {
-            getTextInputField(fieldID, values, allowTabs);
+            getTextInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'select') {
-            getSelectInputField(fieldID, values, allowTabs);
+            getSelectInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'checkbox') {
-            getCheckboxInputField(fieldID, values, allowTabs);
+            getCheckboxInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'role_checkbox') {
-            getRoleCheckboxInputField(fieldID, values, allowTabs);
+            getRoleCheckboxInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'role_select') {
-            getRoleSelectInputField(fieldID, values, allowTabs);
+            getRoleSelectInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'date') {
-            getDateInputField(fieldID, values, allowTabs);
+            getDateInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'image') {
-            getImageInputField(fieldID, values, allowTabs);
+            getImageInputField(container, fieldID, values, allowTabs);
         } else if (inputType === 'hidden') {
-            getHiddenInputField(fieldID, values, allowTabs);
+            getHiddenInputField(container, fieldID, values, allowTabs);
         } else {
-            getCustomInputField(inputType, fieldID, values, allowTabs);
+            getCustomInputField(container, inputType, fieldID, values, allowTabs);
         }
     } else if (fieldType === 'label') {
-        getLabelField(fieldID, values, allowTabs);
+        getLabelField(container, fieldID, values, allowTabs);
     }
 }
 
-function getTabField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getTabField(container, fieldID, values, allowTabs) {
     var fieldTitle = '';
     var fields = {};
     var fieldType = 'tab';
@@ -98,13 +99,11 @@ function getTabField(fieldID, values, allowTabs) {
     // container.appendChild(startTR);
     for (var i in fields) {
         // alert(JSON.stringify(fields[i]));
-        mp_ssv_add_new_field(fields[i]['field_type'], fields[i]['input_type'], fields[i]['id'], fields[i], allowTabs);
+        mp_ssv_add_new_field(container, fields[i]['field_type'], fields[i]['input_type'], fields[i]['id'], fields[i], allowTabs);
     }
     // container.appendChild(endTR);
 }
-function getHeaderField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getHeaderField(container, fieldID, values, allowTabs) {
     var fieldTitle = '';
     var fieldType = 'header';
     var classValue = '';
@@ -129,9 +128,7 @@ function getHeaderField(fieldID, values, allowTabs) {
 
     container.appendChild(tr);
 }
-function getTextInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getTextInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -158,9 +155,7 @@ function getTextInputField(fieldID, values, allowTabs) {
     tr = getTextInputFields(tr, fieldID, name, required, disabled, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
-function getSelectInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getSelectInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -183,8 +178,7 @@ function getSelectInputField(fieldID, values, allowTabs) {
     tr = getSelectInputFields(tr, fieldID, name, options, disabled, classValue, style);
     container.appendChild(tr);
 }
-function getCheckboxInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
+function getCheckboxInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -209,8 +203,7 @@ function getCheckboxInputField(fieldID, values, allowTabs) {
     tr = getCheckboxInputFields(tr, fieldID, name, required, disabled, defaultChecked, classValue, style);
     container.appendChild(tr);
 }
-function getRoleCheckboxInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
+function getRoleCheckboxInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -229,8 +222,7 @@ function getRoleCheckboxInputField(fieldID, values, allowTabs) {
     tr = getRoleCheckboxInputFields(tr, fieldID, name, classValue, style);
     container.appendChild(tr);
 }
-function getRoleSelectInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
+function getRoleSelectInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -250,9 +242,7 @@ function getRoleSelectInputField(fieldID, values, allowTabs) {
     tr = getRoleSelectInputFields(tr, fieldID, name, options, classValue, style);
     container.appendChild(tr);
 }
-function getImageInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getImageInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -273,9 +263,7 @@ function getImageInputField(fieldID, values, allowTabs) {
     tr = getImageInputFields(tr, fieldID, name, required, classValue, style);
     container.appendChild(tr);
 }
-function getHiddenInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getHiddenInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -296,9 +284,7 @@ function getHiddenInputField(fieldID, values, allowTabs) {
     tr = getHiddenInputFields(tr, fieldID, name, defaultValue, classValue, style);
     container.appendChild(tr);
 }
-function getCustomInputField(inputType, fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getCustomInputField(container, inputType, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -325,9 +311,7 @@ function getCustomInputField(inputType, fieldID, values, allowTabs) {
     tr = getCustomInputFields(tr, fieldID, inputType, name, required, disabled, defaultValue, placeholder, classValue, style);
     container.appendChild(tr);
 }
-function getDateInputField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getDateInputField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldTitle = '';
@@ -356,9 +340,7 @@ function getDateInputField(fieldID, values, allowTabs) {
     tr = getDateInputFields(tr, fieldID, name, required, disabled, defaultValue, dateRangeAfter, dateRangeBefore, classValue, style);
     container.appendChild(tr);
 }
-function getLabelField(fieldID, values, allowTabs) {
-    var container = document.getElementById("custom-fields-placeholder");
-
+function getLabelField(container, fieldID, values, allowTabs) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
     var fieldType = 'label';
@@ -513,7 +495,7 @@ function getStart(fieldID, isTab) {
     var start = document.createElement("input");
     start.setAttribute("type", "hidden");
     start.setAttribute("id", fieldID + "_start");
-    start.setAttribute("name", "custom_field_" + fieldID + "_start");
+    start.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_start");
     start.setAttribute("value", "start");
     var startTD = document.createElement("td");
     if (isTab) {
@@ -527,7 +509,7 @@ function getFieldID(fieldID) {
     var fieldIDElement = document.createElement("input");
     fieldIDElement.setAttribute("type", "hidden");
     fieldIDElement.setAttribute("id", fieldID + "_id");
-    fieldIDElement.setAttribute("name", "custom_field_" + fieldID + "_id");
+    fieldIDElement.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_id");
     fieldIDElement.setAttribute("value", fieldID);
     var fieldIDTD = document.createElement("td");
     fieldIDTD.setAttribute("id", fieldID + "_id_td");
@@ -547,7 +529,7 @@ function getDraggable(fieldID) {
 function getFieldTitle(fieldID, value) {
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", fieldID + "_title");
-    fieldTitle.setAttribute("name", "custom_field_" + fieldID + "_title");
+    fieldTitle.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_title");
     fieldTitle.setAttribute("style", "width: 100%;");
     if (value) {
         fieldTitle.setAttribute("value", value);
@@ -589,7 +571,7 @@ function getFieldType(fieldID, value, allowTabs) {
 function getText(fieldID, value) {
     var fieldTitle = document.createElement("textarea");
     fieldTitle.setAttribute("id", fieldID + "_text");
-    fieldTitle.setAttribute("name", "custom_field_" + fieldID + "_text");
+    fieldTitle.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_text");
     fieldTitle.setAttribute("style", "width: 100%;");
     fieldTitle.innerHTML = value;
     var fieldTitleLabel = document.createElement("label");
@@ -633,7 +615,7 @@ function getInputType(fieldID, value) {
     if (value === 'custom') {
         var inputTypeCustom = document.createElement("input");
         inputTypeCustom.setAttribute("id", fieldID + "_input_type");
-        inputTypeCustom.setAttribute("name", "custom_field_" + fieldID + "_input_type");
+        inputTypeCustom.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_input_type");
         inputTypeCustom.setAttribute("style", "width: 50%;");
         inputTypeCustom.setAttribute("value", customValue);
         inputTypeCustom.setAttribute("required", "required");
@@ -644,7 +626,7 @@ function getInputType(fieldID, value) {
 function getName(fieldID, value) {
     var name = document.createElement("input");
     name.setAttribute("id", fieldID + "_name");
-    name.setAttribute("name", "custom_field_" + fieldID + "_name");
+    name.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_name");
     name.setAttribute("style", "width: 100%;");
     if (value) {
         name.setAttribute("value", value);
@@ -693,7 +675,7 @@ function getRequired(fieldID, value) {
     var required = document.createElement("input");
     required.setAttribute("type", "checkbox");
     required.setAttribute("id", fieldID + "_required");
-    required.setAttribute("name", "custom_field_" + fieldID + "_required");
+    required.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_required");
     required.setAttribute("value", "true");
     if (value) {
         required.setAttribute("checked", "checked");
@@ -701,7 +683,7 @@ function getRequired(fieldID, value) {
     var requiredReset = document.createElement("input");
     requiredReset.setAttribute("type", "hidden");
     requiredReset.setAttribute("id", fieldID + "_required");
-    requiredReset.setAttribute("name", "custom_field_" + fieldID + "_required");
+    requiredReset.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_required");
     requiredReset.setAttribute("value", "false");
     var requiredLabel = document.createElement("label");
     requiredLabel.setAttribute("style", "white-space: nowrap;");
@@ -719,7 +701,7 @@ function getPreview(fieldID, value) {
     var preview = document.createElement("input");
     preview.setAttribute("type", "checkbox");
     preview.setAttribute("id", fieldID + "_preview");
-    preview.setAttribute("name", "custom_field_" + fieldID + "_preview");
+    preview.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_preview");
     preview.setAttribute("value", "true");
     if (value) {
         preview.setAttribute("checked", "checked");
@@ -727,7 +709,7 @@ function getPreview(fieldID, value) {
     var previewReset = document.createElement("input");
     previewReset.setAttribute("type", "hidden");
     previewReset.setAttribute("id", fieldID + "_preview");
-    previewReset.setAttribute("name", "custom_field_" + fieldID + "_preview");
+    previewReset.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_preview");
     previewReset.setAttribute("value", "false");
     var previewLabel = document.createElement("label");
     previewLabel.setAttribute("style", "white-space: nowrap;");
@@ -745,7 +727,7 @@ function getDisabled(fieldID, value) {
     var disabled = document.createElement("input");
     disabled.setAttribute("type", "checkbox");
     disabled.setAttribute("id", fieldID + "_disabled");
-    disabled.setAttribute("name", "custom_field_" + fieldID + "_disabled");
+    disabled.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_disabled");
     disabled.setAttribute("value", "true");
     if (value) {
         disabled.setAttribute("checked", "checked");
@@ -753,7 +735,7 @@ function getDisabled(fieldID, value) {
     var disabledReset = document.createElement("input");
     disabledReset.setAttribute("type", "hidden");
     disabledReset.setAttribute("id", fieldID + "_disabled");
-    disabledReset.setAttribute("name", "custom_field_" + fieldID + "_disabled");
+    disabledReset.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_disabled");
     disabledReset.setAttribute("value", "false");
     var disabledLabel = document.createElement("label");
     disabledLabel.setAttribute("style", "white-space: nowrap;");
@@ -770,7 +752,7 @@ function getDisabled(fieldID, value) {
 function getOptions(fieldID, value) {
     var options = document.createElement("input");
     options.setAttribute("id", fieldID + "_options");
-    options.setAttribute("name", "custom_field_" + fieldID + "_options");
+    options.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_options");
     options.setAttribute("style", "width: 100%;");
     if (value) {
         options.setAttribute("value", value);
@@ -796,7 +778,7 @@ function getDefaultValue(fieldID, value, placeholder) {
         defaultValue.setAttribute("type", "hidden");
     }
     defaultValue.setAttribute("id", fieldID + "_default_value");
-    defaultValue.setAttribute("name", "custom_field_" + fieldID + "_default_value");
+    defaultValue.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_default_value");
     defaultValue.setAttribute("style", "width: 100%;");
     if (placeholder) {
         defaultValue.setAttribute("placeholder", placeholder);
@@ -826,7 +808,7 @@ function getDefaultSelected(fieldID, value) {
         defaultSelected.setAttribute("type", "checkbox");
     }
     defaultSelected.setAttribute("id", fieldID + "_default_checked");
-    defaultSelected.setAttribute("name", "custom_field_" + fieldID + "_default_checked");
+    defaultSelected.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_default_checked");
     defaultSelected.setAttribute("value", "true");
     if (value) {
         defaultSelected.setAttribute("checked", "checked");
@@ -834,7 +816,7 @@ function getDefaultSelected(fieldID, value) {
     var defaultSelectedReset = document.createElement("input");
     defaultSelectedReset.setAttribute("type", "hidden");
     defaultSelectedReset.setAttribute("id", fieldID + "_default_checked");
-    defaultSelectedReset.setAttribute("name", "custom_field_" + fieldID + "_default_checked");
+    defaultSelectedReset.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_default_checked");
     defaultSelectedReset.setAttribute("value", "false");
     var requiredTD = document.createElement("td");
     requiredTD.setAttribute("id", fieldID + "_default_checked_td");
@@ -857,7 +839,7 @@ function getPlaceholder(fieldID, value) {
         placeholder.setAttribute("type", "hidden");
     }
     placeholder.setAttribute("id", fieldID + "_placeholder");
-    placeholder.setAttribute("name", "custom_field_" + fieldID + "_placeholder");
+    placeholder.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_placeholder");
     placeholder.setAttribute("style", "width: 100%;");
     if (value) {
         placeholder.setAttribute("value", value);
@@ -875,18 +857,23 @@ function getPlaceholder(fieldID, value) {
     placeholderTD.appendChild(placeholder);
     return placeholderTD;
 }
-function getDateRange(fieldID, valueAfter, valueBefore) {
+function getDateRange(fieldID, valueAfter, valueBefore, show, title) {
+    if (typeof show === 'undefined') {
+        show = custom_field_fields.indexOf('placeholder') !== -1;
+    }
+    if (typeof title === 'undefined') {
+        title = "Range";
+    }
     var dateRangeAfter = document.createElement("input");
     var dateRangeBefore = document.createElement("input");
-    var show = custom_field_fields.indexOf('placeholder') !== -1;
     if (!show) {
         dateRangeAfter.setAttribute("type", "hidden");
         dateRangeBefore.setAttribute("type", "hidden");
     }
     dateRangeAfter.setAttribute("id", fieldID + "_date_range_after");
     dateRangeBefore.setAttribute("id", fieldID + "_date_range_before");
-    dateRangeAfter.setAttribute("name", "custom_field_" + fieldID + "_date_range_after");
-    dateRangeBefore.setAttribute("name", "custom_field_" + fieldID + "_date_range_before");
+    dateRangeAfter.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_date_range_after");
+    dateRangeBefore.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_date_range_before");
     dateRangeAfter.setAttribute("style", "width: 49%;");
     dateRangeBefore.setAttribute("style", "width: 49%;");
     dateRangeAfter.setAttribute("placeholder", "yyyy-mm-dd");
@@ -903,7 +890,7 @@ function getDateRange(fieldID, valueAfter, valueBefore) {
         var dateRangeLabel = document.createElement("label");
         dateRangeLabel.setAttribute("style", "white-space: nowrap;");
         dateRangeLabel.setAttribute("for", fieldID + "_date_range");
-        dateRangeLabel.innerHTML = "Range";
+        dateRangeLabel.innerHTML = title;
         dateRangeTD.appendChild(dateRangeLabel);
         dateRangeTD.appendChild(getBR());
     }
@@ -918,7 +905,7 @@ function getClass(fieldID, value) {
         classField.setAttribute("type", "hidden");
     }
     classField.setAttribute("id", fieldID + "_class");
-    classField.setAttribute("name", "custom_field_" + fieldID + "_class");
+    classField.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_class");
     classField.setAttribute("style", "width: 100%;");
     if (value) {
         classField.setAttribute("value", value);
@@ -943,7 +930,7 @@ function getStyle(fieldID, value) {
         style.setAttribute("type", "hidden");
     }
     style.setAttribute("id", fieldID + "_style");
-    style.setAttribute("name", "custom_field_" + fieldID + "_style");
+    style.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_style");
     style.setAttribute("style", "width: 100%;");
     if (value) {
         style.setAttribute("value", value);
@@ -965,7 +952,7 @@ function getEnd(fieldID, isTab) {
     var stop = document.createElement("input");
     stop.setAttribute("type", "hidden");
     stop.setAttribute("id", fieldID + "_end");
-    stop.setAttribute("name", "custom_field_" + fieldID + "_end");
+    stop.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + "_end");
     stop.setAttribute("value", "end");
     var stopTD = document.createElement("td");
     if (isTab) {
@@ -1062,7 +1049,7 @@ function inputTypeChanged(fieldID) {
 function createSelect(fieldID, fieldNameExtension, options, selected) {
     var select = document.createElement("select");
     select.setAttribute("id", fieldID + fieldNameExtension);
-    select.setAttribute("name", "custom_field_" + fieldID + fieldNameExtension);
+    select.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + fieldNameExtension);
 
     for (var i = 0; i < options.length; i++) {
         var option = document.createElement("option");
@@ -1082,7 +1069,7 @@ function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
     }
     var select = document.createElement("select");
     select.setAttribute("id", fieldID + fieldNameExtension);
-    select.setAttribute("name", "custom_field_" + fieldID + fieldNameExtension + "[]");
+    select.setAttribute("name", "custom_field_" + containerID + "_" + fieldID + fieldNameExtension + "[]");
     select.setAttribute("multiple", "multiple");
 
     for (var i = 0; i < options.length; i++) {

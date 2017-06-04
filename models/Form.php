@@ -175,11 +175,11 @@ class Form
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_new_field('input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
+                mp_ssv_add_new_field('custom-fields-placeholder', 'input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_new_field('<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+            mp_ssv_add_new_field('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
             <?php endforeach; ?>
         </script>
         <?php
@@ -190,8 +190,10 @@ class Form
     #region saveEditorFromPost()
     /**
      * This function removes the old fields from the database and inserts the new fields.
+     *
+     * @param int $containerID is the ID for the container (used if post has multiple custom field containers).
      */
-    public static function saveEditorFromPost()
+    public static function saveEditorFromPost($containerID = 0)
     {
         global $wpdb;
         global $post;
@@ -203,7 +205,7 @@ class Form
         $customFieldValues   = array();
         $id                  = 0;
         $fieldID             = 0;
-        $prefix              = 'custom_field_';
+        $prefix              = 'custom_field_' . $containerID . '_';
         /** @var TabField $currentTab */
         $currentTab = null;
         foreach ($_POST as $key => $value) {
