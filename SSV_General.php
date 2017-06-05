@@ -21,7 +21,8 @@ class SSV_General
     #region Constants
     const PATH = SSV_GENERAL_PATH;
     const URL = SSV_GENERAL_URL;
-    const CUSTOM_FIELDS_TABLE = SSV_GENERAL_CUSTOM_FIELDS_TABLE;
+    const CUSTOM_FIELDS_TABLE = 'ssv_general_custom_fields';
+    const CUSTOM_FORM_FIELDS_TABLE = SSV_GENERAL_CUSTOM_FORM_FIELDS_TABLE;
 
     const BASE_URL = SSV_GENERAL_BASE_URL;
 
@@ -180,12 +181,89 @@ class SSV_General
     }
     #endregion
 
+    #region getFormSecurityFields($adminReferer, $save, $reset)
+    /**
+     * @return string HTML
+     */
+    public static function getCapabilitiesDataList()
+    {
+        ob_start();
+        if (function_exists('members_get_capabilities')) {
+            $capabilities = members_get_capabilities();
+        } else {
+            $capabilities = array(
+                'activate_plugins',
+                'add_users',
+                'create_users',
+                'delete_others_pages',
+                'delete_others_posts',
+                'delete_pages',
+                'delete_plugins',
+                'delete_posts',
+                'delete_private_pages',
+                'delete_private_posts',
+                'delete_published_pages',
+                'delete_published_posts',
+                'delete_themes',
+                'delete_users',
+                'edit_dashboard',
+                'edit_files',
+                'edit_others_pages',
+                'edit_others_posts',
+                'edit_pages',
+                'edit_plugins',
+                'edit_posts',
+                'edit_private_pages',
+                'edit_private_posts',
+                'edit_published_pages',
+                'edit_published_posts',
+                'edit_theme_options',
+                'edit_themes',
+                'edit_users',
+                'export',
+                'import',
+                'install_plugins',
+                'install_themes',
+                'list_users',
+                'manage_categories',
+                'manage_links',
+                'manage_options',
+                'moderate_comments',
+                'promote_users',
+                'publish_pages',
+                'publish_posts',
+                'read',
+                'read_private_pages',
+                'read_private_posts',
+                'remove_users',
+                'switch_themes',
+                'unfiltered_html',
+                'unfiltered_upload',
+                'update_core',
+                'update_plugins',
+                'update_themes',
+                'upload_files',
+                'manage_events',
+                'manage_event_registrations',
+            );
+        }
+        ?>
+        <datalist id="capabilities">
+            <?php foreach ($capabilities as $capability): ?>
+                <option value="<?= $capability ?>"><?= $capability ?></option>
+            <?php endforeach; ?>
+        </datalist>
+        <?php
+        return ob_get_clean();
+    }
+    #endregion
+
     #region sanitize($value)
     /**
-     * @param mixed  $value
+     * @param mixed        $value
      * @param string|array $sanitationType
      *
-     * @return string
+     * @return mixed
      */
     public static function sanitize($value, $sanitationType)
     {

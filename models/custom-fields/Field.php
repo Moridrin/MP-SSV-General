@@ -72,7 +72,7 @@ abstract class Field
     public static function titleFromDatabase($name)
     {
         global $wpdb;
-        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
+        $table  = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $sql    = "SELECT customField FROM $table WHERE customField LIKE '%\"name\":\"$name\"%'";
         $fields = $wpdb->get_results($sql);
         foreach ($fields as $field) {
@@ -131,7 +131,7 @@ abstract class Field
         }
 
         global $wpdb;
-        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        $table = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         if (isset($postID)) {
             $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
         } else {

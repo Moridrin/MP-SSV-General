@@ -90,7 +90,7 @@ class Form
             $user = false;
         }
         global $wpdb;
-        $table  = SSV_General::CUSTOM_FIELDS_TABLE;
+        $table  = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $postID = $post->ID;
         $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID ORDER BY ID ASC");
         foreach ($fields as $field) {
@@ -175,11 +175,11 @@ class Form
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_new_field('custom-fields-placeholder', 'input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
+                mp_ssv_add_custom_field('custom-fields-placeholder', 'input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_new_field('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+            mp_ssv_add_custom_field('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
             <?php endforeach; ?>
         </script>
         <?php
@@ -239,7 +239,7 @@ class Form
         }
         //Remove All old fields for post
         $wpdb->delete(
-            SSV_General::CUSTOM_FIELDS_TABLE,
+            SSV_General::CUSTOM_FORM_FIELDS_TABLE,
             array(
                 'postID' => $post->ID,
             )
@@ -253,7 +253,7 @@ class Form
         foreach ($fields as $field) {
             //Insert new fields for post
             $wpdb->insert(
-                SSV_General::CUSTOM_FIELDS_TABLE,
+                SSV_General::CUSTOM_FORM_FIELDS_TABLE,
                 array(
                     'ID'          => $field->id,
                     'postID'      => $post->ID,
@@ -265,7 +265,7 @@ class Form
             //Update all fields with the same name (set same title)
             if ($field instanceof InputField) {
                 $wpdb->update(
-                    SSV_General::CUSTOM_FIELDS_TABLE,
+                    SSV_General::CUSTOM_FORM_FIELDS_TABLE,
                     array('fieldTitle' => $field->title),
                     array('fieldName' => $field->name),
                     array('%s'),
