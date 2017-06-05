@@ -559,7 +559,7 @@ function getText(fieldID, value) {
     fieldTitleTD.setAttribute("class", "textarea_td");
     fieldTitleTD.setAttribute("style", "padding: 0;");
     fieldTitleTD.setAttribute("id", fieldID + "_text_td");
-    var selected = getSelectValues(event.srcElement);
+    var selected = getSelectValues(document.getElementById('columns'));
     var textAreaColspan = 4;
     if (selected.indexOf("default") !== -1) {
         textAreaColspan++;
@@ -761,7 +761,7 @@ function getOptions(fieldID, value) {
     optionsTD.setAttribute("class", "options_td");
     optionsTD.setAttribute("style", "padding: 0;");
     optionsTD.setAttribute("id", fieldID + "_options_td");
-    var selected = getSelectValues(event.srcElement);
+    var selected = getSelectValues(document.getElementById('columns'));
     var optionsColspan = 1;
     if (selected.indexOf("default") !== -1) {
         optionsColspan++;
