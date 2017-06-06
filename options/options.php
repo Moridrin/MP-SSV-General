@@ -62,6 +62,7 @@ function ssv_settings_page()
                         unset($properties[$key]);
                     }
                 }
+                $properties['field_type'] = InputField::FIELD_TYPE;
                 $field = Field::fromJSON(json_encode($properties));
                 $name = null;
                 if ($field instanceof InputField) {
@@ -150,11 +151,11 @@ function ssv_settings_page()
                     <script>
                         var i = <?= esc_html(Field::getMaxID($fields) + 1) ?>;
                         function mp_ssv_add_new_custom_field() {
-                            mp_ssv_add_custom_field('custom-fields-placeholder', 'input', 'text', i, {"override_right": ""}, false);
+                            mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                             i++;
                         }
                         <?php foreach($fields as $field): ?>
-                        mp_ssv_add_custom_field('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, false);
+                        mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->id) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
                         <?php endforeach; ?>
                     </script>
                 </td>
