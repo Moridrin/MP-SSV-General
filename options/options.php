@@ -16,6 +16,7 @@ function ssv_add_ssv_menu()
 }
 
 add_action('admin_menu', 'ssv_add_ssv_menu', 9);
+add_action('network_admin_menu', 'ssv_add_ssv_menu', 9);
 #endregion
 
 #region Page Content
@@ -38,9 +39,15 @@ function ssv_settings_page()
             /** @var wpdb $wpdb */
             global $wpdb;
             $table = SSV_General::CUSTOM_FIELDS_TABLE;
-            $databaseFieldIDs = implode(", ", $fieldIDs);
-            $wpdb->query("DELETE FROM $table WHERE ID NOT IN ($databaseFieldIDs)");
-
+            if (current_user_can('remove_custom_fields')) {
+                if (!empty($fieldIDs)) {
+                    $databaseFieldIDs = implode(", ", $fieldIDs);
+                    $wpdb->query("DELETE FROM $table WHERE ID NOT IN ($databaseFieldIDs)");
+                } else {
+                    $wpdb->query("DELETE FROM $table WHERE 1");
+                    $fieldIDs = array();
+                }
+            }
             foreach ($fieldIDs as $fieldID) {
                 $properties = array_filter(
                     $_POST,
@@ -64,15 +71,27 @@ function ssv_settings_page()
                         $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
                     }
                 }
-                $wpdb->replace(
-                    $table,
-                    array(
-                        'ID'    => $field->id,
-                        'name'  => $name,
-                        'title' => $field->title,
-                        'json'  => $field->toJSON(true),
-                    )
-                );
+                if (current_user_can('edit_custom_fields')) {
+                    $wpdb->replace(
+                        $table,
+                        array(
+                            'ID'    => $field->id,
+                            'name'  => $name,
+                            'title' => $field->title,
+                            'json'  => $field->toJSON(true),
+                        )
+                    );
+                } elseif (current_user_can('add_custom_fields')) {
+                    $wpdb->insert(
+                        $table,
+                        array(
+                            'ID'    => $field->id,
+                            'name'  => $name,
+                            'title' => $field->title,
+                            'json'  => $field->toJSON(true),
+                        )
+                    );
+                }
             }
             $customFieldFields = isset($_POST['columns']) ? SSV_General::sanitize($_POST['columns'], $columns) : array();
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
@@ -89,8 +108,6 @@ function ssv_settings_page()
         $values->title = $field->title;
         $fields[]      = Field::fromJSON(json_encode($values));
     }
-    echo SSV_General::getCapabilitiesDataList();
-
     ?>
     <div class="wrap">
         <h1>General Options</h1>

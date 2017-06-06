@@ -29,3 +29,17 @@ function getDraggable(fieldID) {
     draggableIconTD.appendChild(draggableIcon);
     return draggableIconTD;
 }
+
+function removeFields(fields) {
+    if (fields !== null) {
+        while (fields.length > 0) {
+            removeField(fields[0]);
+        }
+    }
+}
+
+function removeField(field) {
+    if (field !== null) {
+        field.parentElement.removeChild(field);
+    }
+}

@@ -164,22 +164,34 @@ class Form
      */
     public function getEditor($allowTabs)
     {
+        global $wpdb;
+        $table = SSV_General::CUSTOM_FIELDS_TABLE;
+        $fields = $wpdb->get_results("SELECT `ID`, `title`, `name` FROM $table");
         ob_start();
+        echo SSV_General::getCapabilitiesDataList();
         ?>
         <div style="overflow-x: auto;">
-            <input type="hidden" name="override_right" value="<?= esc_html($this->overrideRight) ?>">
             <table id="custom-fields-placeholder" class="sortable"></table>
-            <button type="button" onclick="mp_ssv_add_new_custom_field()">Add Field</button>
+            <label>
+                Field Name (or title)
+                <input type="text" id="custom_field_selector" list="custom_fields"/>
+            </label>
+            <datalist id="custom_fields">
+                <?php foreach ($fields as $field): ?>
+                    <option value="<?= $field->ID ?>"><?= $field->title ?> (<?= $field->name ?>)</option>
+                <?php endforeach; ?>
+            </datalist>
+            <button type="button" onclick="mp_ssv_add_new_custom_field_customizer()">Add Field</button>
         </div>
         <script>
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
-            function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_custom_field('custom-fields-placeholder', 'input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
+            function mp_ssv_add_new_custom_field_customizer() {
+                mp_ssv_add_custom_field_customizer('custom-fields-placeholder', 'input', 'text', i, {"override_right": "<?= esc_html($this->overrideRight) ?>"}, <?= $allowTabs ? 'true' : 'false' ?>);
                 i++;
             }
             <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_custom_field('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
+            mp_ssv_add_custom_field_customizer('custom-fields-placeholder', '<?= esc_html($field->fieldType) ?>', '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= esc_html($field->id) ?>, <?= $field->toJSON() ?>, <?= $allowTabs ? 'true' : 'false' ?>);
             <?php endforeach; ?>
         </script>
         <?php
