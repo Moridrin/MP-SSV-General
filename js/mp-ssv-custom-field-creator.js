@@ -204,10 +204,10 @@ function getImageInputFields(tr, fieldID, name) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
-function getHiddenInputFields(tr, fieldID, name) {
+function getHiddenInputFields(tr, fieldID, name, value) {
     tr.appendChild(getInputType(fieldID, 'hidden'));
     tr.appendChild(getName(fieldID, name));
-    tr.appendChild(getEmpty(fieldID));
+    tr.appendChild(getValue(fieldID, value));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
@@ -397,6 +397,26 @@ function getOptions(fieldID, value) {
     optionsTD.appendChild(getBR());
     optionsTD.appendChild(options);
     return optionsTD;
+}
+function getValue(fieldID, value) {
+    var valueField = document.createElement("input");
+    valueField.setAttribute("id", fieldID + "_value");
+    valueField.setAttribute("name", "custom_field_" + fieldID + "_value");
+    valueField.setAttribute("style", "width: 100%;");
+    if (value) {
+        valueField.setAttribute("value", value);
+    }
+    var valueLabel = document.createElement("label");
+    valueLabel.setAttribute("style", "white-space: nowrap;");
+    valueLabel.setAttribute("for", fieldID + "_value");
+    valueLabel.innerHTML = "Value";
+    var valueTD = document.createElement("td");
+    valueTD.setAttribute("style", "padding: 0;");
+    valueTD.setAttribute("id", fieldID + "_value_td");
+    valueTD.appendChild(valueLabel);
+    valueTD.appendChild(getBR());
+    valueTD.appendChild(valueField);
+    return valueTD;
 }
 function getDeleteRow(fieldID) {
     var deleteButton = document.createElement("img");

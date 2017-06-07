@@ -24,7 +24,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
                 'settings',
                 array(
                     'roles' => json_encode(array_keys(get_editable_roles())),
-                    'columns' => json_encode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array())),
+                    'columns' => User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array()),
                 )
             );
         }

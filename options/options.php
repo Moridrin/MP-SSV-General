@@ -23,11 +23,12 @@ add_action('network_admin_menu', 'ssv_add_ssv_menu', 9);
 function ssv_settings_page()
 {
     $columns = array(
-        'default',
+        'disabled',
+        'required',
         'placeholder',
+        'override_right',
         'class',
         'style',
-        'override_right',
     );
 
     if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {

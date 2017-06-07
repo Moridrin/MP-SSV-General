@@ -172,14 +172,41 @@ class Form
         $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
         ob_start();
         echo SSV_General::getCapabilitiesDataList();
+        $columns = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array()));
         ?>
         <div style="overflow-x: auto;">
-            <table id="custom-fields-placeholder" class="sortable"></table>
-            <button type="button" onclick="mp_ssv_add_new_custom_tab_field_customizer('tab')">Add Tab</button>
+            <table id="custom-fields-placeholder" class="sortable">
+                <tr>
+                    <th style="text-align: left;"></th>
+                    <th style="text-align: left;">Title (override)</th>
+                    <th style="text-align: left;">Default</th>
+                    <?php if (in_array("disabled", $columns)): ?>
+                        <th style="text-align: left;">Disabled</th>
+                    <?php endif; ?>
+                    <?php if (in_array("required", $columns)): ?>
+                        <th style="text-align: left;">Required</th>
+                    <?php endif; ?>
+                    <?php if (in_array("placeholder", $columns)): ?>
+                        <th style="text-align: left;">Placeholder</th>
+                    <?php endif; ?>
+                    <?php if (in_array("override_right", $columns)): ?>
+                        <th style="text-align: left;">Override Right</th>
+                    <?php endif; ?>
+                    <?php if (in_array("class", $columns)): ?>
+                        <th style="text-align: left;">Class</th>
+                    <?php endif; ?>
+                    <?php if (in_array("style", $columns)): ?>
+                        <th style="text-align: left;">Style</th>
+                    <?php endif; ?>
+                </tr>
+            </table>
+            <?php if ($allowTabs): ?>
+                <button type="button" onclick="mp_ssv_add_new_custom_tab_field_customizer('tab')">Add Tab</button>
+                <br/>
+            <?php endif; ?>
+            <button type="button" onclick="mp_ssv_add_new_custom_header_field_customizer('header')">Add Header</button>
             <br/>
-            <button type="button" onclick="mp_ssv_add_new_custom_input_field_customizer('header')">Add Header</button>
-            <br/>
-            <button type="button" onclick="mp_ssv_add_new_custom_input_field_customizer('label')">Add Label</button>
+            <button type="button" onclick="mp_ssv_add_new_custom_label_field_customizer('label')">Add Label</button>
             <br/>
             <label>
                 Field Name (or title)
@@ -203,7 +230,7 @@ class Form
                 } else {
                     document.getElementById("custom_field_selector").setAttribute("placeholder", "");
                     var field = JSON.parse(fields[fieldID]['json']);
-                    mp_ssv_add_custom_input_field_customizer('custom-fields-placeholder', fieldID, field['input_type']);
+                    mp_ssv_add_custom_input_field_customizer('custom-fields-placeholder', i, field['input_type'], field);
                 }
                 i++;
             }
@@ -211,17 +238,30 @@ class Form
                 mp_ssv_add_custom_tab_field_customizer('custom-fields-placeholder', i);
                 i++;
             }
+            function mp_ssv_add_new_custom_header_field_customizer() {
+                mp_ssv_add_custom_header_field_customizer('custom-fields-placeholder', i);
+                i++;
+            }
+            function mp_ssv_add_new_custom_label_field_customizer() {
+                mp_ssv_add_custom_label_field_customizer('custom-fields-placeholder', i);
+                i++;
+            }
             <?php
             foreach ($this->fields as $field) {
                 if ($field instanceof TabField) {
                     echo 'mp_ssv_add_custom_tab_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
                 } elseif ($field instanceof HeaderField) {
-                    echo 'mp_ssv_add_custom_tab_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_header_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
                 } elseif ($field instanceof LabelField) {
-                    echo 'mp_ssv_add_custom_tab_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_label_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
                 } else {
                     echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', "' . $field->inputType . '", ' . $field->toJSON() . ');';
                 }
+            }
+            foreach ($baseFields as $field) {
+                /** @var InputField $inputField */
+                $inputField = Field::fromJSON($field->json);
+                echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $inputField->id . ', "' . $inputField->inputType . '", ' . $inputField->toJSON() . ');';
             }
             ?>
         </script>
