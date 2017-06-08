@@ -157,7 +157,7 @@ function getDateInputField(container, fieldID, values) {
 function getBaseFields(fieldID, fieldTitle) {
     var tr = document.createElement("tr");
     tr.setAttribute("id", fieldID + "_tr");
-    tr.appendChild(getStart(fieldID));
+    tr.appendChild(getFieldIDs(fieldID));
     tr.appendChild(getFieldID(fieldID));
     tr.appendChild(getFieldTitle(fieldID, fieldTitle));
     return tr;
@@ -240,7 +240,7 @@ function getEmpty(fieldID, columnClass) {
     }
     return td;
 }
-function getStart(fieldID, isTab) {
+function getFieldIDs(fieldID, isTab) {
     var fieldIDs = document.createElement("input");
     fieldIDs.setAttribute("type", "hidden");
     fieldIDs.setAttribute("name", "field_ids[]");

@@ -1,6 +1,7 @@
 <?php
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
+use mp_ssv_general\Form;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
@@ -64,14 +65,12 @@ function ssv_settings_page()
                     }
                 }
                 $properties['field_type'] = InputField::FIELD_TYPE;
-                $field = Field::fromJSON(json_encode($properties));
-                $name = null;
-                if ($field instanceof InputField) {
-                    $oldName = $wpdb->get_row("SELECT `name` FROM $table WHERE ID = $fieldID")->name;
-                    $name = $field->name;
-                    if ($name != $oldName) {
-                        $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
-                    }
+                /** @var InputField $field */
+                $field   = Field::fromJSON(json_encode($properties));
+                $oldName = $wpdb->get_row("SELECT `name` FROM $table WHERE ID = $fieldID")->name;
+                $name    = $field->name;
+                if ($name != $oldName) {
+                    $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
                 }
                 if (current_user_can('edit_custom_fields')) {
                     $wpdb->replace(
@@ -98,17 +97,6 @@ function ssv_settings_page()
             $customFieldFields = isset($_POST['columns']) ? SSV_General::sanitize($_POST['columns'], $columns) : array();
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
         }
-    }
-    global $wpdb;
-    $table          = SSV_General::CUSTOM_FIELDS_TABLE;
-    $databaseFields = $wpdb->get_results("SELECT * FROM $table ORDER BY ID ASC");
-    $fields         = array();
-    foreach ($databaseFields as $field) {
-        $values        = json_decode($field->json);
-        $values->id    = $field->ID;
-        $values->name  = $field->name;
-        $values->title = $field->title;
-        $fields[]      = Field::fromJSON(json_encode($values));
     }
     ?>
     <div class="wrap">
@@ -145,20 +133,7 @@ function ssv_settings_page()
             </tr>
             <tr>
                 <td colspan="2" style="padding: 0;">
-                    <div style="overflow-x: auto;">
-                        <table id="custom-fields-placeholder"></table>
-                        <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
-                    </div>
-                    <script>
-                        var i = <?= esc_html(Field::getMaxID($fields) + 1) ?>;
-                        function mp_ssv_add_new_custom_field() {
-                            mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
-                            i++;
-                        }
-                        <?php foreach($fields as $field): ?>
-                        mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->id) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
-                        <?php endforeach; ?>
-                    </script>
+                    <?= Form::fromDatabase(false, 'base_fields')->getBaseEditor(); ?>
                 </td>
             </tr>
         </table>

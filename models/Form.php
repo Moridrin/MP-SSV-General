@@ -33,8 +33,6 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
-    /** @var string $overrideRight */
-    public $overrideRight;
     #endregion
 
     #region Construct($fields)
@@ -42,17 +40,16 @@ class Form
      * Form constructor.
      *
      * @param Field[] $fields
-     * @param string  $overrideRight
      */
-    public function __construct($fields = array(), $overrideRight = '')
+    public function __construct($fields = array())
     {
         $this->fields = $fields;
         if (isset($_GET['member']) && current_user_can('edit_users')) {
             $this->user = User::getByID($_GET['member']);
-        } else {
+        }
+        if (!$this->user) {
             $this->user = User::getCurrent();
         }
-        $this->overrideRight = $overrideRight;
     }
     #endregion
 
@@ -60,58 +57,49 @@ class Form
     /**
      * This function gets all the Fields from the post metadata.
      *
-     * @param string       $overrideRight
      * @param bool         $setValues
      * @param WP_Post|null $post
      *
      * @return Form|Message
      */
-    public static function fromDatabase($overrideRight, $setValues = true, $post = null)
+    public static function fromDatabase($setValues = true, $post = null)
     {
-        $form                = new Form();
-        $form->overrideRight = $overrideRight;
+        $form = new Form();
+
+        /** @var \wpdb $wpdb */
+        global $wpdb;
+
         if ($post == null) {
             global $post;
         }
         if (!$post) {
             return $form;
         }
-        if ($setValues) {
-            if (isset($_GET['member']) && current_user_can('edit_users')) {
-                $user = User::getByID($_GET['member']);
-                if (!$user) {
-                    echo (new Message('User not found.', Message::ERROR_MESSAGE))->getHTML();
-                    return $form;
-                }
-            } else {
-                $user = User::getCurrent();
+        if ($post === 'base_fields') {
+            $baseTable          = SSV_General::CUSTOM_FIELDS_TABLE;
+            $databaseBaseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY ID ASC");
+            foreach ($databaseBaseFields as $baseField) {
+                $form->fields[] = Field::fromDatabaseRow($baseField);
             }
         } else {
-            $user = false;
-        }
-        /** @var \wpdb $wpdb */
-        global $wpdb;
-        $table  = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $postID = $post->ID;
-        $fields = $wpdb->get_results("SELECT * FROM $table WHERE postID = $postID ORDER BY ID ASC");
-        foreach ($fields as $field) {
-            $values        = json_decode($field->customField);
-            $values->id    = $field->ID;
-            $values->name  = $field->fieldName;
-            $values->title = $field->fieldTitle;
-            $field         = Field::fromJSON(json_encode($values));
-            if ($user) {
-                if ($field instanceof TabField) {
-                    foreach ($field->fields as $childField) {
-                        if ($childField instanceof InputField) {
-                            $childField->setValue($user->getMeta($childField->name));
+            $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+            $postID             = $post->ID;
+            $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY ID ASC");
+            foreach ($customizedFields as $customizedField) {
+                $customizedField = Field::fromDatabaseRow($customizedField);
+                if ($setValues) {
+                    if ($customizedField instanceof TabField) {
+                        foreach ($customizedField->fields as $childField) {
+                            if ($childField instanceof InputField) {
+                                $childField->setValue($form->user->getMeta($childField->name));
+                            }
                         }
+                    } elseif ($customizedField instanceof InputField) {
+                        $customizedField->setValue($form->user->getMeta($customizedField->name));
                     }
-                } elseif ($field instanceof InputField) {
-                    $field->setValue($user->getMeta($field->name));
                 }
+                $form->fields[] = $customizedField;
             }
-            $form->fields[] = $field;
         }
         return $form;
     }
@@ -157,13 +145,40 @@ class Form
     }
     #endregion
 
-    #region getEditor($allowTabs)
+    #region getBaseEditor()
+    /**
+     * @return string HTML
+     */
+    public function getBaseEditor()
+    {
+        ob_start();
+        ?>
+        <div style="overflow-x: auto;">
+            <table id="custom-fields-placeholder"></table>
+            <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
+        </div>
+        <script>
+            var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
+            function mp_ssv_add_new_custom_field() {
+                mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
+                i++;
+            }
+            <?php foreach($this->fields as $field): ?>
+            mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->id) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
+            <?php endforeach; ?>
+        </script>
+        <?php
+        return ob_get_clean();
+    }
+    #endregion
+
+    #region getCustomizationEditor($allowTabs)
     /**
      * @param bool $allowTabs if set true it will display the select option for tab in the Field Type
      *
      * @return string HTML
      */
-    public function getEditor($allowTabs)
+    public function getCustomizationEditor($allowTabs)
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
@@ -178,6 +193,8 @@ class Form
             <table id="custom-fields-placeholder" class="sortable">
                 <tr>
                     <th style="text-align: left;"></th>
+                    <th style="text-align: left;"></th>
+                    <th style="text-align: left;">Field</th>
                     <th style="text-align: left;">Title (override)</th>
                     <th style="text-align: left;">Default</th>
                     <?php if (in_array("disabled", $columns)): ?>
@@ -200,13 +217,17 @@ class Form
                     <?php endif; ?>
                 </tr>
             </table>
+            <br/>
             <?php if ($allowTabs): ?>
                 <button type="button" onclick="mp_ssv_add_new_custom_tab_field_customizer('tab')">Add Tab</button>
+                <br/>
                 <br/>
             <?php endif; ?>
             <button type="button" onclick="mp_ssv_add_new_custom_header_field_customizer('header')">Add Header</button>
             <br/>
+            <br/>
             <button type="button" onclick="mp_ssv_add_new_custom_label_field_customizer('label')">Add Label</button>
+            <br/>
             <br/>
             <label>
                 Field Name (or title)
@@ -258,11 +279,6 @@ class Form
                     echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', "' . $field->inputType . '", ' . $field->toJSON() . ');';
                 }
             }
-            foreach ($baseFields as $field) {
-                /** @var InputField $inputField */
-                $inputField = Field::fromJSON($field->json);
-                echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $inputField->id . ', "' . $inputField->inputType . '", ' . $inputField->toJSON() . ');';
-            }
             ?>
         </script>
         <?php
@@ -273,10 +289,8 @@ class Form
     #region saveEditorFromPost()
     /**
      * This function removes the old fields from the database and inserts the new fields.
-     *
-     * @param int $containerID is the ID for the container (used if post has multiple custom field containers).
      */
-    public static function saveEditorFromPost($containerID = 0)
+    public static function saveEditorFromPost()
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
@@ -284,41 +298,32 @@ class Form
         if (!$post) {
             return;
         }
-        $form                = new Form();
-        $form->overrideRight = SSV_General::sanitize($_POST['override_right'], 'text');
-        $customFieldValues   = array();
-        $id                  = 0;
-        $fieldID             = 0;
-        $prefix              = 'custom_field_' . $containerID . '_';
+        $form              = new Form();
         /** @var TabField $currentTab */
         $currentTab = null;
-        foreach ($_POST as $key => $value) {
-            if (strpos($key, $prefix) !== false) {
-                if (strpos($key, '_start') !== false) {
-                    $customFieldValues = array();
-                    $fieldID           = str_replace($prefix, '', str_replace('_start', '', $key));
+        foreach ($_POST['field_ids'] as $fieldID) {
+            $properties = array_filter(
+                $_POST,
+                function ($key) use ($fieldID) {
+                    return mp_ssv_starts_with($key, 'custom_field_' . $fieldID . '_');
+                },
+                ARRAY_FILTER_USE_KEY
+            );
+            foreach ($properties as $key => $property) {
+                if (mp_ssv_starts_with($key, 'custom_field_' . $fieldID . '_')) {
+                    $properties[str_replace('custom_field_' . $fieldID . '_', '', $key)] = $property;
+                    unset($properties[$key]);
                 }
-                $fieldKey                     = str_replace($fieldID . '_', '', str_replace($prefix, '', $key));
-                $customFieldValues[$fieldKey] = SSV_General::sanitize($value, $fieldKey);
-                if (strpos($key, '_end') !== false) {
-                    $customFieldValues['override_right'] = $form->overrideRight;
-                    $field                               = Field::fromJSON(json_encode($customFieldValues));
-                    if ($field instanceof InputField) {
-//                        $field->updateName($id, $post->ID);
-                    }
-                    $field->id = $id;
-                    if (!empty($field->title)) {
-                        if ($field instanceof TabField) {
-                            $currentTab        = $field;
-                            $form->fields[$id] = $field;
-                        } elseif ($currentTab != null) {
-                            $currentTab->addField($id, $field);
-                        } else {
-                            $form->fields[$id] = $field;
-                        }
-                        $id++;
-                    }
-                }
+            }
+            SSV_General::var_export($properties, 1);
+            $field = Field::fromJSON(json_encode($properties));
+            if ($field instanceof TabField) {
+                $currentTab             = $field;
+                $form->fields[$fieldID] = $field;
+            } elseif ($currentTab != null) {
+                $currentTab->addField($fieldID, $field);
+            } else {
+                $form->fields[$fieldID] = $field;
             }
         }
         //Remove All old fields for post

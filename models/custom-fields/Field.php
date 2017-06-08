@@ -117,7 +117,28 @@ abstract class Field
         }
         throw new Exception($values->field_type . ' is an unknown field type');
     }
+    #endregion
 
+    #region fromDatabaseRow($row)
+    /**
+     * This function extracts a Field from the JSON string.
+     *
+     * @param  $row
+     *
+     * @return Field
+     */
+    public static function fromDatabaseRow($row)
+    {
+        $values        = json_decode($row->json);
+        $values->id    = $row->ID;
+        $values->name  = $row->name;
+        $values->title = $row->title;
+
+        return Field::fromJSON(json_encode($values));
+    }
+    #endregion
+
+    #region getByID($fieldID)
     /**
      * @param int $fieldID
      *
