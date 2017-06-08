@@ -23,7 +23,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
                 'mp-ssv-custom-field-customizer',
                 'settings',
                 array(
-                    'roles' => json_encode(array_keys(get_editable_roles())),
+                    'roles'   => json_encode(array_keys(get_editable_roles())),
                     'columns' => User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array()),
                 )
             );
@@ -65,10 +65,13 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
         $sql
                     = "
 		CREATE TABLE IF NOT EXISTS $table_name (
-			`ID` bigint(20) NOT NULL PRIMARY KEY,
-			`name` VARCHAR(50) UNIQUE,
-			`title` VARCHAR(50) NOT NULL,
-			`json` TEXT NOT NULL
+			`ID` bigint(20) NOT NULL AUTO_INCREMENT,
+			`postID` bigint(20) NOT NULL,
+			`containerID` bigint(20) NOT NULL DEFAULT 0,
+			`order` bigint(20) NOT NULL,
+			`name` VARCHAR(50),
+			`json` TEXT NOT NULL,
+			PRIMARY KEY(`postID`, `containerID`, `order`)
 		) $charset_collate;";
         $wpdb->query($sql);
     }

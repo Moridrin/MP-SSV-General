@@ -28,8 +28,10 @@ abstract class Field
     #endregion
 
     #region Variables
-    /** @var int $id */
-    public $id;
+    /** @var int $containerID */
+    public $containerID;
+    /** @var int $order */
+    public $order;
     /** @var string $title */
     public $title;
     /** @var string $fieldType */
@@ -38,29 +40,26 @@ abstract class Field
     public $class;
     /** @var string $style */
     public $style;
-    /** @var string $overrideRight */
-    public $overrideRight;
     #endregion
 
     #region __construct($id, $title, $fieldType, $class, $style, $overrideRight)
     /**
      * Field constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $fieldType
      * @param string $class
      * @param string $style
-     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $fieldType, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $fieldType, $class, $style)
     {
-        $this->id            = $id;
-        $this->title         = $title;
-        $this->fieldType     = $fieldType;
-        $this->class         = $class;
-        $this->style         = $style;
-        $this->overrideRight = $overrideRight;
+        $this->containerID = $containerID;
+        $this->order       = $order;
+        $this->title       = $title;
+        $this->fieldType   = $fieldType;
+        $this->class       = $class;
+        $this->style       = $style;
     }
     #endregion
 
@@ -130,7 +129,7 @@ abstract class Field
     public static function fromDatabaseRow($row)
     {
         $values        = json_decode($row->json);
-        $values->id    = $row->ID;
+        $values->order = $row->order;
         $values->name  = $row->name;
         $values->title = $row->title;
 
@@ -140,24 +139,24 @@ abstract class Field
 
     #region getByID($fieldID)
     /**
-     * @param int $fieldID
+     * @param int $order
      *
      * @return Field
      */
-    public static function getByID($fieldID)
+    public static function getByOrder($containerID = 0, $order)
     {
         global $post;
         if ($post != null) {
             $postID = $post->ID;
         }
+        if (!isset($postID)) {
+            return null;
+        }
 
         global $wpdb;
         $table = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        if (isset($postID)) {
-            $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND ID = $fieldID");
-        } else {
-            $field = $wpdb->get_var("SELECT customField FROM $table WHERE ID = $fieldID");
-        }
+        $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
+        SSV_General::var_export("SELECT customField FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order", 1);
         if (!empty($field)) {
             return self::fromJSON($field);
         } else {
@@ -170,22 +169,18 @@ abstract class Field
     /**
      * This function creates an array containing all variables of this Field.
      *
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    abstract public function toJSON($forDatabase = false);
+    abstract public function toJSON();
     #endregion
 
     #region getHTML()
     /**
      * This function returns a string with the Field as HTML (to be used in the frontend).
      *
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    abstract public function getHTML($overrideRight);
+    abstract public function getHTML();
     #endregion
 
     #region getMaxID($fields)
@@ -200,10 +195,10 @@ abstract class Field
     {
         $maxID = 0;
         foreach ($fields as $field) {
-            $maxID = $field->id > $maxID ? $field->id : $maxID;
+            $maxID = $field->order > $maxID ? $field->order : $maxID;
             if ($field instanceof TabField) {
                 foreach ($field->fields as $tabField) {
-                    $maxID = $tabField->id > $maxID ? $tabField->id : $maxID;
+                    $maxID = $tabField->order > $maxID ? $tabField->order : $maxID;
                 }
             }
         }
@@ -232,10 +227,10 @@ abstract class Field
      */
     public function __compare($field)
     {
-        if ($this->id == $field->id) {
+        if ($this->order == $field->order) {
             return 0;
         }
-        return ($this->id < $field->id) ? -1 : 1;
+        return ($this->order < $field->order) ? -1 : 1;
     }
     #endregion
 
@@ -245,7 +240,7 @@ abstract class Field
      */
     public function __toString()
     {
-        return $this->getHTML('');
+        return $this->getHTML();
     }
     #endregion
 }

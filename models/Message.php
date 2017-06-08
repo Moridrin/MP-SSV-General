@@ -1,4 +1,5 @@
 <?php
+
 namespace mp_ssv_general;
 if (!defined('ABSPATH')) {
     exit;
@@ -22,7 +23,7 @@ class Message
     public function __construct($message, $type = Message::NOTIFICATION_MESSAGE)
     {
         $this->message = $message;
-        $this->type = $type;
+        $this->type    = $type;
     }
 
     /**

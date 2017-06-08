@@ -462,50 +462,38 @@ function getFieldIDs(fieldID, isTab) {
     return fieldIDsTD;
 }
 function getDraggable(fieldID) {
-    var fieldIDElement = document.createElement("input");
-    fieldIDElement.setAttribute("type", "hidden");
-    fieldIDElement.setAttribute("id", fieldID + "_id");
-    fieldIDElement.setAttribute("name", "custom_field_" + fieldID + "_id");
-    fieldIDElement.setAttribute("value", fieldID);
     var draggableIcon = document.createElement("img");
     draggableIcon.setAttribute("src", pluginBaseURL + '/general/images/icon-menu.svg');
     draggableIcon.setAttribute("style", "padding-right: 15px; margin: 10px 0;");
     var draggableIconTD = document.createElement("td");
     draggableIconTD.setAttribute("id", fieldID + "_draggable_td");
     draggableIconTD.setAttribute("style", "vertical-align: middle; cursor: move;");
-    draggableIconTD.appendChild(fieldIDElement);
     draggableIconTD.appendChild(draggableIcon);
     return draggableIconTD;
 }
-function getFieldName(fieldID, value, placeholder) {
-    var fieldName = document.createElement("label");
-    fieldName.setAttribute("id", fieldID + "_title");
-    fieldName.setAttribute("name", "custom_field_" + fieldID + "_title");
-    fieldName.setAttribute("style", "width: 100%;");
-    fieldName.setAttribute("disabled", "disabled");
-    if (value) {
-        fieldName.setAttribute("value", value);
-        fieldName.innerHTML = value;
-    }
-    if (placeholder) {
-        fieldName.setAttribute("placeholder", placeholder);
-    }
+function getFieldName(fieldID, value) {
+    var fieldName = document.createElement("input");
+    fieldName.setAttribute("type", "hidden");
+    fieldName.setAttribute("id", fieldID + "_name");
+    fieldName.setAttribute("name", "custom_field_" + fieldID + "_name");
+    fieldName.setAttribute("value", value);
+    var fieldNameLabel = document.createElement("label");
+    fieldNameLabel.setAttribute("id", fieldID + "_name_label");
+    fieldNameLabel.innerHTML = value;
     var fieldNameTD = document.createElement("td");
     fieldNameTD.setAttribute("style", "padding: 0 5px;");
     fieldNameTD.setAttribute("id", fieldID + "_field_title_td");
     fieldNameTD.appendChild(fieldName);
+    fieldNameTD.appendChild(fieldNameLabel);
     return fieldNameTD;
 }
-function getFieldTitle(fieldID, value, placeholder) {
+function getFieldTitle(fieldID, value) {
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", fieldID + "_title");
     fieldTitle.setAttribute("name", "custom_field_" + fieldID + "_title");
     fieldTitle.setAttribute("style", "width: 100%;");
     if (value) {
         fieldTitle.setAttribute("value", value);
-    }
-    if (placeholder) {
-        fieldTitle.setAttribute("placeholder", placeholder);
     }
     var fieldTitleTD = document.createElement("td");
     fieldTitleTD.setAttribute("style", "padding: 0 5px;");
@@ -822,41 +810,6 @@ function removeFields(fields) {
 function removeField(field) {
     if (field !== null) {
         field.parentElement.removeChild(field);
-    }
-}
-
-function columnsChanged() {
-    var columns = event.srcElement.options;
-    var selected = getSelectValues(event.srcElement);
-    var i;
-    var j;
-    for (i = 0; i < columns.length; i++) {
-        var columnElements = document.getElementsByClassName("column-" + columns[i].text);
-        for (j = 0; j < columnElements.length; j++) {
-            if (selected.indexOf(columns[i].text) !== -1) {
-                columnElements[j].classList.remove("hidden");
-            } else {
-                columnElements[j].classList.add("hidden");
-            }
-        }
-    }
-
-    var textColumns = document.getElementById(containerID).getElementsByClassName("textarea_td");
-    var textAreaColspan = 4;
-    if (selected.indexOf("placeholder") !== -1) {
-        textAreaColspan++;
-    }
-    for (i = 0; i < textColumns.length; i++) {
-        textColumns[i].setAttribute("colspan", textAreaColspan);
-    }
-
-    var optionsColumns = document.getElementById(containerID).getElementsByClassName("options_td");
-    var optionsColspan = 1;
-    if (selected.indexOf("placeholder") !== -1) {
-        optionsColspan++;
-    }
-    for (i = 0; i < optionsColumns.length; i++) {
-        optionsColumns[i].setAttribute("colspan", optionsColspan);
     }
 }
 

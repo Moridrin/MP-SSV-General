@@ -33,6 +33,8 @@ class Form
     public $errors;
     /** @var User $values */
     public $user;
+    /** @var int $containerID */
+    public $containerID = 0;
     #endregion
 
     #region Construct($fields)
@@ -75,32 +77,26 @@ class Form
         if (!$post) {
             return $form;
         }
-        if ($post === 'base_fields') {
-            $baseTable          = SSV_General::CUSTOM_FIELDS_TABLE;
-            $databaseBaseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY ID ASC");
-            foreach ($databaseBaseFields as $baseField) {
-                $form->fields[] = Field::fromDatabaseRow($baseField);
-            }
-        } else {
-            $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-            $postID             = $post->ID;
-            $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY ID ASC");
-            foreach ($customizedFields as $customizedField) {
-                $customizedField = Field::fromDatabaseRow($customizedField);
-                if ($setValues) {
-                    if ($customizedField instanceof TabField) {
-                        foreach ($customizedField->fields as $childField) {
-                            if ($childField instanceof InputField) {
-                                $childField->setValue($form->user->getMeta($childField->name));
-                            }
+        $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $postID             = $post->ID;
+        $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY ID ASC");
+//        SSV_General::var_export($customizedFields, 1);
+        foreach ($customizedFields as $customizedField) {
+            $customizedField = Field::fromJSON($customizedField->json, $customizedField->containerID);
+            if ($setValues) {
+                if ($customizedField instanceof TabField) {
+                    foreach ($customizedField->fields as $childField) {
+                        if ($childField instanceof InputField) {
+                            $childField->setValue($form->user->getMeta($childField->name));
                         }
-                    } elseif ($customizedField instanceof InputField) {
-                        $customizedField->setValue($form->user->getMeta($customizedField->name));
                     }
+                } elseif ($customizedField instanceof InputField) {
+                    $customizedField->setValue($form->user->getMeta($customizedField->name));
                 }
-                $form->fields[] = $customizedField;
             }
+            $form->fields[] = $customizedField;
         }
+        SSV_General::var_export($form->fields, 1);
         return $form;
     }
     #endregion
@@ -145,40 +141,13 @@ class Form
     }
     #endregion
 
-    #region getBaseEditor()
-    /**
-     * @return string HTML
-     */
-    public function getBaseEditor()
-    {
-        ob_start();
-        ?>
-        <div style="overflow-x: auto;">
-            <table id="custom-fields-placeholder"></table>
-            <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
-        </div>
-        <script>
-            var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
-            function mp_ssv_add_new_custom_field() {
-                mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
-                i++;
-            }
-            <?php foreach($this->fields as $field): ?>
-            mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->id) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
-            <?php endforeach; ?>
-        </script>
-        <?php
-        return ob_get_clean();
-    }
-    #endregion
-
-    #region getCustomizationEditor($allowTabs)
+    #region getEditor($allowTabs)
     /**
      * @param bool $allowTabs if set true it will display the select option for tab in the Field Type
      *
      * @return string HTML
      */
-    public function getCustomizationEditor($allowTabs)
+    public function getEditor($allowTabs)
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
@@ -241,16 +210,16 @@ class Form
             <button type="button" onclick="mp_ssv_add_new_custom_input_field_customizer()">Add Field</button>
         </div>
         <script>
-            var fields = <?= json_encode($baseFields) ?>;
+            var baseFields = <?= json_encode($baseFields) ?>;
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_input_field_customizer() {
-                var fieldID = document.getElementById('custom_field_selector').value;
-                if (!fieldID) {
+                var baseFieldID = document.getElementById('custom_field_selector').value;
+                if (!baseFieldID) {
                     document.getElementById("custom_field_selector").setAttribute("placeholder", "fill in a valid Field ID");
                 } else {
                     document.getElementById("custom_field_selector").setAttribute("placeholder", "");
-                    var field = JSON.parse(fields[fieldID]['json']);
+                    var field = JSON.parse(baseFields[baseFieldID]['json']);
                     mp_ssv_add_custom_input_field_customizer('custom-fields-placeholder', i, field['input_type'], field);
                 }
                 i++;
@@ -270,13 +239,13 @@ class Form
             <?php
             foreach ($this->fields as $field) {
                 if ($field instanceof TabField) {
-                    echo 'mp_ssv_add_custom_tab_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_tab_field_customizer(\'custom-fields-placeholder\', ' . $field->order . ', ' . $field->toJSON() . ');';
                 } elseif ($field instanceof HeaderField) {
-                    echo 'mp_ssv_add_custom_header_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_header_field_customizer(\'custom-fields-placeholder\', ' . $field->order . ', ' . $field->toJSON() . ');';
                 } elseif ($field instanceof LabelField) {
-                    echo 'mp_ssv_add_custom_label_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_label_field_customizer(\'custom-fields-placeholder\', ' . $field->order . ', ' . $field->toJSON() . ');';
                 } else {
-                    echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $field->id . ', "' . $field->inputType . '", ' . $field->toJSON() . ');';
+                    echo 'mp_ssv_add_custom_input_field_customizer(\'custom-fields-placeholder\', ' . $field->order . ', "' . $field->inputType . '", ' . $field->toJSON() . ');';
                 }
             }
             ?>
@@ -298,7 +267,12 @@ class Form
         if (!$post) {
             return;
         }
-        $form              = new Form();
+        $form       = new Form();
+        $table      = SSV_General::CUSTOM_FIELDS_TABLE;
+        $baseFields = $wpdb->get_results("SELECT * FROM $table");
+        $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
+
+        $order = 0;
         /** @var TabField $currentTab */
         $currentTab = null;
         foreach ($_POST['field_ids'] as $fieldID) {
@@ -315,7 +289,24 @@ class Form
                     unset($properties[$key]);
                 }
             }
-            SSV_General::var_export($properties, 1);
+            $properties['order']       = $order;
+            $properties['containerID'] = $form->containerID;
+            $order++;
+            switch ($properties['name']) {
+                case '[tab]':
+                    $properties['field_type'] = TabField::FIELD_TYPE;
+                    break;
+                case '[header]':
+                    $properties['field_type'] = HeaderField::FIELD_TYPE;
+                    break;
+                case '[label]':
+                    $properties['field_type'] = LabelField::FIELD_TYPE;
+                    break;
+                default:
+                    $baseField  = $baseFields[strval($properties['name'])];
+                    $properties = array_merge(json_decode($baseField->json, true), $properties);
+                    break;
+            }
             $field = Field::fromJSON(json_encode($properties));
             if ($field instanceof TabField) {
                 $currentTab             = $field;
@@ -340,28 +331,18 @@ class Form
             }
         }
         foreach ($fields as $field) {
-            //Insert new fields for post
             $wpdb->insert(
                 SSV_General::CUSTOM_FORM_FIELDS_TABLE,
                 array(
-                    'ID'          => $field->id,
                     'postID'      => $post->ID,
-                    'fieldName'   => $field instanceof InputField ? $field->name : $field->id,
-                    'fieldTitle'  => $field->title,
-                    'customField' => $field->toJSON(true),
+                    'containerID' => $form->containerID,
+                    'order'       => $field->order,
+                    'name'        => $field instanceof InputField ? $field->name : null,
+                    'json'        => $field->toJSON(true),
                 )
             );
-            //Update all fields with the same name (set same title)
-            if ($field instanceof InputField) {
-                $wpdb->update(
-                    SSV_General::CUSTOM_FORM_FIELDS_TABLE,
-                    array('fieldTitle' => $field->title),
-                    array('fieldName' => $field->name),
-                    array('%s'),
-                    array('%s')
-                );
-            }
         }
+        SSV_General::var_export($fields, 1);
     }
     #endregion
 
@@ -381,7 +362,7 @@ class Form
             if ($field instanceof TabField) {
                 $tabs[] = $field;
             } elseif (empty($tabs)) {
-                $html .= $field->getHTML($this->overrideRight);
+                $html .= $field->getHTML();
             }
         }
         if (empty($tabs)) {
@@ -399,14 +380,14 @@ class Form
             $tabsContentHTML = '';
             /** @var TabField $tab */
             foreach ($tabs as $tab) {
-                $tabsHTML .= $tab->getHTML($this->overrideRight);
+                $tabsHTML .= $tab->getHTML();
                 ob_start();
                 ?>
                 <div id="<?= esc_html($tab->name) ?>">
                     <form action="#" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="tab" value="<?= esc_html($tab->id) ?>">
+                        <input type="hidden" name="tab" value="<?= esc_html($tab->order) ?>">
                         <?php foreach ($tab->fields as $childField): ?>
-                            <?= $childField->getHTML($this->overrideRight) ?>
+                            <?= $childField->getHTML() ?>
                         <?php endforeach; ?>
                         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
                         <?= SSV_General::getFormSecurityFields($adminReferrer, false, false); ?>
@@ -627,7 +608,7 @@ class Form
         $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
-            if (isset($tabID) && $field->id != $tabID) {
+            if (isset($tabID) && $field->order != $tabID) {
                 continue;
             }
             if ($field instanceof TabField) {

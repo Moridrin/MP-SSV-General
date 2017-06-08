@@ -29,7 +29,7 @@ class ImageInputField extends InputField
     /**
      * ImageInputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $name
      * @param bool   $preview
@@ -38,9 +38,9 @@ class ImageInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $preview, $required, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $preview, $required, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->required = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->preview  = $preview;
     }
@@ -58,7 +58,8 @@ class ImageInputField extends InputField
             throw new Exception('Incorrect input type');
         }
         return new ImageInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->preview,
@@ -70,14 +71,13 @@ class ImageInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -88,20 +88,14 @@ class ImageInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
@@ -116,14 +110,14 @@ class ImageInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div style="padding-top: 10px;">
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
                 <?php if ($this->preview): ?>
                     <img src="<?= esc_url($this->value) ?>" <?= $class ?> <?= $style ?>/>
                 <?php endif; ?>
                 <div class="file-field input-field">
                     <div class="btn">
                         <span>Image</span>
-                        <input type="file" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
+                        <input type="file" id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>>
                     </div>
                     <div class="file-path-wrapper">
                         <input class="file-path validate" type="text" title="<?= esc_html($this->title) ?>">
@@ -133,11 +127,11 @@ class ImageInputField extends InputField
             <?php
         } else {
             ?>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
             <?php if ($this->preview): ?>
                 <img src="<?= esc_url($this->value) ?>" <?= $class ?> <?= $style ?>/>
             <?php endif; ?>
-            <input type="file" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>><br/>
+            <input type="file" id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $required ?>><br/>
             <?php
         }
 
@@ -151,7 +145,7 @@ class ImageInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+        <select id="<?= esc_html($this->order) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="0">No Image</option>
             <option value="1">Has Image</option>
         </select>

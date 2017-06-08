@@ -36,21 +36,21 @@ class DateInputField extends InputField
     /**
      * DateTimeInputField constructor.
      *
-     * @param int      $id
-     * @param string   $title
-     * @param string   $name
-     * @param bool     $disabled
-     * @param string   $required
-     * @param string   $defaultValue
+     * @param int    $order
+     * @param string $title
+     * @param string $name
+     * @param bool   $disabled
+     * @param string $required
+     * @param string $defaultValue
      * @param string $dateRangeAfter
      * @param string $dateRangeBefore
-     * @param string   $class
-     * @param string   $style
-     * @param string   $overrideRight
+     * @param string $class
+     * @param string $style
+     * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultValue, $dateRangeAfter, $dateRangeBefore, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $disabled, $required, $defaultValue, $dateRangeAfter, $dateRangeBefore, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled        = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required        = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue    = $defaultValue;
@@ -71,7 +71,8 @@ class DateInputField extends InputField
             throw new Exception('Incorrect input type');
         }
         return new DateInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->disabled,
@@ -86,14 +87,13 @@ class DateInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'                => $this->id,
+            'container_id'      => $this->containerID,
+            'order'             => $this->order,
             'title'             => $this->title,
             'field_type'        => $this->fieldType,
             'input_type'        => $this->inputType,
@@ -107,20 +107,14 @@ class DateInputField extends InputField
             'style'             => $this->style,
             'override_right'    => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
@@ -144,15 +138,15 @@ class DateInputField extends InputField
         ob_start();
         ?>
         <div>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-            <input type="date" id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> <?= $dateAfter ?> <?= $dateBefore ?>/>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="date" id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> <?= $dateAfter ?> <?= $dateBefore ?>/>
         </div>
         <?php
         if (current_theme_supports('materialize') && $this->required) {
             ?>
             <script>
                 jQuery(function ($) {
-                    var dateField = $('#<?= esc_html($this->id) ?>');
+                    var dateField = $('#<?= esc_html($this->order) ?>');
                     dateField.change(function () {
                         if (dateField.val() === '') {
                             dateField.addClass('invalid')
@@ -174,8 +168,8 @@ class DateInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>_after" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
-        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>_before" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
+        ?><input id="<?= esc_html($this->order) ?>" type="text" name="<?= esc_html($this->name) ?>_after" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
+        ?><input id="<?= esc_html($this->order) ?>" type="text" name="<?= esc_html($this->name) ?>_before" title="<?= esc_html($this->title) ?>" placeholder="yyyy-mm-dd"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

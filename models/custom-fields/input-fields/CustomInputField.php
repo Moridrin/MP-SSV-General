@@ -31,7 +31,7 @@ class CustomInputField extends InputField
     /**
      * CustomInputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $inputType
      * @param string $name
@@ -43,9 +43,9 @@ class CustomInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, $inputType, $name, $class, $style, $overrideRight);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -62,7 +62,8 @@ class CustomInputField extends InputField
     {
         $values = json_decode($json);
         return new CustomInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->input_type,
             $values->name,
@@ -77,14 +78,13 @@ class CustomInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -97,20 +97,14 @@ class CustomInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . esc_html($this->inputType) . '"';
@@ -130,8 +124,8 @@ class CustomInputField extends InputField
         ob_start();
         ?>
         <div>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-            <input <?= $inputType ?> id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
         </div>
         <?php
 
@@ -144,7 +138,7 @@ class CustomInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
+        ?><input id="<?= esc_html($this->order) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

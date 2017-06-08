@@ -27,7 +27,7 @@ class RoleSelectInputField extends InputField
     /**
      * CheckboxInputField constructor.
      *
-     * @param int          $id
+     * @param int          $order
      * @param string       $title
      * @param string|array $name
      * @param string       $options
@@ -35,9 +35,9 @@ class RoleSelectInputField extends InputField
      * @param string       $style
      * @param string       $overrideRight
      */
-    protected function __construct($id, $title, $name, $options, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $options, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->options = $options;
     }
 
@@ -54,7 +54,8 @@ class RoleSelectInputField extends InputField
             throw new Exception('Incorrect input type');
         }
         return new RoleSelectInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->options,
@@ -65,14 +66,13 @@ class RoleSelectInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -82,20 +82,14 @@ class RoleSelectInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
@@ -107,20 +101,20 @@ class RoleSelectInputField extends InputField
             global $wp_roles;
             ?>
             <div class="input-field">
-                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <select id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
         } else {
             global $wp_roles;
             ?>
             <div class="input-field">
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label><br/>
-                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label><br/>
+                <select id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= translate_user_role($wp_roles->roles[$option]['name']) ?></option>
                     <?php endforeach; ?>
@@ -140,7 +134,7 @@ class RoleSelectInputField extends InputField
         ob_start();
         ?>
         //TODO
-        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+        <select id="<?= esc_html($this->order) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="false">Not Checked</option>
             <option value="true">Checked</option>
         </select>

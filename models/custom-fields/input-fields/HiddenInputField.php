@@ -27,7 +27,7 @@ class HiddenInputField extends InputField
     /**
      * HiddenInputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $inputType
      * @param string $name
@@ -36,9 +36,9 @@ class HiddenInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $defaultValue, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $inputType, $name, $defaultValue, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, $inputType, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, $inputType, $name, $class, $style, $overrideRight);
         $this->defaultValue = $defaultValue;
         if ($this->defaultValue == 'NOW') {
             $this->value = (new DateTime('NOW'))->format('Y-m-d');
@@ -57,7 +57,8 @@ class HiddenInputField extends InputField
     {
         $values = json_decode($json);
         return new HiddenInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->input_type,
             $values->name,
@@ -69,14 +70,13 @@ class HiddenInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -86,20 +86,14 @@ class HiddenInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
@@ -120,7 +114,7 @@ class HiddenInputField extends InputField
     public function getFilterRow()
     {
         ob_start();
-        ?><input id="<?= esc_html($this->id) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
+        ?><input id="<?= esc_html($this->order) ?>" type="text" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>"/><?php
         return $this->getFilterRowBase(ob_get_clean());
     }
 

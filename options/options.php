@@ -76,7 +76,7 @@ function ssv_settings_page()
                     $wpdb->replace(
                         $table,
                         array(
-                            'ID'    => $field->id,
+                            'ID'    => $field->order,
                             'name'  => $name,
                             'title' => $field->title,
                             'json'  => $field->toJSON(true),
@@ -86,7 +86,7 @@ function ssv_settings_page()
                     $wpdb->insert(
                         $table,
                         array(
-                            'ID'    => $field->id,
+                            'ID'    => $field->order,
                             'name'  => $name,
                             'title' => $field->title,
                             'json'  => $field->toJSON(true),
@@ -133,7 +133,20 @@ function ssv_settings_page()
             </tr>
             <tr>
                 <td colspan="2" style="padding: 0;">
-                    <?= Form::fromDatabase(false, 'base_fields')->getBaseEditor(); ?>
+                    <div style="overflow-x: auto;">
+                        <table id="custom-fields-placeholder"></table>
+                        <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
+                    </div>
+                    <script>
+                        var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
+                        function mp_ssv_add_new_custom_field() {
+                            mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
+                            i++;
+                        }
+                        <?php foreach($this->fields as $field): ?>
+                        mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->order) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
+                        <?php endforeach; ?>
+                    </script>
                 </td>
             </tr>
         </table>

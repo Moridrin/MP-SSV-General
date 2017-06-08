@@ -3,6 +3,7 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
+use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -24,16 +25,15 @@ class TabField extends Field
     /**
      * TabField constructor.
      *
-     * @param int     $id
+     * @param int     $order
      * @param string  $title
      * @param string  $class
      * @param string  $style
      * @param Field[] $fields
-     * @param string  $overrideRight
      */
-    protected function __construct($id, $title, $class, $style, $overrideRight, $fields = array())
+    protected function __construct($containerID, $order, $title, $class, $style, $fields = array())
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
         $this->fields = $fields;
         $this->name   = strtolower(str_replace(' ', '_', $title));
     }
@@ -56,57 +56,48 @@ class TabField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
+        SSV_General::var_export($values, 1);
         if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
-        $fieldIDs = array();
-        if (isset($values->fieldIDs)) {
-            foreach ($values->fieldIDs as $fieldID) {
-                $fieldIDs[] = Field::getByID($fieldID);
-            }
+        $fields = array();
+        for ($i = 1; $i <= $values->fieldCount; $i++) {
+            $fields[] = Field::getByOrder($values->containerID, ($values->order + $i));
         }
         return new TabField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->class,
             $values->style,
-            $values->override_right,
-            $fieldIDs
+            $fields
         );
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
-        $fieldIDs = array_column($this->fields, 'id');
-        $values   = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
-            'fieldIDs'       => $fieldIDs,
+        $values = array(
+            'container_id' => $this->containerID,
+            'order'        => $this->order,
+            'title'        => $this->title,
+            'field_type'   => $this->fieldType,
+            'class'        => $this->class,
+            'style'        => $this->style,
+            'fieldCount'   => count($this->fields),
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
-        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->id ? 'active' : '';
+        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->order ? 'active' : '';
         $class       = !empty($this->class) ? 'class="tab ' . esc_html($this->class) . '"' : 'class="tab ' . esc_html($activeClass) . '"';
         $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         ob_start();

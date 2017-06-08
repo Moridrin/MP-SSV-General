@@ -24,16 +24,16 @@ class LabelField extends Field
     /**
      * TabField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $text
      * @param string $class
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $text, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $text, $class, $style)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
         $this->text  = $text;
         $this->class = $class;
         $this->style = $style;
@@ -52,44 +52,37 @@ class LabelField extends Field
             throw new Exception('Incorrect field type');
         }
         return new LabelField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->text,
             $values->class,
-            $values->style,
-            $values->override_right
+            $values->style
         );
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'text'           => $this->text,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'container_id' => $this->containerID,
+            'order'        => $this->order,
+            'title'        => $this->title,
+            'field_type'   => $this->fieldType,
+            'text'         => $this->text,
+            'class'        => $this->class,
+            'style'        => $this->style,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
         $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';

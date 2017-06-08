@@ -31,7 +31,7 @@ class CheckboxInputField extends InputField
     /**
      * CheckboxInputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $name
      * @param bool   $disabled
@@ -41,9 +41,9 @@ class CheckboxInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $required, $defaultChecked, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $disabled, $required, $defaultChecked, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled       = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
@@ -62,7 +62,8 @@ class CheckboxInputField extends InputField
             throw new Exception('Incorrect input type');
         }
         return new CheckboxInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->disabled,
@@ -75,14 +76,13 @@ class CheckboxInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'              => $this->id,
+            'container_id'    => $this->containerID,
+            'order'           => $this->order,
             'title'           => $this->title,
             'field_type'      => $this->fieldType,
             'input_type'      => $this->inputType,
@@ -94,20 +94,14 @@ class CheckboxInputField extends InputField
             'style'           => $this->style,
             'override_right'  => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
         $name      = 'name="' . esc_html($this->name) . '"';
@@ -125,9 +119,9 @@ class CheckboxInputField extends InputField
         ob_start();
         ?>
         <div <?= $style ?>>
-            <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
-            <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input type="hidden" id="<?= esc_html($this->order) ?>_reset" <?= $name ?> value="false"/>
+            <input type="checkbox" id="<?= esc_html($this->order) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
         </div>
         <?php
 
@@ -141,7 +135,7 @@ class CheckboxInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+        <select id="<?= esc_html($this->order) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="false">Not Checked</option>
             <option value="true">Checked</option>
         </select>

@@ -24,16 +24,16 @@ class RoleCheckboxInputField extends InputField
     /**
      * CheckboxInputField constructor.
      *
-     * @param int          $id
+     * @param int          $order
      * @param string       $title
      * @param string|array $name
      * @param string       $class
      * @param string       $style
      * @param string       $overrideRight
      */
-    protected function __construct($id, $title, $name, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
     }
 
     /**
@@ -49,7 +49,8 @@ class RoleCheckboxInputField extends InputField
             throw new Exception('Incorrect input type');
         }
         return new RoleCheckboxInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->class,
@@ -59,14 +60,13 @@ class RoleCheckboxInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -75,20 +75,14 @@ class RoleCheckboxInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
@@ -99,9 +93,9 @@ class RoleCheckboxInputField extends InputField
         ob_start();
         ?>
         <div <?= $style ?>>
-            <input type="hidden" id="<?= esc_html($this->id) ?>_reset" <?= $name ?> value="false"/>
-            <input type="checkbox" id="<?= esc_html($this->id) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+            <input type="hidden" id="<?= esc_html($this->order) ?>_reset" <?= $name ?> value="false"/>
+            <input type="checkbox" id="<?= esc_html($this->order) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?>/>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label>
         </div>
         <?php
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
@@ -114,7 +108,7 @@ class RoleCheckboxInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+        <select id="<?= esc_html($this->order) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <option value="false">Not Checked</option>
             <option value="true">Checked</option>
         </select>

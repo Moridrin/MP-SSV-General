@@ -43,14 +43,15 @@ class InputField extends Field
     public $inputType;
     /** @var string $name */
     public $name;
-
+    /** @var string $overrideRight */
+    public $overrideRight;
     /** @var string $value */
     public $value;
 
     /**
      * InputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $inputType
      * @param string $name
@@ -58,11 +59,12 @@ class InputField extends Field
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $inputType, $name, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $inputType, $name, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::FIELD_TYPE, $class, $style, $overrideRight);
-        $this->inputType = $inputType;
-        $this->name      = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
+        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
+        $this->inputType     = $inputType;
+        $this->name          = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
+        $this->overrideRight = $overrideRight;
     }
 
     /**
@@ -96,23 +98,19 @@ class InputField extends Field
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         throw new Exception('This should be implemented in a sub class.');
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      * @throws Exception if the method is not implemented by a sub class.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
     }
@@ -136,12 +134,12 @@ class InputField extends Field
         ob_start();
         ?>
         <td>
-            <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label>
         </td>
         <td>
             <label>
                 Filter
-                <input id="filter_<?= esc_html($this->id) ?>" type="checkbox" name="filter_<?= esc_html($this->name) ?>">
+                <input id="filter_<?= esc_html($this->order) ?>" type="checkbox" name="filter_<?= esc_html($this->name) ?>">
             </label>
         </td>
         <td>

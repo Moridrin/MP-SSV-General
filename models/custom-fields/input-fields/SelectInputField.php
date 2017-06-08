@@ -28,7 +28,7 @@ class SelectInputField extends InputField
     /**
      * SelectInputField constructor.
      *
-     * @param int    $id
+     * @param int    $order
      * @param string $title
      * @param string $name
      * @param bool   $disabled
@@ -37,9 +37,9 @@ class SelectInputField extends InputField
      * @param string $style
      * @param string $overrideRight
      */
-    protected function __construct($id, $title, $name, $disabled, $options, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $disabled, $options, $class, $style, $overrideRight)
     {
-        parent::__construct($id, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
         $this->disabled = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->options  = explode(',', $options);
     }
@@ -54,7 +54,8 @@ class SelectInputField extends InputField
     {
         $values = json_decode($json);
         return new SelectInputField(
-            $values->id,
+            $values->container_id,
+            $values->order,
             $values->title,
             $values->name,
             $values->disabled,
@@ -66,14 +67,13 @@ class SelectInputField extends InputField
     }
 
     /**
-     * @param bool $forDatabase
-     *
      * @return string the class as JSON object.
      */
-    public function toJSON($forDatabase = false)
+    public function toJSON()
     {
         $values = array(
-            'id'             => $this->id,
+            'container_id'   => $this->containerID,
+            'order'          => $this->order,
             'title'          => $this->title,
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
@@ -84,20 +84,14 @@ class SelectInputField extends InputField
             'style'          => $this->style,
             'override_right' => $this->overrideRight,
         );
-        if (!$forDatabase) {
-            $values['title'] = $this->title;
-            $values['name']  = $this->name;
-        }
         $values = json_encode($values);
         return $values;
     }
 
     /**
-     * @param string $overrideRight is the right needed to override disabled and required parameters of the field.
-     *
      * @return string the field as HTML object.
      */
-    public function getHTML($overrideRight)
+    public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
@@ -112,19 +106,19 @@ class SelectInputField extends InputField
         if (current_theme_supports('materialize')) {
             ?>
             <div class="input-field">
-                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <select id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label>
             </div>
             <?php
         } else {
             ?>
             <div class="input-field">
-                <label for="<?= esc_html($this->id) ?>"><?= esc_html($this->title) ?></label><br/>
-                <select id="<?= esc_html($this->id) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?></label><br/>
+                <select id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $disabled ?>>
                     <?php foreach ($this->options as $option): ?>
                         <option value="<?= $option ?>" <?= selected($option, $this->value) ?>><?= $option ?></option>
                     <?php endforeach; ?>
@@ -143,7 +137,7 @@ class SelectInputField extends InputField
     {
         ob_start();
         ?>
-        <select id="<?= esc_html($this->id) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
+        <select id="<?= esc_html($this->order) ?>" name="<?= esc_html($this->name) ?>" title="<?= esc_html($this->title) ?>">
             <?php foreach ($this->options as $option): ?>
                 <option value="<?= esc_html($option) ?>"><?= esc_html($option) ?></option>
             <?php endforeach; ?>
