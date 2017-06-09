@@ -57,7 +57,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 			`ID` bigint(20) NOT NULL PRIMARY KEY,
 			`name` VARCHAR(50) UNIQUE,
 			`title` VARCHAR(50) NOT NULL,
-			`json` TEXT NOT NULL,
+			`json` TEXT NOT NULL
 		) $charset_collate;";
         $wpdb->query($sql);
 
@@ -65,15 +65,17 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
         $sql
                     = "
 		CREATE TABLE IF NOT EXISTS $table_name (
-			`ID` bigint(20) NOT NULL AUTO_INCREMENT,
+			`ID` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
 			`postID` bigint(20) NOT NULL,
 			`containerID` bigint(20) NOT NULL DEFAULT 0,
 			`order` bigint(20) NOT NULL,
 			`name` VARCHAR(50),
-			`json` TEXT NOT NULL,
-			PRIMARY KEY(`postID`, `containerID`, `order`)
+			`json` TEXT NOT NULL
 		) $charset_collate;";
         $wpdb->query($sql);
+        if (!empty($wpdb->last_error)) {
+            SSV_General::var_export($wpdb->last_error, 1);
+        }
     }
     #endregion
 }

@@ -258,6 +258,25 @@ class SSV_General
     }
     #endregion
 
+    #region getFormSecurityFields($adminReferer, $save, $reset)
+    /**
+     * @return string HTML
+     */
+    public static function getInputTypeDataList()
+    {
+        ob_start();
+        $inputTypes = array('Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Date', 'Image', 'Hidden');
+        ?>
+        <datalist id="input_type">
+            <?php foreach ($inputTypes as $inputType): ?>
+                <option value="<?= mp_ssv_to_snake_case($inputType) ?>"><?= $inputType ?></option>
+            <?php endforeach; ?>
+        </datalist>
+        <?php
+        return ob_get_clean();
+    }
+    #endregion
+
     #region sanitize($value)
     /**
      * @param mixed        $value

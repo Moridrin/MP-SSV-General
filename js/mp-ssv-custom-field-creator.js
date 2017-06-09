@@ -3,11 +3,9 @@ var roles = JSON.parse(settings.roles);
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 var fieldIDs = [];
-var containerID = '';
 
 function mp_ssv_add_custom_input_field(container, fieldID, inputType, values) {
     fieldIDs.push(fieldID);
-    containerID = container;
     container = document.getElementById(container);
     if (!values) {
         values = [];
@@ -163,64 +161,64 @@ function getBaseFields(fieldID, fieldTitle) {
     return tr;
 }
 function getTextInputFields(tr, fieldID, name) {
-    tr.appendChild(getInputType(fieldID, 'text'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'text'));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getSelectInputFields(tr, fieldID, name, options) {
-    tr.appendChild(getInputType(fieldID, 'select'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'select'));
     tr.appendChild(getOptions(fieldID, options));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getCheckboxInputFields(tr, fieldID, name) {
-    tr.appendChild(getInputType(fieldID, 'checkbox'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'checkbox'));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getRoleCheckboxInputFields(tr, fieldID, role) {
-    tr.appendChild(getInputType(fieldID, 'role_checkbox'));
     tr.appendChild(getRoleCheckbox(fieldID, role));
+    tr.appendChild(getInputType(fieldID, 'role_checkbox'));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getRoleSelectInputFields(tr, fieldID, name, role) {
-    tr.appendChild(getInputType(fieldID, 'role_select'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'role_select'));
     tr.appendChild(getRoleSelect(fieldID, role));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getImageInputFields(tr, fieldID, name) {
-    tr.appendChild(getInputType(fieldID, 'image'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'image'));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getHiddenInputFields(tr, fieldID, name, value) {
-    tr.appendChild(getInputType(fieldID, 'hidden'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'hidden'));
     tr.appendChild(getValue(fieldID, value));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getCustomInputFields(tr, fieldID, inputType, name) {
-    tr.appendChild(getInputType(fieldID, inputType));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, inputType));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
 function getDateInputFields(tr, fieldID, name) {
-    tr.appendChild(getInputType(fieldID, 'date'));
     tr.appendChild(getName(fieldID, name));
+    tr.appendChild(getInputType(fieldID, 'date'));
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
@@ -234,7 +232,7 @@ function getBR() {
 function getEmpty(fieldID, columnClass) {
     var td = document.createElement("td");
     td.setAttribute("style", "padding: 0;");
-    td.setAttribute("class", fieldID + "_empty_td");
+    td.setAttribute("id", fieldID + "_empty_td");
     if (columnClass) {
         td.classList.add(columnClass);
     }
@@ -287,17 +285,13 @@ function getFieldTitle(fieldID, value) {
     return fieldTitleTD;
 }
 function getInputType(fieldID, value) {
-    var options = ["Text", "Select", "Checkbox", "Role_Checkbox", "Role_Select", "Date", "Image", "Hidden", "Custom"];
-    var customValue = '';
-    if (["text", "select", "checkbox", "role_checkbox", "role_select", "date", "image", "hidden", "custom"].indexOf(value) === -1) {
-        customValue = value;
-        value = 'custom';
-    }
-    var inputType = createSelect(fieldID, "_input_type", options, value);
-    if (value === 'custom') {
-        inputType.setAttribute("style", "width: 48%;");
-    } else {
-        inputType.setAttribute("style", "width: 100%;");
+    var inputType = document.createElement("input");
+    inputType.setAttribute("id", fieldID + "_input_type");
+    inputType.setAttribute("name", "custom_field_" + fieldID + "_input_type");
+    inputType.setAttribute("style", "width: 100%;");
+    inputType.setAttribute("list", "input_type");
+    if (value) {
+        inputType.setAttribute("value", value);
     }
     inputType.onchange = function () {
         inputTypeChanged(fieldID);
@@ -312,15 +306,6 @@ function getInputType(fieldID, value) {
     inputTypeTD.appendChild(inputTypeLabel);
     inputTypeTD.appendChild(getBR());
     inputTypeTD.appendChild(inputType);
-    if (value === 'custom') {
-        var inputTypeCustom = document.createElement("input");
-        inputTypeCustom.setAttribute("id", fieldID + "_input_type");
-        inputTypeCustom.setAttribute("name", "custom_field_" + fieldID + "_input_type");
-        inputTypeCustom.setAttribute("style", "width: 50%;");
-        inputTypeCustom.setAttribute("value", customValue);
-        inputTypeCustom.setAttribute("required", "required");
-        inputTypeTD.appendChild(inputTypeCustom);
-    }
     return inputTypeTD;
 }
 function getName(fieldID, value) {
@@ -433,29 +418,25 @@ function getDeleteRow(fieldID) {
 function inputTypeChanged(fieldID) {
     var tr = document.getElementById(fieldID + "_tr");
     var inputType = document.getElementById(fieldID + "_input_type").value;
-    removeField(document.getElementById(fieldID + "_input_type_td"));
+    var name = document.getElementById(fieldID + "_name").value;
     removeField(document.getElementById(fieldID + "_name_td"));
+    removeField(document.getElementById(fieldID + "_empty_td"));
     removeField(document.getElementById(fieldID + "_options_td"));
-    removeField(document.getElementById(fieldID + "_delete_row_td"));
-    removeFields(document.getElementsByClassName(fieldID + "_empty_td"));
-    if (inputType === 'text') {
-        getTextInputFields(tr, fieldID, "");
-    } else if (inputType === 'select') {
-        getSelectInputFields(tr, fieldID, "", "");
-    } else if (inputType === 'checkbox') {
-        getCheckboxInputFields(tr, fieldID, "");
-    } else if (inputType === 'date') {
-        getDateInputFields(tr, fieldID, "");
-    } else if (inputType === 'role_checkbox') {
-        getRoleCheckboxInputFields(tr, fieldID, "");
-    } else if (inputType === 'role_select') {
-        getRoleSelectInputFields(tr, fieldID, "", "");
-    } else if (inputType === 'image') {
-        getImageInputFields(tr, fieldID, "");
-    } else if (inputType === 'hidden') {
-        getHiddenInputFields(tr, fieldID, "");
+        if (inputType === 'role_checkbox') {
+        tr.insertBefore(getRoleCheckbox(fieldID, name), document.getElementById(fieldID + "_input_type_td"));
     } else {
-        getCustomInputFields(tr, fieldID, "", "");
+        tr.insertBefore(getName(fieldID, name), document.getElementById(fieldID + "_input_type_td"));
+    }
+    if (inputType === 'select') {
+        tr.insertBefore(getOptions(fieldID), document.getElementById(fieldID + "_delete_row_td"));
+    } else if (inputType === 'role_checkbox') {
+        tr.insertBefore(getEmpty(fieldID), document.getElementById(fieldID + "_delete_row_td"));
+    } else if (inputType === 'role_select') {
+        tr.insertBefore(getRoleSelect(fieldID), document.getElementById(fieldID + "_delete_row_td"));
+    } else if (inputType === 'hidden') {
+        tr.insertBefore(getValue(fieldID, ""), document.getElementById(fieldID + "_delete_row_td"));
+    } else {
+        tr.insertBefore(getEmpty(fieldID), document.getElementById(fieldID + "_delete_row_td"));
     }
 }
 

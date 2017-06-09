@@ -136,6 +136,7 @@ function getTextInputField(container, fieldID, values) {
 }
 function getSelectInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
+    alert('test');
     var overrideRight = values['override_right'];
     var fieldName = '';
     var fieldTitle = '';
@@ -779,6 +780,7 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
 
     return select;
 }
+//noinspection JSUnusedGlobalSymbols
 function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
     if (selected === null) {
         selected = [];
@@ -800,6 +802,7 @@ function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
 
     return select;
 }
+//noinspection JSUnusedGlobalSymbols
 function removeFields(fields) {
     if (fields !== null) {
         while (fields.length > 0) {

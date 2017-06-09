@@ -3,7 +3,6 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
-use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -56,13 +55,12 @@ class TabField extends Field
     public static function fromJSON($json)
     {
         $values = json_decode($json);
-        SSV_General::var_export($values, 1);
         if ($values->field_type != self::FIELD_TYPE) {
             throw new Exception('Incorrect field type');
         }
         $fields = array();
         for ($i = 1; $i <= $values->fieldCount; $i++) {
-            $fields[] = Field::getByOrder($values->containerID, ($values->order + $i));
+            $fields[] = Field::getByOrder($values->container_id, ($values->order + $i));
         }
         return new TabField(
             $values->container_id,

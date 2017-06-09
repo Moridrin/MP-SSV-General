@@ -29,7 +29,7 @@ abstract class Field
 
     #region Variables
     /** @var int $containerID */
-    public $containerID;
+    public $containerID = 0;
     /** @var int $order */
     public $order;
     /** @var string $title */
@@ -54,7 +54,7 @@ abstract class Field
      */
     protected function __construct($containerID, $order, $title, $fieldType, $class, $style)
     {
-        $this->containerID = $containerID;
+        $this->containerID = $containerID ? $containerID : 0;
         $this->order       = $order;
         $this->title       = $title;
         $this->fieldType   = $fieldType;
@@ -70,6 +70,7 @@ abstract class Field
      */
     public static function titleFromDatabase($name)
     {
+        /** @var \wpdb $wpdb */
         global $wpdb;
         $table  = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $sql    = "SELECT customField FROM $table WHERE customField LIKE '%\"name\":\"$name\"%'";
@@ -153,10 +154,10 @@ abstract class Field
             return null;
         }
 
+        /** @var \wpdb $wpdb */
         global $wpdb;
         $table = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $field = $wpdb->get_var("SELECT customField FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
-        SSV_General::var_export("SELECT customField FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order", 1);
+        $field = $wpdb->get_var("SELECT json FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
         if (!empty($field)) {
             return self::fromJSON($field);
         } else {

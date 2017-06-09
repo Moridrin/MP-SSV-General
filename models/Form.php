@@ -79,10 +79,9 @@ class Form
         }
         $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $postID             = $post->ID;
-        $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY ID ASC");
-//        SSV_General::var_export($customizedFields, 1);
+        $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
-            $customizedField = Field::fromJSON($customizedField->json, $customizedField->containerID);
+            $customizedField = Field::fromJSON($customizedField->json);
             if ($setValues) {
                 if ($customizedField instanceof TabField) {
                     foreach ($customizedField->fields as $childField) {
@@ -96,7 +95,6 @@ class Form
             }
             $form->fields[] = $customizedField;
         }
-        SSV_General::var_export($form->fields, 1);
         return $form;
     }
     #endregion
@@ -153,7 +151,7 @@ class Form
         global $wpdb;
         $table      = SSV_General::CUSTOM_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
-        $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
+        $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
         ob_start();
         echo SSV_General::getCapabilitiesDataList();
         $columns = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array()));
@@ -204,7 +202,7 @@ class Form
             </label>
             <datalist id="custom_fields">
                 <?php foreach ($baseFields as $field): ?>
-                    <option value="<?= $field->ID ?>"><?= $field->title ?> (<?= $field->name ?>)</option>
+                    <option value="<?= $field->name ?>"><?= $field->title ?></option>
                 <?php endforeach; ?>
             </datalist>
             <button type="button" onclick="mp_ssv_add_new_custom_input_field_customizer()">Add Field</button>
@@ -214,15 +212,16 @@ class Form
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
             function mp_ssv_add_new_custom_input_field_customizer() {
-                var baseFieldID = document.getElementById('custom_field_selector').value;
-                if (!baseFieldID) {
+                var baseFieldName = document.getElementById('custom_field_selector').value;
+                if (!baseFieldName) {
                     document.getElementById("custom_field_selector").setAttribute("placeholder", "fill in a valid Field ID");
                 } else {
                     document.getElementById("custom_field_selector").setAttribute("placeholder", "");
-                    var field = JSON.parse(baseFields[baseFieldID]['json']);
+                    var field = JSON.parse(baseFields[baseFieldName]['json']);
                     mp_ssv_add_custom_input_field_customizer('custom-fields-placeholder', i, field['input_type'], field);
                 }
                 i++;
+                document.getElementById('custom_field_selector').value = '';
             }
             function mp_ssv_add_new_custom_tab_field_customizer() {
                 mp_ssv_add_custom_tab_field_customizer('custom-fields-placeholder', i);
@@ -342,7 +341,6 @@ class Form
                 )
             );
         }
-        SSV_General::var_export($fields, 1);
     }
     #endregion
 

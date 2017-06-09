@@ -1,8 +1,7 @@
 <?php
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
-use mp_ssv_general\Form;
-use mp_ssv_general\SSV_General;
+    use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -23,6 +22,8 @@ add_action('network_admin_menu', 'ssv_add_ssv_menu', 9);
 #region Page Content
 function ssv_settings_page()
 {
+    /** @var wpdb $wpdb */
+    global $wpdb;
     $columns = array(
         'disabled',
         'required',
@@ -36,10 +37,9 @@ function ssv_settings_page()
         if (isset($_POST['reset'])) {
             SSV_General::resetOptions();
         } else {
-            $fieldIDs = SSV_General::sanitize($_POST['field_ids'], 'array');
+            $fieldIDs = SSV_General::sanitize($_POST['field_ids'], 'int');
+            $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
 
-            /** @var wpdb $wpdb */
-            global $wpdb;
             $table = SSV_General::CUSTOM_FIELDS_TABLE;
             if (current_user_can('remove_custom_fields')) {
                 if (!empty($fieldIDs)) {
@@ -69,27 +69,27 @@ function ssv_settings_page()
                 $field   = Field::fromJSON(json_encode($properties));
                 $oldName = $wpdb->get_row("SELECT `name` FROM $table WHERE ID = $fieldID")->name;
                 $name    = $field->name;
-                if ($name != $oldName) {
+                if ($oldName !== null && $name != $oldName) {
                     $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
                 }
                 if (current_user_can('edit_custom_fields')) {
                     $wpdb->replace(
                         $table,
                         array(
-                            'ID'    => $field->order,
+                            'ID'    => $fieldID,
                             'name'  => $name,
                             'title' => $field->title,
-                            'json'  => $field->toJSON(true),
+                            'json'  => $field->toJSON(),
                         )
                     );
                 } elseif (current_user_can('add_custom_fields')) {
                     $wpdb->insert(
                         $table,
                         array(
-                            'ID'    => $field->order,
+                            'ID'    => $fieldID,
                             'name'  => $name,
                             'title' => $field->title,
-                            'json'  => $field->toJSON(true),
+                            'json'  => $field->toJSON(),
                         )
                     );
                 }
@@ -98,10 +98,29 @@ function ssv_settings_page()
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
         }
     }
+    $table      = SSV_General::CUSTOM_FIELDS_TABLE;
+    $baseFields = $wpdb->get_results("SELECT * FROM $table");
+    $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
+    echo SSV_General::getInputTypeDataList();
     ?>
     <div class="wrap">
         <h1>General Options</h1>
     </div>
+    <?php if (!current_user_can('add_custom_fields')): ?>
+    <div class="notice">
+        <p>You are not allowed to add custom fields.</p>
+    </div>
+    <?php endif; ?>
+    <?php if (!current_user_can('edit_custom_fields')): ?>
+    <div class="notice">
+        <p>You are not allowed to edit existing custom fields.</p>
+    </div>
+    <?php endif; ?>
+    <?php if (!current_user_can('remove_custom_fields')): ?>
+    <div class="notice">
+        <p>You are not allowed to remove custom fields.</p>
+    </div>
+    <?php endif; ?>
     <form method="post" action="#">
         <table class="form-table">
             <tr>
@@ -113,7 +132,7 @@ function ssv_settings_page()
                     $selected = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))));
                     $selected = $selected ?: array();
                     ?>
-                    <select id="columns" size="<?= count($columns) ?>" name="columns[]" multiple onchange="columnsChanged()">
+                    <select id="columns" size="<?= count($columns) ?>" name="columns[]" multiple>
                         <?php
                         foreach ($columns as $field) {
                             ?>
@@ -138,13 +157,15 @@ function ssv_settings_page()
                         <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
                     </div>
                     <script>
-                        var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
+//                        var i = <?//= esc_html(Field::getMaxID($baseFields) + 1) ?>//;
+                        var i = <?= max(array_keys($baseFields)) + 1 ?>;
                         function mp_ssv_add_new_custom_field() {
                             mp_ssv_add_custom_input_field('custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                             i++;
                         }
-                        <?php foreach($this->fields as $field): ?>
-                        mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= esc_html($field->order) ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
+                        <?php foreach($baseFields as $fieldID => $baseField): ?>
+                        <?php $field = Field::fromJSON($baseField->json); ?>
+                        mp_ssv_add_custom_input_field('custom-fields-placeholder', <?= $fieldID ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
                         <?php endforeach; ?>
                     </script>
                 </td>
