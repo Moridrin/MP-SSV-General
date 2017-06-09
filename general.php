@@ -57,7 +57,8 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 			`ID` bigint(20) NOT NULL PRIMARY KEY,
 			`name` VARCHAR(50) UNIQUE,
 			`title` VARCHAR(50) NOT NULL,
-			`json` TEXT NOT NULL
+			`json` TEXT NOT NULL,
+			`shared` TINYINT NOT NULL DEFAULT 1
 		) $charset_collate;";
         $wpdb->query($sql);
 
