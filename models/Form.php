@@ -77,47 +77,39 @@ class Form
         if (!$post) {
             return $form;
         }
-        $baseTable          = SSV_General::CUSTOM_FIELDS_TABLE;
         $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $postID             = $post->ID;
         $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
-            $customizedFieldJSON               = json_decode($customizedField->json);
-            $customizedFieldJSON->container_id = $customizedField->containerID;
-            $customizedFieldJSON->order        = $customizedField->order;
-            $customizedFieldJSON->name         = $customizedField->name;
-            if ($customizedField->name !== null) {
-                $baseField                       = $wpdb->get_row("SELECT * FROM $baseTable WHERE `name` = '$customizedField->name'");
-                $baseFieldJSON                   = json_decode($baseField->json);
-                $customizedFieldJSON->field_type = $baseFieldJSON->field_type;
-                $customizedFieldJSON->input_type = $baseFieldJSON->input_type;
-            }
-            $customizedFieldJSON = json_encode($customizedFieldJSON);
-            $customizedField     = Field::fromJSON($customizedFieldJSON);
+            $field = Field::fromDatabase($customizedField);
             if ($setValues) {
-                if ($customizedField instanceof TabField) {
-                    foreach ($customizedField->fields as $childField) {
+                if ($field instanceof TabField) {
+                    foreach ($field->fields as $childField) {
                         if ($childField instanceof InputField) {
                             $childField->setValue($form->user->getMeta($childField->name));
                         }
                     }
-                } elseif ($customizedField instanceof InputField) {
-                    $customizedField->setValue($form->user->getMeta($customizedField->name));
+                } elseif ($field instanceof InputField) {
+                    $field->setValue($form->user->getMeta($field->name));
                 }
             }
-            $form->fields[] = $customizedField;
+            $form->fields[] = $field;
         }
         return $form;
     }
-    #endregion
 
-    #region addFields($fields)
+#endregion
+
+#region addFields($fields)
     /**
      * @param Field[]|Field $fields
      * @param bool          $atEnd if set to false, this will append the fields at the start of the array.
      */
-    public function addFields($fields, $atEnd = true)
-    {
+    public
+    function addFields(
+        $fields,
+        $atEnd = true
+    ) {
         if ($fields instanceof Field) {
             $fields = array($fields);
         } elseif (!is_array($fields)) {
@@ -129,14 +121,17 @@ class Form
             $this->fields = array_merge($fields, $this->fields);
         }
     }
-    #endregion
 
-    #region setValues($values)
+#endregion
+
+#region setValues($values)
     /**
      * @param null|array $values if set to null it uses form->user variable.
      */
-    public function setValues($values = null)
-    {
+    public
+    function setValues(
+        $values = null
+    ) {
         if ($values == null) {
             $values = $this->user ?: array();
         }
@@ -149,16 +144,19 @@ class Form
             }
         );
     }
-    #endregion
 
-    #region getEditor($allowTabs)
+#endregion
+
+#region getEditor($allowTabs)
     /**
      * @param bool $allowTabs if set true it will display the select option for tab in the Field Type
      *
      * @return string HTML
      */
-    public function getEditor($allowTabs)
-    {
+    public
+    function getEditor(
+        $allowTabs
+    ) {
         /** @var \wpdb $wpdb */
         global $wpdb;
         $table      = SSV_General::CUSTOM_FIELDS_TABLE;
@@ -264,13 +262,15 @@ class Form
         <?php
         return ob_get_clean();
     }
-    #endregion
 
-    #region saveEditorFromPost()
+#endregion
+
+#region saveEditorFromPost()
     /**
      * This function removes the old fields from the database and inserts the new fields.
      */
-    public static function saveEditorFromPost()
+    public
+    static function saveEditorFromPost()
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
@@ -354,17 +354,21 @@ class Form
             );
         }
     }
-    #endregion
 
-    #region getHTML($adminReferer, $buttonText = 'save')
+#endregion
+
+#region getHTML($adminReferer, $buttonText = 'save')
     /**
      * @param string $adminReferrer is the admin referer for the form.
      * @param string $buttonText    is the text on the submit button (default = 'save').
      *
      * @return string the field as HTML object.
      */
-    public function getHTML($adminReferrer, $buttonText = 'save')
-    {
+    public
+    function getHTML(
+        $adminReferrer,
+        $buttonText = 'save'
+    ) {
         $tabs = array();
         $html = '';
         /** @var Field $field */
@@ -412,13 +416,14 @@ class Form
         return $html;
     }
 
-    #endregion
+#endregion
 
-    #region getInputFields()
+#region getInputFields()
     /**
      * @return InputField[]
      */
-    public function getInputFields()
+    public
+    function getInputFields()
     {
         return $this->loopRecursive(
             function ($field) {
@@ -430,16 +435,19 @@ class Form
             }
         );
     }
-    #endregion
 
-    #region isValid($tabId)
+#endregion
+
+#region isValid($tabId)
     /**
      * @param int|null $tabID if set it will only check the fields inside that tab.
      *
      * @return array|bool array of errors or true if no errors.
      */
-    public function isValid($tabID = null)
-    {
+    public
+    function isValid(
+        $tabID = null
+    ) {
         $this->errors = array();
         $this->loopRecursive(
             function ($field) {
@@ -454,9 +462,10 @@ class Form
         );
         return empty($this->errors) ? true : $this->errors;
     }
-    #endregion
 
-    #region save($tabId)
+#endregion
+
+#region save($tabId)
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
@@ -465,8 +474,10 @@ class Form
      *
      * @return Message[]
      */
-    public function save($tabID = null)
-    {
+    public
+    function save(
+        $tabID = null
+    ) {
         //Fields
         $messages = $this->loopRecursive(
             function ($field) {
@@ -517,16 +528,19 @@ class Form
         $messages = array_diff($messages, array(true));
         return $messages;
     }
-    #endregion
 
-    #region getValue($name)
+#endregion
+
+#region getValue($name)
     /**
      * @param string $name of the field to return the value
      *
      * @return string|null
      */
-    public function getValue($name)
-    {
+    public
+    function getValue(
+        $name
+    ) {
         $values = $this->loopRecursive(
             function ($field, $args) {
                 if ($field instanceof InputField) {
@@ -541,16 +555,19 @@ class Form
         );
         return count($values) ? reset($values) : null;
     }
-    #endregion
 
-    #region getInputFieldProperty($_property)
+#endregion
+
+#region getInputFieldProperty($_property)
     /**
      * @param string $_property
      *
      * @return string[] array of all properties for the fields that have that property
      */
-    public function getFieldProperty($_property)
-    {
+    public
+    function getFieldProperty(
+        $_property
+    ) {
         global $property;
         $property   = $_property;
         $properties = $this->loopRecursive(
@@ -565,16 +582,18 @@ class Form
         return $properties;
     }
 
-    #endregion
+#endregion
 
-    #region getEmail($_hidePasswordFields)
+#region getEmail($_hidePasswordFields)
     /**
      * @param bool $_hidePasswordFields if true, the passwords will be replaced with ******.
      *
      * @return string email body in HTML.
      */
-    public function getEmail($_hidePasswordFields = true)
-    {
+    public
+    function getEmail(
+        $_hidePasswordFields = true
+    ) {
         global $hidePasswordFields;
         $hidePasswordFields = $_hidePasswordFields;
         $rows               = $this->loopRecursive(
@@ -601,9 +620,10 @@ class Form
         );
         return '<table>' . implode('', $rows) . '</table>';
     }
-    #endregion
 
-    #region loopRecursive($callback)
+#endregion
+
+#region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
      *
@@ -613,8 +633,12 @@ class Form
      *
      * @return array
      */
-    public function loopRecursive($callback, $tabID = null, $args = array())
-    {
+    public
+    function loopRecursive(
+        $callback,
+        $tabID = null,
+        $args = array()
+    ) {
         $return = array();
         /** @var Field $field */
         foreach ($this->fields as $field) {
@@ -632,5 +656,5 @@ class Form
         $return = array_diff($return, array(null));
         return $return;
     }
-    #endregion
+#endregion
 }

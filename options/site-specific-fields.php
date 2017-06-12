@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable       = SSV_General::CUSTOM_FIELDS_TABLE;
+$baseTable       = SSV_General::CUSTOM_SITE_FIELDS_TABLE;
 $customizedTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
 
 if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
@@ -20,15 +20,15 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
         $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
 
         if (current_user_can('remove_custom_fields')) {
-            $oldNames = $wpdb->get_results("SELECT ID, `name` FROM $baseTable WHERE `shared` = 0");
+            $oldNames = $wpdb->get_results("SELECT ID, `name` FROM $baseTable");
             $oldNames = array_combine(array_column($oldNames, 'ID'), array_column($oldNames, 'name'));
             if (!empty($fieldIDs)) {
                 $databaseFieldIDs = implode(", ", $fieldIDs);
                 $fieldsToBeRemoved = array_diff_key($oldNames, array_fill_keys($fieldIDs, ''));
-                $wpdb->query("DELETE FROM $baseTable WHERE ID NOT IN ($databaseFieldIDs) AND `shared` = 0");
+                $wpdb->query("DELETE FROM $baseTable WHERE ID NOT IN ($databaseFieldIDs)");
                 $wpdb->query("DELETE FROM $customizedTable WHERE `name` IN ($fieldsToBeRemoved)");
             } else {
-                $wpdb->query("DELETE FROM $baseTable WHERE 1 AND `shared` = 0");
+                $wpdb->query("DELETE FROM $baseTable WHERE 1");
                 $wpdb->query("DELETE FROM $customizedTable WHERE `name` IN ($oldNames)");
                 $fieldIDs = array();
             }
@@ -64,7 +64,6 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
                         'name'   => $name,
                         'title'  => $field->title,
                         'json'   => $field->toJSON(),
-                        'shared' => 0,
                     )
                 );
             } elseif (current_user_can('add_custom_fields')) {
@@ -75,16 +74,13 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
                         'name'   => $name,
                         'title'  => $field->title,
                         'json'   => $field->toJSON(),
-                        'shared' => 0,
                     )
                 );
             }
         }
     }
 }
-$allBaseFields = $wpdb->get_results("SELECT * FROM $baseTable");
-$allBaseFields = array_combine(array_column($allBaseFields, 'ID'), $allBaseFields);
-$baseFields = $wpdb->get_results("SELECT * FROM $baseTable WHERE `shared` = 0");
+$baseFields = $wpdb->get_results("SELECT * FROM $baseTable");
 $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
 echo SSV_General::getInputTypeDataList();
 ?>
@@ -108,18 +104,18 @@ echo SSV_General::getInputTypeDataList();
         <tr>
             <td colspan="2" style="padding: 0;">
                 <div style="overflow-x: auto;">
-                    <table id="shared-custom-fields-placeholder"></table>
+                    <table id="site-specific-custom-fields-placeholder"></table>
                     <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
                 </div>
                 <script>
-                    var i = <?= max(array_keys($allBaseFields)) + 1 ?>;
+                    var i = <?= max(array_keys($baseFields)) + 1 ?>;
                     function mp_ssv_add_new_custom_field() {
-                        mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
+                        mp_ssv_add_custom_input_field('site-specific-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                         i++;
                     }
                     <?php foreach($baseFields as $fieldID => $baseField): ?>
                     <?php $field = Field::fromJSON($baseField->json); ?>
-                    mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', <?= $fieldID ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
+                    mp_ssv_add_custom_input_field('site-specific-custom-fields-placeholder', <?= $fieldID ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
                     <?php endforeach; ?>
                 </script>
             </td>

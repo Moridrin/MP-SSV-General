@@ -37,6 +37,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
     define('SSV_GENERAL_PATH', plugin_dir_path(__FILE__));
     define('SSV_GENERAL_URL', plugins_url() . '/' . plugin_basename(__DIR__));
     define('SSV_GENERAL_BASE_URL', (is_ssl() ? 'https://' : 'http://') . $_SERVER['HTTP_HOST']);
+    define('SSV_GENERAL_CUSTOM_SITE_FIELDS_TABLE', $wpdb->prefix . "ssv_general_custom_fields");
     define('SSV_GENERAL_CUSTOM_FORM_FIELDS_TABLE', $wpdb->prefix . "ssv_general_customized_form_fields");
     require_once 'SSV_General.php';
 
@@ -57,8 +58,18 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 			`ID` bigint(20) NOT NULL PRIMARY KEY,
 			`name` VARCHAR(50) UNIQUE,
 			`title` VARCHAR(50) NOT NULL,
-			`json` TEXT NOT NULL,
-			`shared` TINYINT NOT NULL DEFAULT 1
+			`json` TEXT NOT NULL
+		) $charset_collate;";
+        $wpdb->query($sql);
+
+        $table_name = SSV_General::CUSTOM_SITE_FIELDS_TABLE;
+        $sql
+                    = "
+		CREATE TABLE IF NOT EXISTS $table_name (
+			`ID` bigint(20) NOT NULL PRIMARY KEY,
+			`name` VARCHAR(50) UNIQUE,
+			`title` VARCHAR(50) NOT NULL,
+			`json` TEXT NOT NULL
 		) $charset_collate;";
         $wpdb->query($sql);
 

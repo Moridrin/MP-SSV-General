@@ -119,22 +119,39 @@ abstract class Field
     }
     #endregion
 
-    #region fromDatabaseRow($row)
+    #region fromDatabase($row)
     /**
      * This function extracts a Field from the JSON string.
      *
-     * @param  $row
+     * @param object $row
      *
      * @return Field
      */
-    public static function fromDatabaseRow($row)
+    public static function fromDatabase($row)
     {
-        $values        = json_decode($row->json);
-        $values->order = $row->order;
-        $values->name  = $row->name;
-        $values->title = $row->title;
+        /** @var \wpdb $wpdb */
+        global $wpdb;
+        $baseTable     = SSV_General::CUSTOM_FIELDS_TABLE;
+        $baseSiteTable = SSV_General::CUSTOM_SITE_FIELDS_TABLE;
 
-        return Field::fromJSON(json_encode($values));
+        $rowJSON               = json_decode($row->json);
+        $rowJSON->container_id = $row->containerID;
+        $rowJSON->order        = $row->order;
+        $rowJSON->name         = $row->name;
+        if ($row->name !== null) {
+            $baseField = $wpdb->get_row("SELECT * FROM $baseSiteTable WHERE `name` = '$row->name'");
+            if ($baseField == null) { //If there isn't a Base Field in the Site Specific Fields -> use the Shared Base Field
+                $baseField = $wpdb->get_row("SELECT * FROM $baseTable WHERE `name` = '$row->name'");
+            }
+            $baseFieldJSON       = json_decode($baseField->json);
+            $rowJSON->field_type = $baseFieldJSON->field_type;
+            $rowJSON->input_type = $baseFieldJSON->input_type;
+            $rowJSON->options    = $baseFieldJSON->options;
+            $rowJSON->value      = $baseFieldJSON->value;
+        }
+        $rowJSON = json_encode($rowJSON);
+        $row     = Field::fromJSON($rowJSON);
+        return $row;
     }
     #endregion
 
@@ -156,22 +173,9 @@ abstract class Field
 
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $customizedFieldTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $baseFieldTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $field = $wpdb->get_row("SELECT * FROM $customizedFieldTable WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
-        $fieldJSON = json_decode($field->json);
-        if ($field->name !== null) {
-            $baseField   = $wpdb->get_row("SELECT * FROM $baseFieldTable WHERE `name` = '$field->name'");
-            $baseJSON = json_decode($baseField->json);
-            $fieldJSON->field_type = $baseJSON->field_type;
-            $fieldJSON->input_type = $baseJSON->input_type;
-        }
-        $fieldJSON = json_encode($fieldJSON);
-        if (!empty($fieldJSON)) {
-            return self::fromJSON($fieldJSON);
-        } else {
-            return null;
-        }
+        $rowTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $field    = $wpdb->get_row("SELECT * FROM $rowTable WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
+        return Field::fromDatabase($field);
     }
     #endregion
 
