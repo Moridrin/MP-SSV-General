@@ -111,7 +111,7 @@ class CheckboxInputField extends InputField
         $disabled  = disabled($this->disabled, true, false);
         $checked   = checked($isChecked, true, false);
 
-        if (isset($overrideRight) && current_user_can($overrideRight)) {
+        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
             $disabled = '';
             $required = '';
         }

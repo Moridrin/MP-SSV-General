@@ -102,7 +102,7 @@ class ImageInputField extends InputField
         $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
         $required = $this->required && !empty($this->value) ? 'required="required"' : '';
 
-        if (isset($overrideRight) && current_user_can($overrideRight)) {
+        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
             $required = '';
         }
 

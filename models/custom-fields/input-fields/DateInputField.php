@@ -6,7 +6,6 @@ use DateTime;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -130,7 +129,7 @@ class DateInputField extends InputField
         $dateAfter   = 'dateAfter="' . $this->dateRangeAfter . '"';
         $dateBefore  = 'dateBefore="' . $this->dateRangeBefore . '"';
 
-        if (isset($overrideRight) && current_user_can($overrideRight)) {
+        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
             $disabled = '';
             $required = '';
         }

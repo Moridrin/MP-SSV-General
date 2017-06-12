@@ -122,7 +122,7 @@ class TextInputField extends InputField
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
 
-        if (isset($overrideRight) && current_user_can($overrideRight)) {
+        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
             $disabled = '';
             $required = '';
         }
