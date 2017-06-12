@@ -136,7 +136,6 @@ function getTextInputField(container, fieldID, values) {
 }
 function getSelectInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
-    alert('test');
     var overrideRight = values['override_right'];
     var fieldName = '';
     var fieldTitle = '';

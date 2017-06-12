@@ -156,10 +156,19 @@ abstract class Field
 
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $field = $wpdb->get_var("SELECT json FROM $table WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
-        if (!empty($field)) {
-            return self::fromJSON($field);
+        $customizedFieldTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $baseFieldTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $field = $wpdb->get_row("SELECT * FROM $customizedFieldTable WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
+        $fieldJSON = json_decode($field->json);
+        if ($field->name !== null) {
+            $baseField   = $wpdb->get_row("SELECT * FROM $baseFieldTable WHERE `name` = '$field->name'");
+            $baseJSON = json_decode($baseField->json);
+            $fieldJSON->field_type = $baseJSON->field_type;
+            $fieldJSON->input_type = $baseJSON->input_type;
+        }
+        $fieldJSON = json_encode($fieldJSON);
+        if (!empty($fieldJSON)) {
+            return self::fromJSON($fieldJSON);
         } else {
             return null;
         }

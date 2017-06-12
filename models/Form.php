@@ -77,11 +77,23 @@ class Form
         if (!$post) {
             return $form;
         }
+        $baseTable          = SSV_General::CUSTOM_FIELDS_TABLE;
         $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
         $postID             = $post->ID;
         $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
-            $customizedField = Field::fromJSON($customizedField->json);
+            $customizedFieldJSON               = json_decode($customizedField->json);
+            $customizedFieldJSON->container_id = $customizedField->containerID;
+            $customizedFieldJSON->order        = $customizedField->order;
+            $customizedFieldJSON->name         = $customizedField->name;
+            if ($customizedField->name !== null) {
+                $baseField                       = $wpdb->get_row("SELECT * FROM $baseTable WHERE `name` = '$customizedField->name'");
+                $baseFieldJSON                   = json_decode($baseField->json);
+                $customizedFieldJSON->field_type = $baseFieldJSON->field_type;
+                $customizedFieldJSON->input_type = $baseFieldJSON->input_type;
+            }
+            $customizedFieldJSON = json_encode($customizedFieldJSON);
+            $customizedField     = Field::fromJSON($customizedFieldJSON);
             if ($setValues) {
                 if ($customizedField instanceof TabField) {
                     foreach ($customizedField->fields as $childField) {
