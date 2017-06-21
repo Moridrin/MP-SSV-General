@@ -435,6 +435,17 @@ class SSV_General
         }
         return site_url() . '/wp-login.php?redirect_to=' . site_url();
     }
+
+    public static function getChangePasswordURL()
+    {
+        if (self::usersPluginActive()) {
+            $changePasswordPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_CHANGE_PASSWORD);
+            if (count($changePasswordPages) > 0) {
+                return add_query_arg('redirect_to', get_site_url(), get_permalink($changePasswordPages[0]));
+            }
+        }
+        return '';
+    }
     #endregion
 
     #region getListSelect($name, $options, $selected)
