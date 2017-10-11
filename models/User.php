@@ -377,12 +377,19 @@ class User extends \WP_User
             update_user_meta($this->ID, 'display_name', $value);
             $this->display_name = $value;
             return true;
-        } elseif ($meta_key == "first_name" || $meta_key == "last_name") {
+        } elseif ($meta_key == "first_name" || $meta_key == "firstname" || $meta_key == "fname" || $meta_key == "last_name" || $meta_key == "lastname" || $meta_key == "lname") {
+            if ($meta_key == "first_name" || $meta_key == "firstname" || $meta_key == "fname") {
+                $this->first_name = $value;
+                wp_update_user(array('ID' => $this->ID, 'first_name' => $value));
+            } else {
+                $this->last_name = $value;
+                wp_update_user(array('ID' => $this->ID, 'last_name' => $value));
+            }
             update_user_meta($this->ID, $meta_key, $value);
             $display_name = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
+            $this->display_name = $display_name;
             wp_update_user(array('ID' => $this->ID, 'display_name' => $display_name));
             update_user_meta($this->ID, 'display_name', $display_name);
-            $this->display_name = $display_name;
             return true;
         } elseif ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return new Message('Cannot change the user-login.', Message::ERROR_MESSAGE); //cannot change user_login
