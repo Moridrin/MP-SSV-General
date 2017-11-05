@@ -33,6 +33,10 @@ function ssv_settings_page()
         } else {
             $customFieldFields = isset($_POST['custom_field_fields']) ? SSV_General::sanitize($_POST['custom_field_fields'], $fields) : array();
             User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
+            // Save atms options
+            foreach (['enabled', 'url', 'key'] as $opt) {
+                update_option('atms_' . $opt, $_POST['atms_' . $opt], true);
+            }
         }
     }
     ?>
@@ -67,6 +71,11 @@ function ssv_settings_page()
                     </select>
                 </td>
             </tr>
+            <input type="hidden" name="atms_enabled" value="0"/>
+            <tr><th>Integrate with ATMS</th><td><input type="checkbox" name="atms_enabled" value="1" <?= get_option('atms_enabled') ? 'checked' : '' ?>/></td></tr>
+            <tr><th>ATMS url</th><td><input type="text" name="atms_url" value="<?= get_option('atms_url') ?>"/></td></tr>
+            <tr><th>ATMS API key</th><td><input type="text" name="atms_key" value="<?= get_option('atms_key') ?>"/></td></tr>
+            
         </table>
         <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER, true, 'Reset Preference'); ?>
     </form>

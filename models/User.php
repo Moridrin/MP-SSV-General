@@ -45,7 +45,11 @@ class User extends \WP_User
         if ($id == null) {
             return false;
         }
-        $user = new User(get_user_by('id', $id));
+        if (get_user_meta($id, 'lidnr', true)) {
+            $user = new ExternalUser(get_user_by('id', $id));
+        } else {
+            $user = new User(get_user_by('id', $id));
+        }
         if ($user->ID != $id) {
             return false;
         }
@@ -62,7 +66,11 @@ class User extends \WP_User
         if (!is_user_logged_in()) {
             return false;
         }
-        return new User(wp_get_current_user());
+        $currentUser = wp_get_current_user();
+        if (get_user_meta($currentUser->ID, 'lidnr', true)) {
+            return new ExternalUser($currentUser);
+        }
+        return new User($currentUser);
     }
     #endregion
     #endregion
@@ -446,6 +454,16 @@ class User extends \WP_User
         $url = get_edit_user_link($this->ID);
         $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
+    }
+    #endregion
+
+    #region commitChanges()
+    /**
+     * Commit all pending changes to the database or API
+     */
+    public function commitChanges()
+    {
+        return true;
     }
     #endregion
 }

@@ -408,7 +408,7 @@ class Form
             },
             $tabID
         );
-
+        $this->user->commitChanges();
         //Files
         foreach ($_FILES as $name => $file) {
             if ($file['size'] == 0) {

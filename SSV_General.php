@@ -46,8 +46,10 @@ class SSV_General
             require_once 'functions.php';
             require_once 'options/options.php';
             require_once 'models/User.php';
+            require_once 'models/ExternalUser.php';
             require_once 'models/Message.php';
             require_once 'models/Form.php';
+            require_once 'ATMS_API.php';
             self::$initialized = true;
         }
     }
