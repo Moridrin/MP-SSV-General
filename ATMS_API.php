@@ -18,7 +18,7 @@ class ATMS_API
         'preffered_language' => 'prefered_lang',
         'registration_date' => 'joined_at',
         'postal_code' => 'zip_code',
-        'cotact_name' => 'name',
+        'contact_name' => 'name',
         'phone' => 'phone_number'
     ];
     public static function get($url, $token=null)
