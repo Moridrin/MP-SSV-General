@@ -45,7 +45,7 @@ class User extends \WP_User
         if ($id == null) {
             return false;
         }
-        if (get_user_meta($id, 'lidnr', true)) {
+        if (get_option('atms_enabled', false) && get_user_meta($id, 'lidnr', true)) {
             $user = new ExternalUser(get_user_by('id', $id));
         } else {
             $user = new User(get_user_by('id', $id));
@@ -67,7 +67,7 @@ class User extends \WP_User
             return false;
         }
         $currentUser = wp_get_current_user();
-        if (get_user_meta($currentUser->ID, 'lidnr', true)) {
+        if (get_option('atms_enabled', false) && get_user_meta($currentUser->ID, 'lidnr', true)) {
             return new ExternalUser($currentUser);
         }
         return new User($currentUser);

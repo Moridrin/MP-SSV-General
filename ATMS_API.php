@@ -21,6 +21,7 @@ class ATMS_API
         'contact_name' => 'name',
         'phone' => 'phone_number'
     ];
+    
     public static function get($url, $token=null)
     {
         $ch = curl_init();
