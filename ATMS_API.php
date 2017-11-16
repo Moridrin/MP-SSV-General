@@ -19,7 +19,8 @@ class ATMS_API
         'registration_date' => 'joined_at',
         'postal_code' => 'zip_code',
         'contact_name' => 'name',
-        'phone' => 'phone_number'
+        'phone' => 'phone_number',
+        'street' => 'address'
     ];
     
     public static function get($url, $token=null)
