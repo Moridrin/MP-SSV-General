@@ -12,7 +12,7 @@ class ATMS_API
         'display_name' => 'full_name',
         'address_city' => 'city',
         'address_postal_code' => 'zip_code',
-        'address_street' => 'street',
+        'address_street' => 'address',
         'at_ot_other' => 'type',
         'date_of_birth' => 'birthdate',
         'preffered_language' => 'prefered_lang',
