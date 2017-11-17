@@ -98,7 +98,11 @@ class ExternalUser extends User
      */
     function getMeta($meta_key, $default = '')
     {
-        $userData = ATMS_API::cache('member/' . $this->lidnr . '?with_updates=1');
+        try {
+            $userData = ATMS_API::cache('member/' . $this->lidnr . '?with_updates=1');
+        } catch (\Exception $e) {
+            return $default;
+        }
         if ($meta_key == "login" || $meta_key == "username" || $meta_key == "user_name" || $meta_key == "user_login") {
             return $this->user_login;
         }
