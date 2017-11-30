@@ -1,2 +1,2 @@
-# SSV-General
-The parent for all the SSV plugins.
+# General
+This repository contains lots of usefull functions I use in lots of WordPress plugins.
