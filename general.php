@@ -14,7 +14,7 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
     {
         wp_enqueue_script('mp-ssv-general-functions', SSV_General::URL . '/js/mp-ssv-general-functions.js', array('jquery'));
         wp_enqueue_script('mp-ssv-sortable-tables', SSV_General::URL . '/js/mp-ssv-sortable-tables.js', array('jquery', 'jquery-ui-sortable'));
-        if ($_GET["page"] == "ssv_settings") {
+        if (isset($_GET["page"]) && $_GET["page"] == "ssv_settings") {
             wp_enqueue_script('mp-ssv-custom-field-creator', SSV_General::URL . '/js/mp-ssv-custom-field-creator.js', array('jquery'));
             wp_localize_script('mp-ssv-custom-field-creator', 'settings', array('roles' => json_encode(array_keys(get_editable_roles())),));
         } else {

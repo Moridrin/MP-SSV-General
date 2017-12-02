@@ -182,7 +182,7 @@ class SSV_General
     }
     #endregion
 
-    #region getFormSecurityFields($adminReferer, $save, $reset)
+    #region getCapabilitiesDataList()
     /**
      * @return string HTML
      */
@@ -256,6 +256,28 @@ class SSV_General
         </datalist>
         <?php
         return ob_get_clean();
+    }
+    #endregion
+
+    #region getRoles(getRoles)
+    /**
+     * @return array
+     */
+    public static function getRoles(): array
+    {
+        ob_start();
+        if (function_exists('members_get_capabilities')) {
+            $roles = members_get_roles();
+        } else {
+            $roles = array(
+                'administrator',
+                'editor',
+                'author',
+                'contributor',
+                'subscriber',
+            );
+        }
+        return $roles;
     }
     #endregion
 
