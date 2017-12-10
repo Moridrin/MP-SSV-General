@@ -85,9 +85,6 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 			`json` TEXT NOT NULL
 		) $charset_collate;";
         $wpdb->query($sql);
-        if (!empty($wpdb->last_error)) {
-            SSV_General::var_export($wpdb->last_error, 1);
-        }
     }
     #endregion
 }
