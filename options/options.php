@@ -31,7 +31,7 @@ function ssv_settings_page()
             <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
             <a href="?page=<?= $_GET['page'] ?>&tab=shared-fields" class="nav-tab <?= $active_tab == 'shared-fields' ? 'nav-tab-active' : '' ?>">Shared Fields</a>
             <a href="?page=<?= $_GET['page'] ?>&tab=site-specific-fields" class="nav-tab <?= $active_tab == 'site-specific-fields' ? 'nav-tab-active' : '' ?>">Site Specific Fields</a>
-            <a href="http://bosso.nl/ssv-users/" target="_blank" class="nav-tab">
+            <a href="http://bosso.nl/plugins/ssv-general/" target="_blank" class="nav-tab">
                 Help <img src="<?= SSV_General::URL ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle" height="14">
             </a>
         </h2>
