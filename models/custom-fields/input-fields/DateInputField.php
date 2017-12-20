@@ -102,9 +102,9 @@ class DateInputField extends InputField
             'default_value'     => $this->defaultValue,
             'date_range_after'  => $this->dateRangeAfter,
             'date_range_before' => $this->dateRangeBefore,
-            'class'             => $this->class,
-            'style'             => $this->style,
-            'override_right'    => $this->overrideRight,
+            'class'             => $this->classes,
+            'style'             => $this->styles,
+            'override_right'    => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -120,8 +120,8 @@ class DateInputField extends InputField
         }
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $name        = 'name="' . esc_html($this->name) . '"';
-        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : '';
+        $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $placeholder = 'placeholder="yyyy-mm-dd"';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
@@ -129,7 +129,7 @@ class DateInputField extends InputField
         $dateAfter   = 'dateAfter="' . $this->dateRangeAfter . '"';
         $dateBefore  = 'dateBefore="' . $this->dateRangeBefore . '"';
 
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
+        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
             $disabled = '';
             $required = '';
         }
@@ -179,7 +179,7 @@ class DateInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && empty($this->value)) {
-            $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
 
         $date = DateTime::createFromFormat('Y-m-d', $this->value);

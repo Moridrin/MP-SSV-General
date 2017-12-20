@@ -3,6 +3,7 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
+use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -18,78 +19,17 @@ class LabelField extends Field
 {
     const FIELD_TYPE = 'label';
 
-    /** @var string $text */
     public $text;
 
-    /**
-     * TabField constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $text
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
-     */
-    protected function __construct($containerID, $order, $title, $text, $class, $style)
+    protected function __construct(int $id, string $title, string $name, int $order = null, string $text = '', array $classes = [], array $styles = [])
     {
-        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
         $this->text  = $text;
-        $this->class = $class;
-        $this->style = $style;
     }
 
-    /**
-     * @param string $json
-     *
-     * @return LabelField
-     * @throws Exception
-     */
-    public static function fromJSON($json)
+    public function getHTML(): string
     {
-        $values = json_decode($json);
-        if ($values->field_type != self::FIELD_TYPE) {
-            throw new Exception('Incorrect field type');
-        }
-        return new LabelField(
-            $values->container_id,
-            $values->order,
-            $values->title,
-            $values->text,
-            $values->class,
-            $values->style
-        );
-    }
-
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
-    {
-        $values = array(
-            'container_id' => $this->containerID,
-            'order'        => $this->order,
-            'title'        => $this->title,
-            'field_type'   => $this->fieldType,
-            'text'         => $this->text,
-            'class'        => $this->class,
-            'style'        => $this->style,
-        );
-        $values = json_encode($values);
-        return $values;
-    }
-
-    /**
-     * @return string the field as HTML object.
-     */
-    public function getHTML()
-    {
-        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        ob_start();
-        ?>
-        <p <?= $class ?> <?= $style ?>><?= esc_html($this->text) ?></p><br/>
-        <?php
-        return ob_get_clean();
+        $labelId = SSV_General::escape('label_'.$this->id, 'attr');
+        return '<p '.$this->getElementAttributesString($labelId).'>'.SSV_General::escape($this->text, 'html').'</p><br/>';
     }
 }

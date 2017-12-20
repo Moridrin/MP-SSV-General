@@ -84,9 +84,9 @@ class ImageInputField extends InputField
             'name'           => $this->name,
             'preview'        => $this->preview,
             'required'       => $this->required,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -98,11 +98,11 @@ class ImageInputField extends InputField
     public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
-        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
-        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class    = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate"';
+        $style    = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $required = $this->required && !empty($this->value) ? 'required="required"' : '';
 
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
+        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
             $required = '';
         }
 
@@ -160,9 +160,9 @@ class ImageInputField extends InputField
     {
         $errors = array();
         if ($this->required && empty($this->value)) {
-            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, SSV_General::BASE_URL)) {
-            $errors[] = new Message($this->title . ' has an incorrect url.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' has an incorrect url.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

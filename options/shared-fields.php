@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable       = SSV_General::CUSTOM_FIELDS_TABLE;
+$baseTable       = SSV_General::BASE_FIELDS_TABLE;
 $customizedTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
 
 if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
@@ -108,7 +108,7 @@ echo SSV_General::getInputTypeDataList();
                     <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
                 </div>
                 <script>
-                    var i = <?= max(array_keys($baseFields)) + 1 ?>;
+                    var i = <?= count($baseFields) > 0 ? max(array_keys($baseFields)) + 1 : 1 ?>;
                     function mp_ssv_add_new_custom_field() {
                         mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                         i++;

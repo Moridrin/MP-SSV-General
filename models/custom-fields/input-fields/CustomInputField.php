@@ -19,33 +19,14 @@ if (!defined('ABSPATH')) {
  */
 class CustomInputField extends InputField
 {
-    /** @var bool $disabled */
     public $disabled;
-    /** @var array $required */
     public $required;
-    /** @var string $defaultValue */
     public $defaultValue;
-    /** @var string $placeholder */
     public $placeholder;
 
-    /**
-     * CustomInputField constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $inputType
-     * @param string $name
-     * @param bool   $disabled
-     * @param string $required
-     * @param string $defaultValue
-     * @param string $placeholder
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
-     */
-    protected function __construct($containerID, $order, $title, $inputType, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
+    protected function __construct(int $id, string $name, string $title, string $type, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [], bool $disabled = false, bool $required = false, bool $defaultChecked = false)
     {
-        parent::__construct($containerID, $order, $title, $inputType, $name, $class, $style, $overrideRight);
+        parent::__construct($id, $name, $title, $type, $order, $classes, $styles, $overrideRights);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
         $this->defaultValue = $defaultValue;
@@ -93,9 +74,9 @@ class CustomInputField extends InputField
             'required'       => $this->required,
             'default_value'  => $this->defaultValue,
             'placeholder'    => $this->placeholder,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -109,25 +90,34 @@ class CustomInputField extends InputField
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $inputType   = 'type="' . esc_html($this->inputType) . '"';
         $name        = 'name="' . esc_html($this->name) . '"';
-        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : '';
+        $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
 
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
+        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
             $disabled = '';
             $required = '';
         }
 
         ob_start();
-        ?>
-        <div>
-            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-            <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
-        </div>
-        <?php
+        if (current_theme_supports('materialize')) {
+            ?>
+            <div>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+                <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div>
+                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+                <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/><br/>
+            </div>
+            <?php
+        }
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
@@ -149,23 +139,23 @@ class CustomInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && empty($this->value)) {
-            $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' field is required but not set.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         switch (strtolower($this->inputType)) {
             case 'iban':
                 $this->value = str_replace(' ', '', strtoupper($this->value));
                 if (!empty($this->value) && !SSV_General::isValidIBAN($this->value)) {
-                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid IBAN.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
             case 'email':
                 if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid email.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid email.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
             case 'url':
                 if (!filter_var($this->value, FILTER_VALIDATE_URL)) {
-                    $errors[] = new Message($this->title . ' field is not a valid url.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+                    $errors[] = new Message($this->title . ' field is not a valid url.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;
         }

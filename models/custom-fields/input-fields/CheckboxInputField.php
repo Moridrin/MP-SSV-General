@@ -5,6 +5,7 @@ namespace mp_ssv_general\custom_fields\input_fields;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
+use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -21,117 +22,46 @@ class CheckboxInputField extends InputField
 {
     const INPUT_TYPE = 'checkbox';
 
-    /** @var bool $disabled */
     public $disabled;
-    /** @var bool $required */
     public $required;
-    /** @var bool $defaultChecked */
     public $defaultChecked;
 
-    /**
-     * CheckboxInputField constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $name
-     * @param bool   $disabled
-     * @param string $required
-     * @param string $defaultChecked
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
-     */
-    protected function __construct($containerID, $order, $title, $name, $disabled, $required, $defaultChecked, $class, $style, $overrideRight)
+    protected function __construct(int $id, string $name, string $title, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [], bool $disabled = false, bool $required = false, bool $defaultChecked = false)
     {
-        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
-        $this->disabled       = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
-        $this->required       = filter_var($required, FILTER_VALIDATE_BOOLEAN);
-        $this->defaultChecked = filter_var($defaultChecked, FILTER_VALIDATE_BOOLEAN);
-    }
-
-    /**
-     * @param string $json
-     *
-     * @return CheckboxInputField
-     * @throws Exception
-     */
-    public static function fromJSON($json)
-    {
-        $values = json_decode($json);
-        if ($values->input_type != self::INPUT_TYPE) {
-            throw new Exception('Incorrect input type');
+        parent::__construct($id, $name, $title, self::INPUT_TYPE, $order, $classes, $styles, $overrideRights);
+        $this->disabled     = $disabled;
+        $this->required     = $required;
+        $this->defaultChecked = $defaultChecked;
+        $checkboxId = SSV_General::escape('checkbox_'.$this->id, 'attr');
+        if (!isset($this->classes[$checkboxId])) {
+            $this->classes[$checkboxId] = ['validate', 'filled-id'];
         }
-        return new CheckboxInputField(
-            $values->container_id,
-            $values->order,
-            $values->title,
-            $values->name,
-            $values->disabled,
-            $values->required,
-            $values->default_checked,
-            $values->class,
-            $values->style,
-            $values->override_right
-        );
-    }
-
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
-    {
-        $values = array(
-            'container_id'    => $this->containerID,
-            'order'           => $this->order,
-            'title'           => $this->title,
-            'field_type'      => $this->fieldType,
-            'input_type'      => $this->inputType,
-            'name'            => $this->name,
-            'disabled'        => $this->disabled,
-            'required'        => $this->required,
-            'default_checked' => $this->defaultChecked,
-            'class'           => $this->class,
-            'style'           => $this->style,
-            'override_right'  => $this->overrideRight,
-        );
-        $values = json_encode($values);
-        return $values;
-    }
-
-    /**
-     * @return string the field as HTML object.
-     */
-    public function getHTML()
-    {
-        $isChecked = is_bool($this->value) ? $this->value : $this->defaultChecked;
-        $name      = 'name="' . esc_html($this->name) . '"';
-        $class     = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
-        $style     = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        $required  = $this->required ? 'required="required"' : '';
-        $disabled  = disabled($this->disabled, true, false);
-        $checked   = checked($isChecked, true, false);
-
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
-            $disabled = '';
-            $required = '';
+        if (in_array('!validate', $this->classes[$checkboxId])) {
+            $this->classes[$checkboxId] = array_diff($this->classes[$checkboxId], ['!validate', 'validate']);
         }
+        if (in_array('!filled-in', $this->classes[$checkboxId])) {
+            $this->classes[$checkboxId] = array_diff($this->classes[$checkboxId], ['!filled-in', 'filled-in']);
+        }
+    }
 
+    public function getHTML(): string
+    {
+        $divId = SSV_General::escape('div_'.$this->id, 'attr');
+        $hiddenId = SSV_General::escape('fallback_'.$this->id, 'attr');
+        $checkboxId = SSV_General::escape('checkbox_'.$this->id, 'attr');
+        $labelId = SSV_General::escape('label_'.$this->id, 'attr');
         ob_start();
         ?>
-        <div <?= $style ?>>
-            <input type="hidden" id="<?= esc_html($this->order) ?>_reset" <?= $name ?> value="false"/>
-            <input type="checkbox" id="<?= esc_html($this->order) ?>" <?= $name ?> value="true" <?= $class ?> <?= $checked ?> <?= $disabled ?> <?= $required ?>/>
-            <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+        <div <?= $this->getElementAttributesString($divId) ?>>
+            <input type="hidden" value="false" <?= $this->getElementAttributesString($hiddenId, '_reset') ?>/>
+            <input type="checkbox"  value="true" <?= $this->getElementAttributesString($checkboxId, '', true, true, true) ?>/>
+            <label for="<?= $checkboxId ?>" <?= $this->getElementAttributesString($labelId) ?>><?= SSV_General::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
         </div>
         <?php
-
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
-    /**
-     * @return string the filter for this field as HTML object.
-     */
-    public function getFilterRow()
+    public function getFilterRow(): string
     {
         ob_start();
         ?>
@@ -149,18 +79,9 @@ class CheckboxInputField extends InputField
     public function isValid()
     {
         $errors = array();
-        if (($this->required && !$this->disabled) && (empty($this->value) || !is_bool($this->value) || !$this->value)) {
-            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+        if (($this->required && !$this->disabled) && $this->getValue() !== true) {
+            $errors[] = new Message($this->title . ' is required but checked.', $this->currentUserCanOcerride() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
-        return empty($errors) ? true : $errors;
-    }
-
-    /**
-     * @param string|array|User|mixed $value
-     */
-    public function setValue($value)
-    {
-        parent::setValue($value);
-        $this->value = filter_var($this->value, FILTER_VALIDATE_BOOLEAN);
+        return empty($errors) ?: $errors;
     }
 }

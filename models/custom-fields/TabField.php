@@ -3,6 +3,7 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
+use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -19,89 +20,32 @@ class TabField extends Field
     const FIELD_TYPE = 'tab';
 
     public $fields;
-    public $name;
 
-    /**
-     * TabField constructor.
-     *
-     * @param int     $order
-     * @param string  $title
-     * @param string  $class
-     * @param string  $style
-     * @param Field[] $fields
-     */
-    protected function __construct($containerID, $order, $title, $class, $style, $fields = array())
+    protected function __construct(int $id, string $title, string $name, int $order = null, array $fields = [], array $classes = [], array $styles = [])
     {
-        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
         $this->fields = $fields;
-        $this->name   = strtolower(str_replace(' ', '_', $title));
+        $tabId = SSV_General::escape('tab_'.$this->id, 'attr');
+        if (!isset($this->classes[$tabId])) {
+            $this->classes[$tabId] = ['tab'];
+        }
+        if (in_array('!tab', $this->classes[$tabId])) {
+            $this->classes[$tabId] = array_diff($this->classes[$tabId], ['!tab', 'tab']);
+        }
     }
 
-    /**
-     * @param int   $id
-     * @param Field $field
-     */
-    public function addField($id, $field)
+    public function addField(int $id, Field $field)
     {
         $this->fields[$id] = $field;
     }
 
-    /**
-     * @param string $json
-     *
-     * @return TabField
-     * @throws Exception
-     */
-    public static function fromJSON($json)
+    public function getHTML(): string
     {
-        $values = json_decode($json);
-        if ($values->field_type != self::FIELD_TYPE) {
-            throw new Exception('Incorrect field type');
+        $tabId = SSV_General::escape('tab_'.$this->id, 'attr');
+        $aId = SSV_General::escape('a_'.$this->id, 'attr');
+        if (isset($_POST['tab']) && $_POST['tab'] == $this->order) {
+            $this->classes[$tabId][] = 'active';
         }
-        $fields = array();
-        for ($i = 1; $i <= $values->fieldCount; $i++) {
-            $fields[] = Field::getByOrder($values->container_id, ($values->order + $i));
-        }
-        return new TabField(
-            $values->container_id,
-            $values->order,
-            $values->title,
-            $values->class,
-            $values->style,
-            $fields
-        );
-    }
-
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
-    {
-        $values = array(
-            'container_id' => $this->containerID,
-            'order'        => $this->order,
-            'title'        => $this->title,
-            'field_type'   => $this->fieldType,
-            'class'        => $this->class,
-            'style'        => $this->style,
-            'fieldCount'   => count($this->fields),
-        );
-        $values = json_encode($values);
-        return $values;
-    }
-
-    /**
-     * @return string the field as HTML object.
-     */
-    public function getHTML()
-    {
-        $activeClass = isset($_POST['tab']) && $_POST['tab'] == $this->order ? 'active' : '';
-        $class       = !empty($this->class) ? 'class="tab ' . esc_html($this->class) . '"' : 'class="tab ' . esc_html($activeClass) . '"';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
-        ob_start();
-        ?>
-        <li <?= $class ?> <?= $style ?>><a href="#<?= esc_html($this->name) ?>"><?= esc_html($this->title) ?></a></li>
-        <?php
-        return ob_get_clean();
+        return '<li '.$this->getElementAttributesString($tabId).'><a '.$this->getElementAttributesString($aId).'>'.SSV_General::escape($this->title, 'html').'</a></li>';
     }
 }

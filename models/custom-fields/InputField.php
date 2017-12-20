@@ -12,6 +12,7 @@ use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
 use mp_ssv_general\custom_fields\input_fields\SelectInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
+use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 
@@ -35,101 +36,51 @@ require_once 'input-fields/RoleSelectInputField.php';
  * Date: 6-1-17
  * Time: 6:38
  */
-class InputField extends Field
+abstract class InputField extends Field
 {
     const FIELD_TYPE = 'input';
 
-    /** @var string $inputType */
     public $inputType;
-    /** @var string $name */
-    public $name;
-    /** @var string $overrideRight */
-    public $overrideRight;
-    /** @var string $value */
-    public $value;
+    private $overrideRights;
+    private $value;
 
-    /**
-     * InputField constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $inputType
-     * @param string $name
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
-     */
-    protected function __construct($containerID, $order, $title, $inputType, $name, $class, $style, $overrideRight)
+    protected function __construct(int $id, string $name, string $title, string $inputType, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [])
     {
-        parent::__construct($containerID, $order, $title, self::FIELD_TYPE, $class, $style);
+        parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
         $this->inputType     = $inputType;
-        $this->name          = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
-        $this->overrideRight = $overrideRight;
+        $this->overrideRights = $overrideRights;
     }
 
-    /**
-     * @param string $json
-     *
-     * @return InputField
-     */
-    public static function fromJSON($json)
+    public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);
         switch ($values->input_type) {
             case TextInputField::INPUT_TYPE:
-                return TextInputField::fromJSON($json);
+                return new TextInputField(...json_decode($json, true));
             case SelectInputField::INPUT_TYPE:
-                return SelectInputField::fromJSON($json);
+                return new SelectInputField(...json_decode($json, true));
             case CheckboxInputField::INPUT_TYPE:
-                return CheckboxInputField::fromJSON($json);
+                return new CheckboxInputField(...json_decode($json, true));
             case DateInputField::INPUT_TYPE:
-                return DateInputField::fromJSON($json);
+                return new DateInputField(...json_decode($json, true));
             case RoleCheckboxInputField::INPUT_TYPE:
-                return RoleCheckboxInputField::fromJSON($json);
+                return new RoleCheckboxInputField(...json_decode($json, true));
             case RoleSelectInputField::INPUT_TYPE:
-                return RoleSelectInputField::fromJSON($json);
+                return new RoleSelectInputField(...json_decode($json, true));
             case ImageInputField::INPUT_TYPE:
-                return ImageInputField::fromJSON($json);
+                return new ImageInputField(...json_decode($json, true));
             case HiddenInputField::INPUT_TYPE:
-                return HiddenInputField::fromJSON($json);
+                return new HiddenInputField(...json_decode($json, true));
             default:
-                return CustomInputField::fromJSON($json);
+                return new CustomInputField(...json_decode($json, true));
         }
     }
 
-    /**
-     * @return string the class as JSON object.
-     * @throws Exception if the method is not implemented by a sub class.
-     */
-    public function toJSON()
-    {
-        throw new Exception('This should be implemented in a sub class.');
-    }
+    public abstract function getHTML(): string;
 
-    /**
-     * @return string the field as HTML object.
-     * @throws Exception if the method is not implemented by a sub class.
-     */
-    public function getHTML()
-    {
-        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
-    }
+    public abstract function getFilterRow(): string;
 
-    /**
-     * @return string the field as HTML object.
-     * @throws Exception if the method is not implemented by a sub class.
-     */
-    public function getFilterRow()
-    {
-        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
-    }
-
-    /**
-     * @param string $filter HTML string with the filter rows.
-     *
-     * @return string the field as HTML object.
-     */
-    public function getFilterRowBase($filter)
+    public function getFilterRowBase(string $filter): string
     {
         ob_start();
         ?>
@@ -150,53 +101,36 @@ class InputField extends Field
     }
 
     /**
-     * @return array|bool array of errors or true if no errors.
-     * @throws Exception if the method is not implemented by a sub class.
+     * @return Message[]|bool array of errors or true if no errors.
      */
-    public function isValid()
+    public abstract function isValid();
+
+    public function getValue(): mixed
     {
-        throw new Exception('This should be implemented in sub class: ' . get_class($this) . '.');
+        return $this->value;
     }
 
-    /**
-     * @param string|array|User|mixed $value
-     */
-    public function setValue($value)
+    public function setValue($value): void
     {
-        if (get_class($this) == HiddenInputField::class) {
+        if ($this instanceof HiddenInputField) {
             return; //Can't change the value of hidden fields.
         }
         if ($value instanceof User) { //User values can always be set (even if isDisabled())
             $this->value = $value->getMeta($this->name);
         } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
-                $this->value = SSV_General::sanitize($value[$this->name], $this->name);
+                $this->value = SSV_General::sanitize($value[$this->name], $this->inputType);
             }
         } else {
-            $this->value = SSV_General::sanitize($value, $this->name);
+            $this->value = SSV_General::sanitize($value, $this->inputType);
         }
     }
 
-    /**
-     * @return bool returns if the field is disabled or not.
-     */
-    public function isDisabled()
+    public function isDisabled(): bool
     {
-        if ($this instanceof CheckboxInputField
-            || $this instanceof CustomInputField
-            || $this instanceof SelectInputField
-            || $this instanceof TextInputField
-        ) {
-            return $this->disabled;
-        } else {
-            return false;
-        }
+        return isset($this->disabled) ? $this->disabled : false;
     }
 
-    /**
-     * @param int $id     is the new ID for the field (it currently has the old ID to find the old row).
-     * @param int $postID is the ID of the post.
-     */
     public function updateName($id, $postID)
     {
         global $wpdb;
@@ -227,7 +161,17 @@ class InputField extends Field
         );
     }
 
-    function __toString()
+    public function currentUserCanOcerride(): bool
+    {
+        foreach ($this->overrideRights as $overrideRight) {
+            if (current_user_can($overrideRight)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function __toString(): string
     {
         return $this->name;
     }

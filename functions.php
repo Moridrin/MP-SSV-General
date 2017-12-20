@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-#region Functions that should be in PHP
 /**
  * @param string $string
  * @param bool   $capitalizeFirstCharacter
@@ -96,4 +95,3 @@ function mp_ssv_ends_with($haystack, $needle)
 {
     return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
 }
-#endregion

@@ -14,247 +14,97 @@ require_once 'HeaderField.php';
 require_once 'InputField.php';
 require_once 'LabelField.php';
 
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 5-1-17
- * Time: 20:25
- */
 abstract class Field
 {
-    #region Constants
-    const PREFIX = 'custom_field_';
-    const CUSTOM_FIELD_IDS_META = 'custom_field_ids';
-    #endregion
-
-    #region Variables
-    /** @var int $containerID */
-    public $containerID = 0;
-    /** @var int $order */
-    public $order;
-    /** @var string $title */
+    protected $id;
+    public $name;
     public $title;
-    /** @var string $fieldType */
     public $fieldType;
-    /** @var string $class */
-    public $class;
-    /** @var string $style */
-    public $style;
-    #endregion
+    public $order;
+    public $classes;
+    public $styles;
 
-    #region __construct($id, $title, $fieldType, $class, $style, $overrideRight)
-    /**
-     * Field constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $fieldType
-     * @param string $class
-     * @param string $style
-     */
-    protected function __construct($containerID, $order, $title, $fieldType, $class, $style)
+    protected function __construct(int $id, string $title, string $fieldType, string $name = null, int $order = null, array $classes = [], array $styles = [])
     {
-        $this->containerID = $containerID ? $containerID : 0;
-        $this->order       = $order;
-        $this->title       = $title;
-        $this->fieldType   = $fieldType;
-        $this->class       = $class;
-        $this->style       = $style;
+        $this->id = $id;
+        if ($name !== null) {
+            $this->name = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
+        }
+        $this->title = $title;
+        $this->fieldType = $fieldType;
+        if ($order === null) {
+            $order = $id;
+        }
+        $this->order = $order;
+        $this->classes = $classes;
+        $this->styles = $styles;
     }
-    #endregion
 
-    /**
-     * @param string $name
-     *
-     * @return string with the title for that field or empty if no match is found.
-     */
-    public static function titleFromDatabase($name)
+    public static function titleFromDatabase(string $name): string
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table  = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $sql    = "SELECT customField FROM $table WHERE customField LIKE '%\"name\":\"$name\"%'";
-        $fields = $wpdb->get_results($sql);
-        foreach ($fields as $field) {
-            $field = self::fromJSON($field->customField);
-            if ($field instanceof TabField) {
-                foreach ($field->fields as $childField) {
-                    if ($childField instanceof InputField) {
-                        if ($childField->name == $name) {
-                            return $childField->title;
-                        }
-                    }
-                }
-            } elseif ($field instanceof InputField && $field->name == $name) {
-                return $field->title;
-            }
-        }
-        return '';
+        $table  = SSV_General::BASE_FIELDS_TABLE;
+        return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
-    #region fromJSON($json)
-
-    /**
-     * This function extracts a Field from the JSON string.
-     *
-     * @param string $json
-     *
-     * @return Field
-     * @throws Exception if the field type is unknown.
-     */
-    public static function fromJSON($json)
+    public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);
         switch ($values->field_type) {
             case InputField::FIELD_TYPE:
                 return InputField::fromJSON($json);
             case TabField::FIELD_TYPE:
-                return TabField::fromJSON($json);
+                return new TabField(...json_decode($json, true));
             case HeaderField::FIELD_TYPE:
-                return HeaderField::fromJSON($json);
+                return new HeaderField(...json_decode($json, true));
             case LabelField::FIELD_TYPE:
-                return LabelField::fromJSON($json);
+                return new LabelField(...json_decode($json, true));
         }
         throw new Exception($values->field_type . ' is an unknown field type');
     }
-    #endregion
 
-    #region fromDatabase($row)
-    /**
-     * This function extracts a Field from the JSON string.
-     *
-     * @param object $row
-     *
-     * @return Field
-     */
-    public static function fromDatabase($row)
+    public function toJSON(): string
     {
-        /** @var \wpdb $wpdb */
-        global $wpdb;
-        $baseTable     = SSV_General::CUSTOM_FIELDS_TABLE;
-        $baseSiteTable = SSV_General::CUSTOM_SITE_FIELDS_TABLE;
+        return get_object_vars($this);
+    }
 
-        $rowJSON               = json_decode($row->json);
-        $rowJSON->container_id = $row->containerID;
-        $rowJSON->order        = $row->order;
-        $rowJSON->name         = $row->name;
-        if ($row->name !== null) {
-            $baseField = $wpdb->get_row("SELECT * FROM $baseSiteTable WHERE `name` = '$row->name'");
-            if ($baseField == null) { //If there isn't a Base Field in the Site Specific Fields -> use the Shared Base Field
-                $baseField = $wpdb->get_row("SELECT * FROM $baseTable WHERE `name` = '$row->name'");
+    abstract public function getHTML(): string;
+
+    protected function getElementAttributesString(string $elementId, string $nameSuffix = null, bool $withRequired = false, bool $withDisabled = false, bool $withChecked = false): string
+    {
+        $attributesString = 'id="'.$elementId.'"';
+        if (isset($this->classes[$elementId])) {
+            $attributesString .= ' class="' . SSV_General::escape($this->classes[$elementId], 'attr', ' ') . '"';
+        }
+        if (isset($this->styles[$elementId])) {
+            $attributesString .= ' style="' . SSV_General::escape($this->styles[$elementId], 'attr', ' ') . '"';
+        }
+        if ($this instanceof InputField) {
+            $currentUserCanOverride = $this->currentUserCanOcerride();
+            if ($nameSuffix !== null) {
+                $attributesString .= ' name="'.SSV_General::escape($this->name.$nameSuffix, 'attr').'"';
             }
-            $baseFieldJSON       = json_decode($baseField->json);
-            $rowJSON->field_type = $baseFieldJSON->field_type;
-            $rowJSON->input_type = $baseFieldJSON->input_type;
-            $rowJSON->options    = $baseFieldJSON->options;
-            $rowJSON->value      = $baseFieldJSON->value;
-        }
-        $rowJSON = json_encode($rowJSON);
-        $row     = Field::fromJSON($rowJSON);
-        return $row;
-    }
-    #endregion
-
-    #region getByID($fieldID)
-    /**
-     * @param int $order
-     *
-     * @return Field
-     */
-    public static function getByOrder($containerID = 0, $order)
-    {
-        global $post;
-        if ($post != null) {
-            $postID = $post->ID;
-        }
-        if (!isset($postID)) {
-            return null;
-        }
-
-        /** @var \wpdb $wpdb */
-        global $wpdb;
-        $rowTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
-        $field    = $wpdb->get_row("SELECT * FROM $rowTable WHERE postID = $postID AND `containerID` = $containerID AND `order` = $order");
-        return Field::fromDatabase($field);
-    }
-    #endregion
-
-    #region toJSON($encode = true)
-    /**
-     * This function creates an array containing all variables of this Field.
-     *
-     * @return string the class as JSON object.
-     */
-    abstract public function toJSON();
-    #endregion
-
-    #region getHTML()
-    /**
-     * This function returns a string with the Field as HTML (to be used in the frontend).
-     *
-     * @return string the field as HTML object.
-     */
-    abstract public function getHTML();
-    #endregion
-
-    #region getMaxID($fields)
-    /**
-     * This function returns the highest ID in all the fields (including all sub-fields)
-     *
-     * @param Field[] $fields
-     *
-     * @return int the max ID
-     */
-    public static function getMaxID($fields)
-    {
-        $maxID = 0;
-        foreach ($fields as $field) {
-            $maxID = $field->order > $maxID ? $field->order : $maxID;
-            if ($field instanceof TabField) {
-                foreach ($field->fields as $tabField) {
-                    $maxID = $tabField->order > $maxID ? $tabField->order : $maxID;
-                }
+            if (!$currentUserCanOverride && $withRequired && isset($this->required)) {
+                $attributesString .= $this->required ? 'required="required"' : '';
+            }
+            if (!$currentUserCanOverride && $withDisabled && isset($this->disabled)) {
+                $attributesString .= disabled($this->disabled, true, false);
+            }
+            if ($withChecked && isset($this->checked)) {
+                $attributesString .= checked($this->checked, true, false);
             }
         }
-        return $maxID;
+        return $attributesString;
     }
-    #endregion
 
-    #region __compare($field)
-    /**
-     * @param Field $a
-     * @param Field $b
-     *
-     * @return int -1 / 0 / 1
-     */
-    public static function compare($a, $b)
+    public function __compare(Field $field): int
     {
-        return $a->__compare($b);
+        return $this->order <=> $field->order;
     }
-    #endregion
 
-    #region __compare($field)
-    /**
-     * @param Field $field
-     *
-     * @return int -1 / 0 / 1
-     */
-    public function __compare($field)
-    {
-        if ($this->order == $field->order) {
-            return 0;
-        }
-        return ($this->order < $field->order) ? -1 : 1;
-    }
-    #endregion
-
-    #region __toString()
-    /**
-     * @return string HTML code for the field
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getHTML();
     }
-    #endregion
 }
