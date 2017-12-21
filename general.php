@@ -23,9 +23,9 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
         wp_enqueue_script('mp-ssv-general-functions', SSV_General::URL . '/js/mp-ssv-general-functions.js', ['jquery']);
         wp_enqueue_script('mp-ssv-sortable-tables', SSV_General::URL . '/js/mp-ssv-sortable-tables.js', ['jquery', 'jquery-ui-sortable']);
         if (isset($_GET["page"]) && $_GET["page"] == "ssv_settings") {
-            wp_enqueue_script('mp-ssv-custom-field-creator', SSV_General::URL . '/js/mp-ssv-custom-field-creator.js', ['jquery']);
-            wp_localize_script('mp-ssv-custom-field-creator', 'settings', ['roles' => json_encode(array_keys(get_editable_roles())),]);
+            wp_enqueue_script('mp-ssv-base-fields-manager', SSV_General::URL . '/js/mp-ssv-base-fields-manager.js', ['jquery']);
         } else {
+            wp_enqueue_script('mp-ssv-base-fields-manager', SSV_General::URL . '/js/mp-ssv-base-fields-manager.js', ['jquery']);
             wp_enqueue_script('mp-ssv-custom-field-customizer', SSV_General::URL . '/js/mp-ssv-custom-field-customizer.js', ['jquery']);
             wp_localize_script(
                 'mp-ssv-custom-field-customizer',
@@ -54,7 +54,6 @@ if (!class_exists('mp_ssv_general\SSV_General')) {
 			`bf_id` bigint(20) NOT NULL PRIMARY KEY,
 			`bf_name` VARCHAR(50) UNIQUE,
 			`bf_title` VARCHAR(50) NOT NULL,
-			`bf_type` VARCHAR(50),
 			`bf_inputType` VARCHAR(50)
 		) $charset_collate;";
         $wpdb->query($sql);
