@@ -27,7 +27,6 @@ function ssv_form_fields_creator_menu_page_network_admin()
     /** @var wpdb $wpdb */
     global $wpdb;
     $baseTable       = SSV_General::BASE_FIELDS_TABLE;
-    $customizedTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
 
     if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
         if (isset($_POST['reset'])) {
@@ -39,12 +38,9 @@ function ssv_form_fields_creator_menu_page_network_admin()
             if (current_user_can('remove_custom_fields')) {
                 if (!empty($fieldIds)) {
                     $databaseFieldIds = implode(", ", $fieldIds);
-                    $databaseOldFieldIds           = implode(', ', $wpdb->get_results("SELECT bf_id FROM $baseTable WHERE bf_id NOT IN ($databaseFieldIds)"));
                     $wpdb->query("DELETE FROM $baseTable WHERE bf_id NOT IN ($databaseFieldIds)");
-                    $wpdb->query("DELETE FROM $customizedTable WHERE cf_bf_id IN ($databaseOldFieldIds)");
                 } else {
                     $wpdb->query("TRUNCATE $baseTable");
-                    $wpdb->query("TRUNCATE $customizedTable");
                     $fieldIds = [];
                 }
             }
@@ -63,46 +59,36 @@ function ssv_form_fields_creator_menu_page_network_admin()
                         unset($properties[$key]);
                     }
                 }
-                $properties['bf_type'] = InputField::FIELD_TYPE;
-                $wpdb->replace(SSV_General::BASE_FIELDS_TABLE, $properties);
 //                /** @var InputField $field */
 //                $field   = Field::fromJSON(json_encode($properties));
 //                SSV_General::var_export($field, 1);
-//                $oldName = $wpdb->get_row("SELECT `name` FROM $baseTable WHERE ID = $fieldId")->name;
-//                $name    = $field->name;
-//                if ($oldName !== null && $name != $oldName) {
-//                    $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
-//                    $wpdb->update($customizedTable, array('name' => $name), array('name' => $oldName));
-//                }
-//                if (current_user_can('edit_custom_fields')) {
-//                    $wpdb->replace(
-//                        $baseTable,
-//                        array(
-//                            'ID'    => $fieldId,
-//                            'name'  => $name,
-//                            'title' => $field->title,
-//                            'json'  => $field->toJSON(),
-//                        )
-//                    );
-//                } elseif (current_user_can('add_custom_fields')) {
-//                    $wpdb->insert(
-//                        $baseTable,
-//                        array(
-//                            'ID'    => $fieldId,
-//                            'name'  => $name,
-//                            'title' => $field->title,
-//                            'json'  => $field->toJSON(),
-//                        )
-//                    );
-//                }
+                $oldName = $wpdb->get_row("SELECT `bf_name` FROM $baseTable WHERE ID = $fieldId")->name;
+                $name    = $properties['bf_name'];
+                if ($oldName !== null && $name != $oldName) {
+                    $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
+                    $wpdb->update($customizedTable, array('name' => $name), array('name' => $oldName));
+                }
+                if (current_user_can('edit_custom_fields')) {
+                    $wpdb->replace(SSV_General::BASE_FIELDS_TABLE, $properties);
+                } elseif (current_user_can('add_custom_fields')) {
+                    $wpdb->insert(
+                        $baseTable,
+                        array(
+                            'ID'    => $fieldId,
+                            'name'  => $name,
+                            'title' => $field->title,
+                            'json'  => $field->toJSON(),
+                        )
+                    );
+                }
             }
         }
     }
     $baseFields = $wpdb->get_results("SELECT * FROM $baseTable");
-    $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
-    echo SSV_General::getInputTypeDataList();
+    $baseFields = array_combine(array_column($baseFields, 'bf_id'), $baseFields);
+    echo SSV_General::getInputTypeDataList(['Role Checkbox', 'Role Select']);
     ?>
-    <h1>Form Fields</h1>
+    <h1>Shared Form Fields</h1>
     <p>These fields will be available for all sites.</p>
     <?php if (!current_user_can('add_custom_fields')): ?>
     <div class="notice">
@@ -125,18 +111,18 @@ function ssv_form_fields_creator_menu_page_network_admin()
                 <td colspan="2" style="padding: 0;">
                     <div style="overflow-x: auto;">
                         <table id="shared-custom-fields-placeholder"></table>
-                        <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
+                        <button type="button" onclick="mp_ssv_add_new_base_input_field()" style="margin-top: 10px;">Add Field</button>
                     </div>
                     <script>
                         var i = <?= count($baseFields) > 0 ? max(array_keys($baseFields)) + 1 : 1 ?>;
 
-                        function mp_ssv_add_new_custom_field() {
-                            mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
+                        function mp_ssv_add_new_base_input_field() {
+                            mp_ssv_add_base_input_field('shared-custom-fields-placeholder', i, '', '', '');
+                            document.getElementById(i+'_title').focus();
                             i++;
                         }
-                        <?php foreach($baseFields as $fieldId => $baseField): ?>
-                        <?php $field = Field::fromJSON($baseField->json); ?>
-                        mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', <?= $fieldId ?>, '<?= isset($field->inputType) ? esc_html($field->inputType) : '' ?>', <?= $field->toJSON() ?>, false);
+                        <?php foreach($baseFields as $baseField): ?>
+                        mp_ssv_add_base_input_field('shared-custom-fields-placeholder', <?= $baseFields->bf_id ?>, '<?= $baseField->bf_title ?>', '<?= $baseField->bf_name ?>', '<?= $baseField->bf_inputType ?>');
                         <?php endforeach; ?>
                     </script>
                 </td>
