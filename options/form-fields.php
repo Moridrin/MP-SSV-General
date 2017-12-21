@@ -1,7 +1,5 @@
 <?php
 
-use mp_ssv_general\custom_fields\Field;
-use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
@@ -26,7 +24,7 @@ function ssv_form_fields_creator_menu_page_network_admin()
 {
     /** @var wpdb $wpdb */
     global $wpdb;
-    $baseTable       = SSV_General::BASE_FIELDS_TABLE;
+    $baseTable = SSV_General::BASE_FIELDS_TABLE;
 
     if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
         if (isset($_POST['reset'])) {
@@ -59,27 +57,16 @@ function ssv_form_fields_creator_menu_page_network_admin()
                         unset($properties[$key]);
                     }
                 }
-//                /** @var InputField $field */
-//                $field   = Field::fromJSON(json_encode($properties));
-//                SSV_General::var_export($field, 1);
-                $oldName = $wpdb->get_row("SELECT `bf_name` FROM $baseTable WHERE ID = $fieldId")->name;
-                $name    = $properties['bf_name'];
-                if ($oldName !== null && $name != $oldName) {
-                    $wpdb->update($wpdb->usermeta, array('meta_key' => $name), array('meta_key' => $oldName));
-                    $wpdb->update($customizedTable, array('name' => $name), array('name' => $oldName));
-                }
                 if (current_user_can('edit_custom_fields')) {
                     $wpdb->replace(SSV_General::BASE_FIELDS_TABLE, $properties);
+                    $oldName = $wpdb->get_row("SELECT bf_name FROM $baseTable WHERE bf_id = $fieldId")->bf_name;
+                    $name    = $properties['bf_name'];
+                    if ($name != $oldName && $oldName !== null) {
+                        $wpdb->update($wpdb->usermeta, ['meta_key' => $name], ['meta_key' => $oldName]);
+                        $wpdb->update($baseTable, ['name' => $name], ['name' => $oldName]);
+                    }
                 } elseif (current_user_can('add_custom_fields')) {
-                    $wpdb->insert(
-                        $baseTable,
-                        array(
-                            'ID'    => $fieldId,
-                            'name'  => $name,
-                            'title' => $field->title,
-                            'json'  => $field->toJSON(),
-                        )
-                    );
+                    $wpdb->insert($baseTable, $properties);
                 }
             }
         }
@@ -118,11 +105,11 @@ function ssv_form_fields_creator_menu_page_network_admin()
 
                         function mp_ssv_add_new_base_input_field() {
                             mp_ssv_add_base_input_field('shared-custom-fields-placeholder', i, '', '', '');
-                            document.getElementById(i+'_title').focus();
+                            document.getElementById(i + '_title').focus();
                             i++;
                         }
                         <?php foreach($baseFields as $baseField): ?>
-                        mp_ssv_add_base_input_field('shared-custom-fields-placeholder', <?= $baseFields->bf_id ?>, '<?= $baseField->bf_title ?>', '<?= $baseField->bf_name ?>', '<?= $baseField->bf_inputType ?>');
+                        mp_ssv_add_base_input_field('shared-custom-fields-placeholder', <?= $baseField->bf_id ?>, '<?= $baseField->bf_title ?>', '<?= $baseField->bf_name ?>', '<?= $baseField->bf_inputType ?>');
                         <?php endforeach; ?>
                     </script>
                 </td>
