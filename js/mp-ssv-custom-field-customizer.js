@@ -62,6 +62,7 @@ function mp_ssv_add_custom_tab_field_customizer(container, fieldID, values) {
         mp_ssv_add_custom_input_field_customizer(container, fields[i]['id'], fields[i]['input_type'], fields[i]);
     }
 }
+
 function mp_ssv_add_custom_header_field_customizer(container, fieldID, values) {
     container = document.getElementById(container);
     var fieldTitle = '';
@@ -86,6 +87,7 @@ function mp_ssv_add_custom_header_field_customizer(container, fieldID, values) {
 
     container.appendChild(tr);
 }
+
 function mp_ssv_add_custom_label_field_customizer(container, fieldID, values) {
     container = document.getElementById(container);
     var fieldTitle = '';
@@ -136,6 +138,7 @@ function getTextInputField(container, fieldID, values) {
     tr = getTextInputFields(tr, fieldID, required, disabled, defaultValue, placeholder, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getSelectInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -158,6 +161,7 @@ function getSelectInputField(container, fieldID, values) {
     tr = getSelectInputFields(tr, fieldID, disabled, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getCheckboxInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -184,6 +188,7 @@ function getCheckboxInputField(container, fieldID, values) {
     tr = getCheckboxInputFields(tr, fieldID, required, disabled, defaultChecked, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getRoleCheckboxInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -203,6 +208,7 @@ function getRoleCheckboxInputField(container, fieldID, values) {
     tr = getRoleCheckboxInputFields(tr, fieldID, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getRoleSelectInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -223,6 +229,7 @@ function getRoleSelectInputField(container, fieldID, values) {
     tr = getRoleSelectInputFields(tr, fieldID, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getImageInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -245,6 +252,7 @@ function getImageInputField(container, fieldID, values) {
     tr = getImageInputFields(tr, fieldID, required, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getHiddenInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -266,6 +274,7 @@ function getHiddenInputField(container, fieldID, values) {
     tr = getHiddenInputFields(tr, fieldID, defaultValue, classValue, style);
     container.appendChild(tr);
 }
+
 function getCustomInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -293,6 +302,7 @@ function getCustomInputField(container, fieldID, values) {
     tr = getCustomInputFields(tr, fieldID, required, disabled, defaultValue, placeholder, classValue, style, overrideRight);
     container.appendChild(tr);
 }
+
 function getDateInputField(container, fieldID, values) {
     //noinspection JSUnusedLocalSymbols
     var overrideRight = values['override_right'];
@@ -332,6 +342,7 @@ function getBaseFields(fieldID, fieldName, fieldTitle, placeholder) {
     tr.appendChild(getFieldTitle(fieldID, fieldTitle, placeholder));
     return tr;
 }
+
 function getTextInputFields(tr, fieldID, required, disabled, defaultValue, placeholder, classValue, style, overrideRight) {
     tr.appendChild(getDefaultValue(fieldID, defaultValue));
     tr.appendChild(getDisabled(fieldID, disabled));
@@ -343,6 +354,7 @@ function getTextInputFields(tr, fieldID, required, disabled, defaultValue, place
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getSelectInputFields(tr, fieldID, disabled, classValue, style) {
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getDisabled(fieldID, disabled));
@@ -354,6 +366,7 @@ function getSelectInputFields(tr, fieldID, disabled, classValue, style) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getCheckboxInputFields(tr, fieldID, required, disabled, defaultChecked, classValue, style, overrideRight) {
     tr.appendChild(getDefaultChecked(fieldID, defaultChecked));
     tr.appendChild(getDisabled(fieldID, disabled));
@@ -365,6 +378,7 @@ function getCheckboxInputFields(tr, fieldID, required, disabled, defaultChecked,
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getRoleCheckboxInputFields(tr, fieldID, classValue, style, overrideRight) {
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID, "disabled"));
@@ -376,6 +390,7 @@ function getRoleCheckboxInputFields(tr, fieldID, classValue, style, overrideRigh
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getRoleSelectInputFields(tr, fieldID, classValue, style, overrideRight) {
     tr.appendChild(getEmpty(fieldID));
     tr.appendChild(getEmpty(fieldID, "disabled"));
@@ -387,6 +402,7 @@ function getRoleSelectInputFields(tr, fieldID, classValue, style, overrideRight)
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getImageInputFields(tr, fieldID, required, classValue, style, overrideRight) {
     tr.appendChild(getPreview(fieldID, required));
     tr.appendChild(getRequired(fieldID, required));
@@ -398,6 +414,7 @@ function getImageInputFields(tr, fieldID, required, classValue, style, overrideR
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getHiddenInputFields(tr, fieldID, value, classValue, style) {
     tr.appendChild(getValue(fieldID, value));
     tr.appendChild(getEmpty(fieldID, "disabled"));
@@ -409,6 +426,7 @@ function getHiddenInputFields(tr, fieldID, value, classValue, style) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getCustomInputFields(tr, fieldID, required, disabled, defaultValue, placeholder, classValue, style, overrideRight) {
     tr.appendChild(getDefaultValue(fieldID, defaultValue));
     tr.appendChild(getDisabled(fieldID, disabled));
@@ -420,6 +438,7 @@ function getCustomInputFields(tr, fieldID, required, disabled, defaultValue, pla
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getDateInputFields(tr, fieldID, required, disabled, defaultValue, dateRangeAfter, dateRangeBefore, classValue, style, overrideRight) {
     tr.appendChild(getDefaultValue(fieldID, defaultValue, 'yyyy-mm-dd'));
     tr.appendChild(getDisabled(fieldID, disabled));
@@ -437,6 +456,7 @@ function getBR() {
     br.innerHTML = '<br/>';
     return br.childNodes[0];
 }
+
 function getEmpty(fieldID, columnClass) {
     var td = document.createElement("td");
     td.setAttribute("style", "padding: 0 5px;");
@@ -449,6 +469,7 @@ function getEmpty(fieldID, columnClass) {
     }
     return td;
 }
+
 function getFieldIDs(fieldID, isTab) {
     var fieldIDs = document.createElement("input");
     fieldIDs.setAttribute("type", "hidden");
@@ -463,6 +484,7 @@ function getFieldIDs(fieldID, isTab) {
     fieldIDsTD.appendChild(fieldIDs);
     return fieldIDsTD;
 }
+
 function getDraggable(fieldID) {
     var draggableIcon = document.createElement("img");
     draggableIcon.setAttribute("src", pluginBaseURL + '/general/images/icon-menu.svg');
@@ -473,6 +495,7 @@ function getDraggable(fieldID) {
     draggableIconTD.appendChild(draggableIcon);
     return draggableIconTD;
 }
+
 function getFieldName(fieldID, value) {
     var fieldName = document.createElement("input");
     fieldName.setAttribute("type", "hidden");
@@ -489,6 +512,7 @@ function getFieldName(fieldID, value) {
     fieldNameTD.appendChild(fieldNameLabel);
     return fieldNameTD;
 }
+
 function getFieldTitle(fieldID, value) {
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", containerID + "_" + fieldID + "_title");
@@ -503,6 +527,7 @@ function getFieldTitle(fieldID, value) {
     fieldTitleTD.appendChild(fieldTitle);
     return fieldTitleTD;
 }
+
 function getText(fieldID, value) {
     var fieldTitle = document.createElement("textarea");
     fieldTitle.setAttribute("id", containerID + "_" + fieldID + "_text");
@@ -540,6 +565,7 @@ function getText(fieldID, value) {
     fieldTitleTD.appendChild(fieldTitle);
     return fieldTitleTD;
 }
+
 function getRequired(fieldID, value) {
     var required = document.createElement("input");
     required.setAttribute("type", "checkbox");
@@ -564,6 +590,7 @@ function getRequired(fieldID, value) {
     }
     return requiredTD;
 }
+
 function getPreview(fieldID, value) {
     var preview = document.createElement("input");
     preview.setAttribute("type", "checkbox");
@@ -585,6 +612,7 @@ function getPreview(fieldID, value) {
     previewTD.appendChild(preview);
     return previewTD;
 }
+
 function getDisabled(fieldID, value) {
     var disabled = document.createElement("input");
     disabled.setAttribute("type", "checkbox");
@@ -609,6 +637,7 @@ function getDisabled(fieldID, value) {
     }
     return disabledTD;
 }
+
 function getValue(fieldID, value) {
     var valueField = document.createElement("input");
     valueField.setAttribute("id", containerID + "_" + fieldID + "_value");
@@ -624,6 +653,7 @@ function getValue(fieldID, value) {
     valueTD.appendChild(valueField);
     return valueTD;
 }
+
 function getDefaultValue(fieldID, value, placeholder) {
     var defaultValue = document.createElement("input");
     defaultValue.setAttribute("id", containerID + "_" + fieldID + "_default_value");
@@ -642,6 +672,7 @@ function getDefaultValue(fieldID, value, placeholder) {
     defaultValueTD.appendChild(defaultValue);
     return defaultValueTD;
 }
+
 function getDefaultChecked(fieldID, value) {
     var defaultChecked = createSelect(fieldID, "_default", ["Checked", "Unchecked"], value ? "checked" : "unchecked");
     var defaultCheckedTD = document.createElement("td");
@@ -651,6 +682,7 @@ function getDefaultChecked(fieldID, value) {
     defaultCheckedTD.appendChild(defaultChecked);
     return defaultCheckedTD;
 }
+
 function getPlaceholder(fieldID, value) {
     var placeholder = document.createElement("input");
     placeholder.setAttribute("id", containerID + "_" + fieldID + "_placeholder");
@@ -669,6 +701,7 @@ function getPlaceholder(fieldID, value) {
     placeholderTD.appendChild(placeholder);
     return placeholderTD;
 }
+
 function getDateRange(fieldID, valueAfter, valueBefore) {
     var dateRangeAfter = document.createElement("input");
     var dateRangeBefore = document.createElement("input");
@@ -697,6 +730,7 @@ function getDateRange(fieldID, valueAfter, valueBefore) {
     dateRangeTD.appendChild(dateRangeBefore);
     return dateRangeTD;
 }
+
 function getClass(fieldID, value) {
     var classField = document.createElement("input");
     classField.setAttribute("id", containerID + "_" + fieldID + "_class");
@@ -715,6 +749,7 @@ function getClass(fieldID, value) {
     classTD.appendChild(classField);
     return classTD;
 }
+
 function getStyle(fieldID, value) {
     var style = document.createElement("input");
     style.setAttribute("id", containerID + "_" + fieldID + "_style");
@@ -733,6 +768,7 @@ function getStyle(fieldID, value) {
     styleTD.appendChild(style);
     return styleTD;
 }
+
 function getOverrideRight(fieldID, value) {
     var overrideRight = document.createElement("input");
     overrideRight.setAttribute("id", containerID + "_" + fieldID + "_override_right");
@@ -752,6 +788,7 @@ function getOverrideRight(fieldID, value) {
     overrideRightTD.appendChild(overrideRight);
     return overrideRightTD;
 }
+
 function getDeleteRow(fieldID) {
     var deleteButton = document.createElement("img");
     deleteButton.setAttribute("src", pluginBaseURL + "/general/images/icon-delete.svg");
@@ -781,6 +818,7 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
 
     return select;
 }
+
 //noinspection JSUnusedGlobalSymbols
 function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
     if (selected === null) {
@@ -803,6 +841,7 @@ function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
 
     return select;
 }
+
 //noinspection JSUnusedGlobalSymbols
 function removeFields(fields) {
     if (fields !== null) {
@@ -811,6 +850,7 @@ function removeFields(fields) {
         }
     }
 }
+
 function removeField(field) {
     if (field !== null) {
         field.parentElement.removeChild(field);

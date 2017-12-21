@@ -80,9 +80,9 @@ class SelectInputField extends InputField
             'name'           => $this->name,
             'disabled'       => $this->disabled,
             'options'        => implode(',', $this->options),
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -94,11 +94,11 @@ class SelectInputField extends InputField
     public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
-        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
-        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class    = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate"';
+        $style    = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $disabled = disabled($this->disabled, true, false);
 
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
+        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
             $disabled = '';
         }
 
@@ -153,7 +153,7 @@ class SelectInputField extends InputField
     {
         $errors = array();
         if (!$this->disabled && (empty($this->value) || !in_array($this->value, $this->options))) {
-            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

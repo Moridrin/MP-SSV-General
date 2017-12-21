@@ -19,8 +19,6 @@ if (!defined('ABSPATH')) {
  */
 class User extends \WP_User
 {
-    #region Get User
-    #region construct
     /**
      * User constructor.
      *
@@ -30,9 +28,7 @@ class User extends \WP_User
     {
         parent::__construct($user);
     }
-    #endregion
 
-    #region By ID
     /**
      * This function searches for a User by its ID.
      *
@@ -51,9 +47,7 @@ class User extends \WP_User
         }
         return $user;
     }
-    #endregion
 
-    #region Current
     /**
      * @return bool|User
      */
@@ -64,10 +58,7 @@ class User extends \WP_User
         }
         return new User(wp_get_current_user());
     }
-    #endregion
-    #endregion
 
-    #region register($user, $password, $email)
     /**
      * @param $username
      * @param $password
@@ -95,112 +86,109 @@ class User extends \WP_User
         return self::getByID($id);
     }
 
-    #endregion
-
-    #region getDefaultFields()
     public static function getDefaultFields()
     {
-        #region Registration Date
         /** @var HiddenInputField $registrationDateField */
         $registrationDateField = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Registration Date',
-                    'field_type'    => 'input',
-                    'input_type'    => 'hidden',
-                    'name'          => 'registration_date',
-                    'default_value' => 'NOW',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Registration Date',
+                    'field_type'     => 'input',
+                    'input_type'     => 'hidden',
+                    'name'           => 'registration_date',
+                    'default_value'  => 'NOW',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region Username
         /** @var TextInputField $usernameField */
         $usernameField = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Username',
-                    'field_type'    => 'input',
-                    'input_type'    => 'text',
-                    'name'          => 'username',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Username',
+                    'field_type'     => 'input',
+                    'input_type'     => 'text',
+                    'name'           => 'username',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region Email
         /** @var TextInputField $emailField */
         $emailField = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Email',
-                    'field_type'    => 'input',
-                    'input_type'    => 'text',
-                    'name'          => 'email',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Email',
+                    'field_type'     => 'input',
+                    'input_type'     => 'text',
+                    'name'           => 'email',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region Password
         /** @var CustomInputField $passwordField */
         $passwordField = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => 'validate',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => 'validate',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region Confirm Password
         /** @var CustomInputField $confirmPasswordField */
         $confirmPasswordField = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Confirm Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'password_confirm',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => 'validate',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Confirm Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'password_confirm',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => 'validate',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
         return array(
             $registrationDateField->name => $registrationDateField,
@@ -210,73 +198,71 @@ class User extends \WP_User
             $confirmPasswordField->name  => $confirmPasswordField,
         );
     }
-    #endregion
 
-    #region getPasswordChangeFields()
     public static function getPasswordChangeFields()
     {
-        #region Current Password
         /** @var CustomInputField $currentPassword */
         $currentPassword = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Current Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'current_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Current Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'current_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region New Password
         /** @var CustomInputField $newPassword */
         $newPassword = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'New Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'new_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'New Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'new_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
-        #region Confirm New Password
         /** @var CustomInputField $confirmNewPassword */
         $confirmNewPassword = Field::fromJSON(
             json_encode(
                 array(
-                    'id'            => -1,
-                    'title'         => 'Confirm New Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'confirm_new_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'container_id'   => '',
+                    'order'          => 0,
+                    'override_right' => '',
+                    'title'          => 'Confirm New Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'confirm_new_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        #endregion
 
         return array(
             $currentPassword->name    => $currentPassword,
@@ -284,9 +270,7 @@ class User extends \WP_User
             $confirmNewPassword->name => $confirmNewPassword,
         );
     }
-    #endregion
 
-    #region isCurrentUser()
     /**
      * @return bool returns true if this is the current user.
      */
@@ -298,9 +282,7 @@ class User extends \WP_User
             return false;
         }
     }
-    #endregion
 
-    #region currentUserCan()
     /**
      * @param $capability
      *
@@ -313,9 +295,7 @@ class User extends \WP_User
         }
         return self::getCurrent()->has_cap($capability);
     }
-    #endregion
 
-    #region checkPassword($password)
     /**
      * @param string $password The plaintext new user password
      *
@@ -325,9 +305,7 @@ class User extends \WP_User
     {
         return wp_check_password($password, $this->data->user_pass, $this->ID);
     }
-    #endregion
 
-    #region update($inputFields)
     /**
      * This method updates all
      *
@@ -339,9 +317,7 @@ class User extends \WP_User
             $this->updateMeta($field->name, $field->value);
         }
     }
-    #endregion
 
-    #region updateMeta($meta_key, $value)
     /**
      * This function sets the metadata defined by the key (or an alias of that key).
      * The aliases are:
@@ -386,7 +362,7 @@ class User extends \WP_User
                 wp_update_user(array('ID' => $this->ID, 'last_name' => $value));
             }
             update_user_meta($this->ID, $meta_key, $value);
-            $display_name = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
+            $display_name       = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
             $this->display_name = $display_name;
             wp_update_user(array('ID' => $this->ID, 'display_name' => $display_name));
             update_user_meta($this->ID, 'display_name', $display_name);
@@ -398,9 +374,7 @@ class User extends \WP_User
             return true;
         }
     }
-    #endregion
 
-    #region getMeta($meta_key, $default)
     /**
      * This function returns the metadata associated with the given key (or an alias of that key).
      * The aliases are:
@@ -426,9 +400,7 @@ class User extends \WP_User
             return $value ?: $default;
         }
     }
-    #endregion
 
-    #region getProfileLink($target)
     /**
      * @param string $target
      *
@@ -442,9 +414,6 @@ class User extends \WP_User
         return "<a href='$href' $target>$label</a>";
     }
 
-    #endregion
-
-    #region getProfileURL()
     /**
      * @return string the url for the users profile
      */
@@ -454,5 +423,4 @@ class User extends \WP_User
         $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
     }
-    #endregion
 }

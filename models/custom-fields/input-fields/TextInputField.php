@@ -3,7 +3,6 @@
 namespace mp_ssv_general\custom_fields\input_fields;
 
 use DateTime;
-use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 
@@ -21,87 +20,29 @@ class TextInputField extends InputField
 {
     const INPUT_TYPE = 'text';
 
-    /** @var bool $disabled */
     public $disabled;
-    /** @var array $required */
     public $required;
-    /** @var string $defaultValue */
     public $defaultValue;
-    /** @var string $placeholder */
     public $placeholder;
 
-    /**
-     * TextInputField constructor.
-     *
-     * @param int    $order
-     * @param string $title
-     * @param string $name
-     * @param string $required
-     * @param string $disabled
-     * @param string $defaultValue
-     * @param string $placeholder
-     * @param string $class
-     * @param string $style
-     * @param string $overrideRight
-     */
-    protected function __construct($containerID, $order, $title, $name, $disabled, $required, $defaultValue, $placeholder, $class, $style, $overrideRight)
-    {
-        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
-        $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
-        $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
+    protected function __construct(
+        int $id,
+        string $name,
+        string $title,
+        int $order = null,
+        array $classes = [],
+        array $styles = [],
+        array $overrideRights = [],
+        bool $disabled = false,
+        bool $required = false,
+        mixed $defaultValue = null,
+        string $placeholder = ''
+    ) {
+        parent::__construct($id, $name, $title, self::INPUT_TYPE, $order, $classes, $styles, $overrideRights);
+        $this->disabled     = $disabled;
+        $this->required     = $required;
         $this->defaultValue = $defaultValue;
         $this->placeholder  = $placeholder;
-    }
-
-    /**
-     * @param string $json
-     *
-     * @return TextInputField
-     * @throws Exception
-     */
-    public static function fromJSON($json)
-    {
-        $values = json_decode($json);
-        if ($values->input_type != self::INPUT_TYPE) {
-            throw new Exception('Incorrect input type');
-        }
-        return new TextInputField(
-            $values->container_id,
-            $values->order,
-            $values->title,
-            $values->name,
-            $values->disabled,
-            $values->required,
-            $values->default_value,
-            $values->placeholder,
-            $values->class,
-            $values->style,
-            $values->override_right
-        );
-    }
-
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
-    {
-        $values = array(
-            'container_id'   => $this->containerID,
-            'order'          => $this->order,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'input_type'     => $this->inputType,
-            'name'           => $this->name,
-            'disabled'       => $this->disabled,
-            'required'       => $this->required,
-            'default_value'  => $this->defaultValue,
-            'placeholder'    => $this->placeholder,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
-        );
-        $values = json_encode($values);
-        return $values;
     }
 
     /**
@@ -115,14 +56,14 @@ class TextInputField extends InputField
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
         $id          = !empty($this->order) ? 'id="' . esc_html($this->order) . '"' : '';
         $name        = 'name="' . $this->name . '"';
-        $class       = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate"';
-        $style       = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate"';
+        $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
         $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
         $disabled    = disabled($this->disabled, true, false);
         $required    = $this->required ? 'required="required"' : '';
 
-        if (!empty($this->overrideRight) && current_user_can($this->overrideRight)) {
+        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
             $disabled = '';
             $required = '';
         }
@@ -137,8 +78,8 @@ class TextInputField extends InputField
             <?php
         } else {
             ?>
-            <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-            <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
+            <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
+            <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/><br/>
             <?php
         }
 
@@ -162,7 +103,7 @@ class TextInputField extends InputField
     {
         $errors = array();
         if (($this->required && !$this->disabled) && (empty($this->value))) {
-            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

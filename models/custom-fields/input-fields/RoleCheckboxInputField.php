@@ -27,13 +27,13 @@ class RoleCheckboxInputField extends InputField
      * @param int          $order
      * @param string       $title
      * @param string|array $name
-     * @param string       $class
-     * @param string       $style
+     * @param string       $classes
+     * @param string       $styles
      * @param string       $overrideRight
      */
-    protected function __construct($containerID, $order, $title, $name, $class, $style, $overrideRight)
+    protected function __construct($containerID, $order, $title, $name, $classes, $styles, $overrideRight)
     {
-        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $class, $style, $overrideRight);
+        parent::__construct($containerID, $order, $title, self::INPUT_TYPE, $name, $classes, $styles, $overrideRight);
     }
 
     /**
@@ -71,9 +71,9 @@ class RoleCheckboxInputField extends InputField
             'field_type'     => $this->fieldType,
             'input_type'     => $this->inputType,
             'name'           => $this->name,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -85,8 +85,8 @@ class RoleCheckboxInputField extends InputField
     public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
-        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
-        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class    = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate filled-in"';
+        $style    = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $disabled = disabled(!current_user_can('edit_roles'), true, false);
         $checked  = checked($this->value, true, false);
 

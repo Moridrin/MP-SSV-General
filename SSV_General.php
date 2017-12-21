@@ -5,6 +5,7 @@ namespace mp_ssv_general;
 use DateTime;
 use Exception;
 use mp_ssv_users\SSV_Users;
+use wpdb;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -18,14 +19,12 @@ if (!defined('ABSPATH')) {
  */
 class SSV_General
 {
-    #region Constants
     const PATH = SSV_GENERAL_PATH;
     const URL = SSV_GENERAL_URL;
-    const CUSTOM_FIELDS_TABLE = 'ssv_general_custom_fields';
-    const CUSTOM_SITE_FIELDS_TABLE = SSV_GENERAL_CUSTOM_SITE_FIELDS_TABLE;
-    const CUSTOM_FORM_FIELDS_TABLE = SSV_GENERAL_CUSTOM_FORM_FIELDS_TABLE;
-
     const BASE_URL = SSV_GENERAL_BASE_URL;
+
+    const BASE_FIELDS_TABLE = SSV_GENERAL_BASE_FIELDS_TABLE;
+    const CUSTOMIZED_FIELDS_TABLE = SSV_GENERAL_CUSTOMIZED_FIELDS;
 
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
@@ -37,9 +36,7 @@ class SSV_General
 
     const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
-    #endregion
 
-    #region _init()
     private static $initialized = false;
 
     public static function _init()
@@ -53,9 +50,7 @@ class SSV_General
             self::$initialized = true;
         }
     }
-    #endregion
 
-    #region resetOptions()
     /**
      * This function sets all the options for this plugin back to their default value
      */
@@ -64,11 +59,7 @@ class SSV_General
         $defaultSelected = json_encode(array('display', 'default', 'placeholder'));
         User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, $defaultSelected, false);
     }
-    #endregion
 
-    #region Tools
-
-    #region redirect($location)
     /**
      * This function can be called from anywhere and will redirect the page to the given location.
      *
@@ -81,9 +72,7 @@ class SSV_General
         $redirect_script .= '</script>';
         echo $redirect_script;
     }
-    #endregion
 
-    #region isValidPOST($adminReferer)
     /**
      * @param $adminReferer
      *
@@ -102,14 +91,104 @@ class SSV_General
         }
         return true;
     }
-    #endregion
 
-    #region isValidIBAN($iban)
     public static function isValidIBAN($iban)
     {
         $iban      = strtolower(str_replace(' ', '', $iban));
-        $Countries = array('al' => 28, 'ad' => 24, 'at' => 20, 'az' => 28, 'bh' => 22, 'be' => 16, 'ba' => 20, 'br' => 29, 'bg' => 22, 'cr' => 21, 'hr' => 21, 'cy' => 28, 'cz' => 24, 'dk' => 18, 'do' => 28, 'ee' => 20, 'fo' => 18, 'fi' => 18, 'fr' => 27, 'ge' => 22, 'de' => 22, 'gi' => 23, 'gr' => 27, 'gl' => 18, 'gt' => 28, 'hu' => 28, 'is' => 26, 'ie' => 22, 'il' => 23, 'it' => 27, 'jo' => 30, 'kz' => 20, 'kw' => 30, 'lv' => 21, 'lb' => 28, 'li' => 21, 'lt' => 20, 'lu' => 20, 'mk' => 19, 'mt' => 31, 'mr' => 27, 'mu' => 30, 'mc' => 27, 'md' => 24, 'me' => 22, 'nl' => 18, 'no' => 15, 'pk' => 24, 'ps' => 29, 'pl' => 28, 'pt' => 25, 'qa' => 29, 'ro' => 24, 'sm' => 27, 'sa' => 24, 'rs' => 22, 'sk' => 24, 'si' => 19, 'es' => 24, 'se' => 24, 'ch' => 21, 'tn' => 24, 'tr' => 26, 'ae' => 23, 'gb' => 22, 'vg' => 24);
-        $Chars     = array('a' => 10, 'b' => 11, 'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15, 'g' => 16, 'h' => 17, 'i' => 18, 'j' => 19, 'k' => 20, 'l' => 21, 'm' => 22, 'n' => 23, 'o' => 24, 'p' => 25, 'q' => 26, 'r' => 27, 's' => 28, 't' => 29, 'u' => 30, 'v' => 31, 'w' => 32, 'x' => 33, 'y' => 34, 'z' => 35);
+        $Countries = array('al' => 28,
+                           'ad' => 24,
+                           'at' => 20,
+                           'az' => 28,
+                           'bh' => 22,
+                           'be' => 16,
+                           'ba' => 20,
+                           'br' => 29,
+                           'bg' => 22,
+                           'cr' => 21,
+                           'hr' => 21,
+                           'cy' => 28,
+                           'cz' => 24,
+                           'dk' => 18,
+                           'do' => 28,
+                           'ee' => 20,
+                           'fo' => 18,
+                           'fi' => 18,
+                           'fr' => 27,
+                           'ge' => 22,
+                           'de' => 22,
+                           'gi' => 23,
+                           'gr' => 27,
+                           'gl' => 18,
+                           'gt' => 28,
+                           'hu' => 28,
+                           'is' => 26,
+                           'ie' => 22,
+                           'il' => 23,
+                           'it' => 27,
+                           'jo' => 30,
+                           'kz' => 20,
+                           'kw' => 30,
+                           'lv' => 21,
+                           'lb' => 28,
+                           'li' => 21,
+                           'lt' => 20,
+                           'lu' => 20,
+                           'mk' => 19,
+                           'mt' => 31,
+                           'mr' => 27,
+                           'mu' => 30,
+                           'mc' => 27,
+                           'md' => 24,
+                           'me' => 22,
+                           'nl' => 18,
+                           'no' => 15,
+                           'pk' => 24,
+                           'ps' => 29,
+                           'pl' => 28,
+                           'pt' => 25,
+                           'qa' => 29,
+                           'ro' => 24,
+                           'sm' => 27,
+                           'sa' => 24,
+                           'rs' => 22,
+                           'sk' => 24,
+                           'si' => 19,
+                           'es' => 24,
+                           'se' => 24,
+                           'ch' => 21,
+                           'tn' => 24,
+                           'tr' => 26,
+                           'ae' => 23,
+                           'gb' => 22,
+                           'vg' => 24,
+        );
+        $Chars     = array('a' => 10,
+                           'b' => 11,
+                           'c' => 12,
+                           'd' => 13,
+                           'e' => 14,
+                           'f' => 15,
+                           'g' => 16,
+                           'h' => 17,
+                           'i' => 18,
+                           'j' => 19,
+                           'k' => 20,
+                           'l' => 21,
+                           'm' => 22,
+                           'n' => 23,
+                           'o' => 24,
+                           'p' => 25,
+                           'q' => 26,
+                           'r' => 27,
+                           's' => 28,
+                           't' => 29,
+                           'u' => 30,
+                           'v' => 31,
+                           'w' => 32,
+                           'x' => 33,
+                           'y' => 34,
+                           'z' => 35,
+        );
 
         if (empty($iban)) {
             return false;
@@ -155,9 +234,7 @@ class SSV_General
 
         return (int)$mod;
     }
-    #endregion
 
-    #region getFormSecurityFields($adminReferer, $save, $reset)
     /**
      * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
      * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
@@ -180,9 +257,7 @@ class SSV_General
         }
         return ob_get_clean();
     }
-    #endregion
 
-    #region getCapabilitiesDataList()
     /**
      * @return string HTML
      */
@@ -257,9 +332,7 @@ class SSV_General
         <?php
         return ob_get_clean();
     }
-    #endregion
 
-    #region getFormSecurityFields($adminReferer, $save, $reset)
     /**
      * @return string HTML
      */
@@ -268,7 +341,7 @@ class SSV_General
         ob_start();
         $inputTypes = array('Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Date', 'Image', 'Hidden');
         ?>
-        <datalist id="input_type">
+        <datalist id="inputType">
             <?php foreach ($inputTypes as $inputType): ?>
                 <option value="<?= mp_ssv_to_snake_case($inputType) ?>"><?= $inputType ?></option>
             <?php endforeach; ?>
@@ -276,70 +349,123 @@ class SSV_General
         <?php
         return ob_get_clean();
     }
-    #endregion
 
-    #region sanitize($value)
-    /**
-     * @param mixed        $value
-     * @param string|array $sanitationType
-     *
-     * @return mixed
-     */
-    public static function sanitize($value, $sanitationType)
+    public static function sanitize($value, $sanitationType, string $implode = null)
     {
         if (is_array($value)) {
-            foreach ($value as &$item) {
-                self::sanitize($item, $sanitationType);
+            foreach ($value as $key => &$item) {
+                if (is_array($sanitationType)) {
+                    self::sanitize($item, $sanitationType[$key]);
+                } else {
+                    self::sanitize($item, $sanitationType);
+                }
+            }
+            if ($implode !== null) {
+                $value = implode($implode, $value);
             }
             return $value;
         }
-        if (is_array($sanitationType)) {
-            if (!in_array($value, $sanitationType)) {
-                $value = sanitize_text_field(array_values($sanitationType)[0]);
-            }
-        } elseif (strpos($sanitationType, 'email') !== false) {
-            $value = sanitize_email($value);
-        } elseif (strpos($sanitationType, 'file') !== false) {
-            $value = sanitize_file_name($value);
-        } elseif (strpos($sanitationType, 'color') !== false) {
-            $value = sanitize_hex_color($value);
-        } elseif (strpos($sanitationType, 'class') !== false) {
-            $value = sanitize_html_class($value);
-        } elseif (strpos($sanitationType, 'option') !== false) {
-            $value = sanitize_option($sanitationType, $value);
-        } elseif (strpos($sanitationType, 'date') !== false && strpos($sanitationType, 'time') !== false) {
-            $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
-            if ($dateTime) {
-                $value = $dateTime->format('Y-m-d H:i');
-            } else {
-                $value = '';
-            }
-        } elseif (strpos($sanitationType, 'date') !== false) {
-            $date = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
-            if ($date) {
-                $value = $date->format('Y-m-d');
-            } else {
-                $value = '';
-            }
-        } elseif (strpos($sanitationType, 'time') !== false) {
-            $time = DateTime::createFromFormat('H:i', sanitize_text_field($value));
-            if ($time) {
-                $value = $time->format('H:i');
-            } else {
-                $value = '';
-            }
-        } elseif ($sanitationType == 'boolean' || $sanitationType == 'bool') {
-            $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        } elseif ($sanitationType == 'int') {
-            $value = intval($value);
-        } else {
-            $value = sanitize_text_field($value);
+        switch ($sanitationType) {
+            case 'email':
+                $value = sanitize_email($value);
+                break;
+            case 'file':
+            case 'image':
+                $value = sanitize_file_name($value);
+                break;
+            case 'color':
+                $value = sanitize_hex_color($value);
+                break;
+            case 'class':
+                $value = sanitize_html_class($value);
+                break;
+            case 'option':
+                $value = sanitize_option($sanitationType, $value);
+                break;
+            case 'dateTime':
+                $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
+                $value    = $dateTime ? $dateTime->format('Y-m-d H:i') : '';
+                break;
+            case 'date':
+                $dateTime = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
+                $value    = $dateTime ? $dateTime->format('Y-m-d') : '';
+                break;
+            case 'time':
+                $dateTime = DateTime::createFromFormat('H:i', sanitize_text_field($value));
+                $value    = $dateTime ? $dateTime->format('H:i') : '';
+                break;
+            case 'bool':
+            case 'boolean':
+            case 'checkbox':
+                $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                break;
+            case 'int':
+                $value = intval($value);
+                break;
+            case 'role':
+            case 'role_select':
+            case 'role_checkbox':
+                if (function_exists('members_sanitize_role')) {
+                    $value = members_sanitize_role($value);
+                } else {
+                    $value = sanitize_text_field($value);
+                }
+                break;
+            default:
+                $value = sanitize_text_field($value);
+                break;
         }
         return $value;
     }
-    #endregion
 
-    #region var_export($variable, $die)
+    public static function escape($value, $escapeType, string $implode = null)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => &$item) {
+                if (is_array($escapeType)) {
+                    self::sanitize($item, $escapeType[$key]);
+                } else {
+                    self::sanitize($item, $escapeType);
+                }
+            }
+            if ($implode !== null) {
+                $value = implode($implode, $value);
+            }
+            return $value;
+        }
+        switch ($escapeType) {
+            case 'html':
+                $value = esc_html($value);
+                break;
+            case 'sql':
+                $value = esc_sql($value);
+                break;
+            case 'attr':
+            case 'attribute':
+                $value = esc_attr($value);
+                break;
+            case 'js':
+                $value = esc_js($value);
+                break;
+            case 'text':
+            case 'textarea':
+                $value = esc_textarea($value);
+                break;
+            case 'url':
+                $value = esc_url($value);
+                break;
+            default:
+                $function = 'esc_' . $escapeType;
+                if (function_exists($function)) {
+                    $value = $function($value);
+                } else {
+                    throw new \InvalidArgumentException($escapeType . ' is an unknown escape type.');
+                }
+                break;
+        }
+        return $value;
+    }
+
     /**
      * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
      *
@@ -382,9 +508,6 @@ class SSV_General
         }
         return null;
     }
-    #endregion
-
-    #region _hasCircularReference($variable)
 
     /**
      * This function checks if the given $variable is recursive.
@@ -403,31 +526,10 @@ class SSV_General
         }
     }
 
-    public static function eventsPluginActive()
-    {
-        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        return is_plugin_active('ssv-events/ssv-events.php');
-    }
-
-    public static function usersPluginActive()
+    public static function getLoginURL()
     {
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
         if (is_plugin_active('ssv-users/ssv-users.php')) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static function mailchimpPluginActive()
-    {
-        require_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        return is_plugin_active('ssv-mailchimp/ssv-mailchimp.php');
-    }
-
-    public static function getLoginURL()
-    {
-        if (self::usersPluginActive()) {
             $loginPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_LOGIN_FIELDS);
             if (count($loginPages) > 0) {
                 return add_query_arg('redirect_to', get_permalink(), get_permalink($loginPages[0]));
@@ -438,7 +540,8 @@ class SSV_General
 
     public static function getChangePasswordURL()
     {
-        if (self::usersPluginActive()) {
+        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        if (is_plugin_active('ssv-users/ssv-users.php')) {
             $changePasswordPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_CHANGE_PASSWORD);
             if (count($changePasswordPages) > 0) {
                 return add_query_arg('redirect_to', get_site_url(), get_permalink($changePasswordPages[0]));
@@ -446,24 +549,12 @@ class SSV_General
         }
         return '';
     }
-    #endregion
 
-    #region getListSelect($name, $options, $selected)
     public static function getListSelect($name, $options, $selected)
     {
-        if (is_array($selected)) {
-            foreach ($selected as &$item) {
-                $item = esc_html($item);
-            }
-        } elseif (strpos($selected, ',') !== false) {
-            $selected = explode(',', $selected);
-            foreach ($selected as &$item) {
-                $item = esc_html($item);
-            }
-        } else {
-            $selected = esc_html($selected);
-        }
-        $name = esc_html($name);
+        $selected = self::escape($selected, 'html');
+        $options  = self::escape($options, 'html');
+        $name     = self::escape($name, 'attribute');
         ob_start();
         $optionCount = count($options);
         ?>
@@ -472,7 +563,6 @@ class SSV_General
             <br/>
             <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($options as $option): ?>
-                    <?php $option = esc_html($option); ?>
                     <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
@@ -482,7 +572,6 @@ class SSV_General
             <br/>
             <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($selected as $option): ?>
-                    <?php $option = esc_html($option); ?>
                     <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
@@ -492,6 +581,7 @@ class SSV_General
         <script>
             var options = <?= json_encode($selected) ?>;
             document.getElementById('<?= $name ?>').value = options;
+
             function <?= $name ?>_add(val) {
                 options.push(val);
                 document.getElementById('<?= $name ?>').value = options;
@@ -521,13 +611,21 @@ class SSV_General
         <?php
         return ob_get_clean();
     }
-    #endregion
 
-    #region currentNavTab($object, $selected)
     public static function currentNavTab($current, $selected)
     {
         return $current == $selected ? 'nav-tab-active' : '';
     }
-    #endregion
-    #endregion
+
+    public static function CLEAN_INSTALL()
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $tableName = SSV_General::BASE_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        $tableName = SSV_General::CUSTOMIZED_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        mp_ssv_general_register_plugin();
+    }
 }

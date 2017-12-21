@@ -37,19 +37,22 @@ class Message
     public function getHTML()
     {
         switch ($this->type) {
-            case Message::SOFT_ERROR_MESSAGE: {
-                $class = '';
-                break;
-            }
-            case Message::ERROR_MESSAGE: {
-                $class = 'error';
-                break;
-            }
+            case Message::SOFT_ERROR_MESSAGE:
+                {
+                    $class = '';
+                    break;
+                }
+            case Message::ERROR_MESSAGE:
+                {
+                    $class = 'error';
+                    break;
+                }
             case Message::NOTIFICATION_MESSAGE:
-            default: {
-                $class = 'success';
-                break;
-            }
+            default:
+                {
+                    $class = 'success';
+                    break;
+                }
         }
         ob_start();
         ?>

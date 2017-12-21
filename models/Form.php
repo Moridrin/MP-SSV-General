@@ -24,7 +24,6 @@ if (!defined('ABSPATH')) {
  */
 class Form
 {
-    #region variables
     /** @var Field[] $fields */
     public $fields;
     /** @var array|User $values */
@@ -35,9 +34,7 @@ class Form
     public $user;
     /** @var int $containerID */
     public $containerID = 0;
-    #endregion
 
-    #region Construct($fields)
     /**
      * Form constructor.
      *
@@ -53,9 +50,7 @@ class Form
             $this->user = User::getCurrent();
         }
     }
-    #endregion
 
-    #region fromDatabase()
     /**
      * This function gets all the Fields from the post metadata.
      *
@@ -77,7 +72,7 @@ class Form
         if (!$post) {
             return $form;
         }
-        $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $customizationTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
         $postID             = $post->ID;
         $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
@@ -97,9 +92,7 @@ class Form
         }
         return $form;
     }
-    #endregion
 
-    #region addFields($fields)
     /**
      * @param Field[]|Field $fields
      * @param bool          $atEnd if set to false, this will append the fields at the start of the array.
@@ -117,9 +110,7 @@ class Form
             $this->fields = array_merge($fields, $this->fields);
         }
     }
-    #endregion
 
-    #region setValues($values)
     /**
      * @param null|array $values if set to null it uses form->user variable.
      */
@@ -137,9 +128,7 @@ class Form
             }
         );
     }
-    #endregion
 
-    #region getEditor($allowTabs)
     /**
      * @param bool $allowTabs if set true it will display the select option for tab in the Field Type
      *
@@ -149,7 +138,7 @@ class Form
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table      = SSV_General::CUSTOM_FIELDS_TABLE;
+        $table      = SSV_General::BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
         $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
         ob_start();
@@ -211,6 +200,7 @@ class Form
             var baseFields = <?= json_encode($baseFields) ?>;
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
+
             function mp_ssv_add_new_custom_input_field_customizer() {
                 var baseFieldName = document.getElementById('custom_field_selector').value;
                 if (!baseFieldName) {
@@ -223,14 +213,17 @@ class Form
                 i++;
                 document.getElementById('custom_field_selector').value = '';
             }
+
             function mp_ssv_add_new_custom_tab_field_customizer() {
                 mp_ssv_add_custom_tab_field_customizer('custom-fields-placeholder', i);
                 i++;
             }
+
             function mp_ssv_add_new_custom_header_field_customizer() {
                 mp_ssv_add_custom_header_field_customizer('custom-fields-placeholder', i);
                 i++;
             }
+
             function mp_ssv_add_new_custom_label_field_customizer() {
                 mp_ssv_add_custom_label_field_customizer('custom-fields-placeholder', i);
                 i++;
@@ -252,9 +245,7 @@ class Form
         <?php
         return ob_get_clean();
     }
-    #endregion
 
-    #region saveEditorFromPost()
     /**
      * This function removes the old fields from the database and inserts the new fields.
      */
@@ -267,7 +258,7 @@ class Form
             return;
         }
         $form       = new Form();
-        $table      = SSV_General::CUSTOM_FIELDS_TABLE;
+        $table      = SSV_General::BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
         $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
 
@@ -318,7 +309,7 @@ class Form
         }
         //Remove All old fields for post
         $wpdb->delete(
-            SSV_General::CUSTOM_FORM_FIELDS_TABLE,
+            SSV_General::CUSTOMIZED_FIELDS_TABLE,
             array(
                 'postID' => $post->ID,
             )
@@ -331,7 +322,7 @@ class Form
         }
         foreach ($fields as $field) {
             $wpdb->insert(
-                SSV_General::CUSTOM_FORM_FIELDS_TABLE,
+                SSV_General::CUSTOMIZED_FIELDS_TABLE,
                 array(
                     'postID'      => $post->ID,
                     'containerID' => $form->containerID,
@@ -342,9 +333,7 @@ class Form
             );
         }
     }
-    #endregion
 
-    #region getHTML($adminReferer, $buttonText = 'save')
     /**
      * @param string $adminReferrer is the admin referer for the form.
      * @param string $buttonText    is the text on the submit button (default = 'save').
@@ -400,9 +389,6 @@ class Form
         return $html;
     }
 
-    #endregion
-
-    #region getInputFields()
     /**
      * @return InputField[]
      */
@@ -418,9 +404,7 @@ class Form
             }
         );
     }
-    #endregion
 
-    #region isValid($tabId)
     /**
      * @param int|null $tabID if set it will only check the fields inside that tab.
      *
@@ -442,9 +426,7 @@ class Form
         );
         return empty($this->errors) ? true : $this->errors;
     }
-    #endregion
 
-    #region save($tabId)
     /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
@@ -464,7 +446,7 @@ class Form
                     if ($field->name == 'password' || $field->name == 'password_confirm') {
                         return true;
                     }
-                    if (!$field->isDisabled() || current_user_can($field->overrideRight)) {
+                    if (!$field->isDisabled() || current_user_can($field->overrideRights)) {
                         if ($field instanceof RoleCheckboxInputField || $field instanceof RoleSelectInputField) {
                             $field->saveValue($this->user);
                         }
@@ -505,9 +487,7 @@ class Form
         $messages = array_diff($messages, array(true));
         return $messages;
     }
-    #endregion
 
-    #region getValue($name)
     /**
      * @param string $name of the field to return the value
      *
@@ -529,9 +509,7 @@ class Form
         );
         return count($values) ? reset($values) : null;
     }
-    #endregion
 
-    #region getInputFieldProperty($_property)
     /**
      * @param string $_property
      *
@@ -553,9 +531,6 @@ class Form
         return $properties;
     }
 
-    #endregion
-
-    #region getEmail($_hidePasswordFields)
     /**
      * @param bool $_hidePasswordFields if true, the passwords will be replaced with ******.
      *
@@ -589,9 +564,7 @@ class Form
         );
         return '<table>' . implode('', $rows) . '</table>';
     }
-    #endregion
 
-    #region loopRecursive($callback)
     /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
      *
@@ -620,5 +593,4 @@ class Form
         $return = array_diff($return, array(null));
         return $return;
     }
-    #endregion
 }

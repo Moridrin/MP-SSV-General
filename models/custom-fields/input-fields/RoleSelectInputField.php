@@ -78,9 +78,9 @@ class RoleSelectInputField extends InputField
             'input_type'     => $this->inputType,
             'name'           => $this->name,
             'options'        => $this->options,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -92,8 +92,8 @@ class RoleSelectInputField extends InputField
     public function getHTML()
     {
         $name     = 'name="' . esc_html($this->name) . '"';
-        $class    = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : 'class="validate filled-in"';
-        $style    = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class    = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate filled-in"';
+        $style    = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
         $disabled = disabled(!current_user_can('edit_roles'), true, false);
 
         ob_start();
@@ -148,7 +148,7 @@ class RoleSelectInputField extends InputField
     public function isValid()
     {
         if (count($this->options) > 1 && current_user_can('edit_roles') && (empty($this->value) || !in_array($this->value, $this->options))) {
-            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRight) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
+            $errors[] = new Message('The value ' . $this->value . ' is not one of the options.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;
     }

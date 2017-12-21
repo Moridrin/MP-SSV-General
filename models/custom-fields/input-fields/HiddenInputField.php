@@ -82,9 +82,9 @@ class HiddenInputField extends InputField
             'input_type'     => $this->inputType,
             'name'           => $this->name,
             'default_value'  => $this->defaultValue,
-            'class'          => $this->class,
-            'style'          => $this->style,
-            'override_right' => $this->overrideRight,
+            'class'          => $this->classes,
+            'style'          => $this->styles,
+            'override_right' => $this->overrideRights,
         );
         $values = json_encode($values);
         return $values;
@@ -100,8 +100,8 @@ class HiddenInputField extends InputField
         }
         $name  = 'name="' . esc_html($this->name) . '"';
         $value = 'value="' . esc_html($this->defaultValue) . '"';
-        $class = !empty($this->class) ? 'class="' . esc_html($this->class) . '"' : '';
-        $style = !empty($this->style) ? 'style="' . esc_html($this->style) . '"' : '';
+        $class = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : '';
+        $style = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
 
         ob_start();
         ?><input type="hidden" <?= $name ?> <?= $value ?> <?= $class ?> <?= $style ?> /><?php

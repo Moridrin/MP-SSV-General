@@ -1,4 +1,5 @@
 <?php
+
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\SSV_General;
@@ -9,8 +10,8 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable       = SSV_General::CUSTOM_FIELDS_TABLE;
-$customizedTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+$baseTable       = SSV_General::BASE_FIELDS_TABLE;
+$customizedTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
 
 if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
     if (isset($_POST['reset'])) {
@@ -23,7 +24,7 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
             $oldNames = $wpdb->get_results("SELECT ID, `name` FROM $baseTable");
             $oldNames = array_combine(array_column($oldNames, 'ID'), array_column($oldNames, 'name'));
             if (!empty($fieldIDs)) {
-                $databaseFieldIDs = implode(", ", $fieldIDs);
+                $databaseFieldIDs  = implode(", ", $fieldIDs);
                 $fieldsToBeRemoved = array_diff_key($oldNames, array_fill_keys($fieldIDs, ''));
                 $wpdb->query("DELETE FROM $baseTable WHERE ID NOT IN ($databaseFieldIDs)");
                 $wpdb->query("DELETE FROM $customizedTable WHERE `name` IN ($fieldsToBeRemoved)");
@@ -60,20 +61,20 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
                 $wpdb->replace(
                     $baseTable,
                     array(
-                        'ID'     => $fieldID,
-                        'name'   => $name,
-                        'title'  => $field->title,
-                        'json'   => $field->toJSON(),
+                        'ID'    => $fieldID,
+                        'name'  => $name,
+                        'title' => $field->title,
+                        'json'  => $field->toJSON(),
                     )
                 );
             } elseif (current_user_can('add_custom_fields')) {
                 $wpdb->insert(
                     $baseTable,
                     array(
-                        'ID'     => $fieldID,
-                        'name'   => $name,
-                        'title'  => $field->title,
-                        'json'   => $field->toJSON(),
+                        'ID'    => $fieldID,
+                        'name'  => $name,
+                        'title' => $field->title,
+                        'json'  => $field->toJSON(),
                     )
                 );
             }
@@ -108,7 +109,8 @@ echo SSV_General::getInputTypeDataList();
                     <button type="button" onclick="mp_ssv_add_new_custom_field()" style="margin-top: 10px;">Add Field</button>
                 </div>
                 <script>
-                    var i = <?= max(array_keys($baseFields)) + 1 ?>;
+                    var i = <?= count($baseFields) > 0 ? max(array_keys($baseFields)) + 1 : 1 ?>;
+
                     function mp_ssv_add_new_custom_field() {
                         mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                         i++;

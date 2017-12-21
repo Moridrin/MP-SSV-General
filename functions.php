@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-#region Functions that should be in PHP
 /**
  * @param string $string
  * @param bool   $capitalizeFirstCharacter
@@ -12,7 +11,7 @@ if (!defined('ABSPATH')) {
  */
 function mp_ssv_to_camel_case($string, $capitalizeFirstCharacter = false)
 {
-    $string    = str_replace(' ', '', mp_ssv_to_title($string));
+    $string = str_replace(' ', '', mp_ssv_to_title($string));
 
     if (!$capitalizeFirstCharacter) {
         $string[0] = strtolower($string[0]);
@@ -96,4 +95,3 @@ function mp_ssv_ends_with($haystack, $needle)
 {
     return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
 }
-#endregion
