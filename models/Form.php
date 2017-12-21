@@ -24,7 +24,7 @@ if (!defined('ABSPATH')) {
  */
 class Form
 {
-        /** @var Field[] $fields */
+    /** @var Field[] $fields */
     public $fields;
     /** @var array|User $values */
     public $values;
@@ -34,8 +34,8 @@ class Form
     public $user;
     /** @var int $containerID */
     public $containerID = 0;
-    
-        /**
+
+    /**
      * Form constructor.
      *
      * @param Field[] $fields
@@ -50,8 +50,8 @@ class Form
             $this->user = User::getCurrent();
         }
     }
-    
-        /**
+
+    /**
      * This function gets all the Fields from the post metadata.
      *
      * @param bool         $setValues
@@ -72,7 +72,7 @@ class Form
         if (!$post) {
             return $form;
         }
-        $customizationTable = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $customizationTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
         $postID             = $post->ID;
         $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
@@ -92,8 +92,8 @@ class Form
         }
         return $form;
     }
-    
-        /**
+
+    /**
      * @param Field[]|Field $fields
      * @param bool          $atEnd if set to false, this will append the fields at the start of the array.
      */
@@ -110,8 +110,8 @@ class Form
             $this->fields = array_merge($fields, $this->fields);
         }
     }
-    
-        /**
+
+    /**
      * @param null|array $values if set to null it uses form->user variable.
      */
     public function setValues($values = null)
@@ -128,8 +128,8 @@ class Form
             }
         );
     }
-    
-        /**
+
+    /**
      * @param bool $allowTabs if set true it will display the select option for tab in the Field Type
      *
      * @return string HTML
@@ -200,6 +200,7 @@ class Form
             var baseFields = <?= json_encode($baseFields) ?>;
             var i = <?= esc_html(Field::getMaxID($this->fields) + 1) ?>;
             mp_ssv_sortable_table('custom-fields-placeholder');
+
             function mp_ssv_add_new_custom_input_field_customizer() {
                 var baseFieldName = document.getElementById('custom_field_selector').value;
                 if (!baseFieldName) {
@@ -212,14 +213,17 @@ class Form
                 i++;
                 document.getElementById('custom_field_selector').value = '';
             }
+
             function mp_ssv_add_new_custom_tab_field_customizer() {
                 mp_ssv_add_custom_tab_field_customizer('custom-fields-placeholder', i);
                 i++;
             }
+
             function mp_ssv_add_new_custom_header_field_customizer() {
                 mp_ssv_add_custom_header_field_customizer('custom-fields-placeholder', i);
                 i++;
             }
+
             function mp_ssv_add_new_custom_label_field_customizer() {
                 mp_ssv_add_custom_label_field_customizer('custom-fields-placeholder', i);
                 i++;
@@ -241,8 +245,8 @@ class Form
         <?php
         return ob_get_clean();
     }
-    
-        /**
+
+    /**
      * This function removes the old fields from the database and inserts the new fields.
      */
     public static function saveEditorFromPost()
@@ -305,7 +309,7 @@ class Form
         }
         //Remove All old fields for post
         $wpdb->delete(
-            SSV_General::CUSTOM_FORM_FIELDS_TABLE,
+            SSV_General::CUSTOMIZED_FIELDS_TABLE,
             array(
                 'postID' => $post->ID,
             )
@@ -318,7 +322,7 @@ class Form
         }
         foreach ($fields as $field) {
             $wpdb->insert(
-                SSV_General::CUSTOM_FORM_FIELDS_TABLE,
+                SSV_General::CUSTOMIZED_FIELDS_TABLE,
                 array(
                     'postID'      => $post->ID,
                     'containerID' => $form->containerID,
@@ -329,8 +333,8 @@ class Form
             );
         }
     }
-    
-        /**
+
+    /**
      * @param string $adminReferrer is the admin referer for the form.
      * @param string $buttonText    is the text on the submit button (default = 'save').
      *
@@ -385,8 +389,7 @@ class Form
         return $html;
     }
 
-    
-        /**
+    /**
      * @return InputField[]
      */
     public function getInputFields()
@@ -401,8 +404,8 @@ class Form
             }
         );
     }
-    
-        /**
+
+    /**
      * @param int|null $tabID if set it will only check the fields inside that tab.
      *
      * @return array|bool array of errors or true if no errors.
@@ -423,8 +426,8 @@ class Form
         );
         return empty($this->errors) ? true : $this->errors;
     }
-    
-        /**
+
+    /**
      * This function saves all the field values to the user meta.
      * This function does not validate fields.
      *
@@ -484,8 +487,8 @@ class Form
         $messages = array_diff($messages, array(true));
         return $messages;
     }
-    
-        /**
+
+    /**
      * @param string $name of the field to return the value
      *
      * @return string|null
@@ -506,8 +509,8 @@ class Form
         );
         return count($values) ? reset($values) : null;
     }
-    
-        /**
+
+    /**
      * @param string $_property
      *
      * @return string[] array of all properties for the fields that have that property
@@ -528,8 +531,7 @@ class Form
         return $properties;
     }
 
-    
-        /**
+    /**
      * @param bool $_hidePasswordFields if true, the passwords will be replaced with ******.
      *
      * @return string email body in HTML.
@@ -562,8 +564,8 @@ class Form
         );
         return '<table>' . implode('', $rows) . '</table>';
     }
-    
-        /**
+
+    /**
      * This function runs the callable for all fields (including all the sub-fields in tabs).
      *
      * @param callable $callback The function to be called with the field as parameter.
@@ -591,4 +593,4 @@ class Form
         $return = array_diff($return, array(null));
         return $return;
     }
-    }
+}

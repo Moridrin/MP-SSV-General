@@ -2,16 +2,8 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use Exception;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
-use mp_ssv_general\custom_fields\input_fields\CustomInputField;
-use mp_ssv_general\custom_fields\input_fields\DateInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
-use mp_ssv_general\custom_fields\input_fields\ImageInputField;
-use mp_ssv_general\custom_fields\input_fields\RoleCheckboxInputField;
-use mp_ssv_general\custom_fields\input_fields\RoleSelectInputField;
-use mp_ssv_general\custom_fields\input_fields\SelectInputField;
-use mp_ssv_general\custom_fields\input_fields\TextInputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
@@ -20,15 +12,15 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once 'input-fields/TextInputField.php';
+//require_once 'input-fields/TextInputField.php';
 require_once 'input-fields/CheckboxInputField.php';
-require_once 'input-fields/SelectInputField.php';
-require_once 'input-fields/ImageInputField.php';
-require_once 'input-fields/HiddenInputField.php';
-require_once 'input-fields/CustomInputField.php';
-require_once 'input-fields/DateInputField.php';
-require_once 'input-fields/RoleCheckboxInputField.php';
-require_once 'input-fields/RoleSelectInputField.php';
+//require_once 'input-fields/SelectInputField.php';
+//require_once 'input-fields/ImageInputField.php';
+//require_once 'input-fields/HiddenInputField.php';
+//require_once 'input-fields/CustomInputField.php';
+//require_once 'input-fields/DateInputField.php';
+//require_once 'input-fields/RoleCheckboxInputField.php';
+//require_once 'input-fields/RoleSelectInputField.php';
 
 /**
  * Created by PhpStorm.
@@ -40,39 +32,41 @@ abstract class InputField extends Field
 {
     const FIELD_TYPE = 'input';
 
-    public $inputType;
-    private $overrideRights;
-    private $value;
+    protected $inputType;
+    protected $overrideRights;
+    protected $value;
 
     protected function __construct(int $id, string $name, string $title, string $inputType, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [])
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
-        $this->inputType     = $inputType;
+        $this->inputType      = $inputType;
         $this->overrideRights = $overrideRights;
     }
 
     public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);
-        switch ($values->input_type) {
-            case TextInputField::INPUT_TYPE:
-                return new TextInputField(...json_decode($json, true));
-            case SelectInputField::INPUT_TYPE:
-                return new SelectInputField(...json_decode($json, true));
+        $tmp    = json_decode($json, true);
+        SSV_General::var_export(json_decode($json, true));
+        switch ($values->inputType) {
+//            case TextInputField::INPUT_TYPE:
+//                return new TextInputField(...json_decode($json, true));
+//            case SelectInputField::INPUT_TYPE:
+//                return new SelectInputField(...json_decode($json, true));
             case CheckboxInputField::INPUT_TYPE:
-                return new CheckboxInputField(...json_decode($json, true));
-            case DateInputField::INPUT_TYPE:
-                return new DateInputField(...json_decode($json, true));
-            case RoleCheckboxInputField::INPUT_TYPE:
-                return new RoleCheckboxInputField(...json_decode($json, true));
-            case RoleSelectInputField::INPUT_TYPE:
-                return new RoleSelectInputField(...json_decode($json, true));
-            case ImageInputField::INPUT_TYPE:
-                return new ImageInputField(...json_decode($json, true));
-            case HiddenInputField::INPUT_TYPE:
-                return new HiddenInputField(...json_decode($json, true));
-            default:
-                return new CustomInputField(...json_decode($json, true));
+                return new CheckboxInputField($tmp);
+//            case DateInputField::INPUT_TYPE:
+//                return new DateInputField(...json_decode($json, true));
+//            case RoleCheckboxInputField::INPUT_TYPE:
+//                return new RoleCheckboxInputField(...json_decode($json, true));
+//            case RoleSelectInputField::INPUT_TYPE:
+//                return new RoleSelectInputField(...json_decode($json, true));
+//            case ImageInputField::INPUT_TYPE:
+//                return new ImageInputField(...json_decode($json, true));
+//            case HiddenInputField::INPUT_TYPE:
+//                return new HiddenInputField(...json_decode($json, true));
+//            default:
+//                return new CustomInputField(...json_decode($json, true));
         }
     }
 
@@ -134,7 +128,7 @@ abstract class InputField extends Field
     public function updateName($id, $postID)
     {
         global $wpdb;
-        $table = SSV_General::CUSTOM_FORM_FIELDS_TABLE;
+        $table = SSV_General::CUSTOMIZED_FIELDS_TABLE;
         $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
         $json  = $wpdb->get_var($sql);
         if (empty($json)) {

@@ -30,28 +30,28 @@ abstract class Field
         if ($name !== null) {
             $this->name = preg_replace('/[^A-Za-z0-9_\-]/', '', str_replace(' ', '_', strtolower($name)));
         }
-        $this->title = $title;
+        $this->title     = $title;
         $this->fieldType = $fieldType;
         if ($order === null) {
             $order = $id;
         }
-        $this->order = $order;
+        $this->order   = $order;
         $this->classes = $classes;
-        $this->styles = $styles;
+        $this->styles  = $styles;
     }
 
     public static function titleFromDatabase(string $name): string
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table  = SSV_General::BASE_FIELDS_TABLE;
+        $table = SSV_General::BASE_FIELDS_TABLE;
         return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
     public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);
-        switch ($values->field_type) {
+        switch ($values->fieldType) {
             case InputField::FIELD_TYPE:
                 return InputField::fromJSON($json);
             case TabField::FIELD_TYPE:
@@ -66,14 +66,21 @@ abstract class Field
 
     public function toJSON(): string
     {
-        return get_object_vars($this);
+        return json_encode(get_object_vars($this));
     }
 
-    abstract public function getHTML(): string;
+//    abstract public function getHTML(): string;
 
-    protected function getElementAttributesString(string $elementId, string $nameSuffix = null, bool $withRequired = false, bool $withDisabled = false, bool $withChecked = false): string
+    protected function getElementAttributesString(string $elementId, string $nameSuffix = null, array $options = []): string
     {
-        $attributesString = 'id="'.$elementId.'"';
+        $options          += [
+            'required' => false,
+            'disabled' => false,
+            'checked'  => false,
+            'value'    => false,
+        ];
+        $attributesString = 'id="' . $elementId . '"';
+        $attributesString .= ' type="' . $this->fieldType . '"';
         if (isset($this->classes[$elementId])) {
             $attributesString .= ' class="' . SSV_General::escape($this->classes[$elementId], 'attr', ' ') . '"';
         }
@@ -83,16 +90,19 @@ abstract class Field
         if ($this instanceof InputField) {
             $currentUserCanOverride = $this->currentUserCanOcerride();
             if ($nameSuffix !== null) {
-                $attributesString .= ' name="'.SSV_General::escape($this->name.$nameSuffix, 'attr').'"';
+                $attributesString .= ' name="' . SSV_General::escape($this->name . $nameSuffix, 'attr') . '"';
             }
-            if (!$currentUserCanOverride && $withRequired && isset($this->required)) {
+            if (!$currentUserCanOverride && $options['required'] && isset($this->required)) {
                 $attributesString .= $this->required ? 'required="required"' : '';
             }
-            if (!$currentUserCanOverride && $withDisabled && isset($this->disabled)) {
+            if (!$currentUserCanOverride && $options['disabled'] && isset($this->disabled)) {
                 $attributesString .= disabled($this->disabled, true, false);
             }
-            if ($withChecked && isset($this->checked)) {
+            if ($options['checked'] && isset($this->checked)) {
                 $attributesString .= checked($this->checked, true, false);
+            }
+            if ($options['value']) {
+                $attributesString .= checked($this->getValue(), true, false);
             }
         }
         return $attributesString;

@@ -2,11 +2,9 @@
 
 namespace mp_ssv_general\custom_fields\input_fields;
 
-use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
-use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -26,13 +24,37 @@ class CheckboxInputField extends InputField
     public $required;
     public $defaultChecked;
 
-    protected function __construct(int $id, string $name, string $title, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [], bool $disabled = false, bool $required = false, bool $defaultChecked = false)
+    /**
+     * @param array   $arguments {
+     *
+     * @type int      $id
+     * @type string   $name
+     * @type string   $title
+     * @type int|null $order
+     * @type array    $classes
+     * @type array    $styles
+     * @type array    $overrideRights
+     * @type bool     $disabled
+     * @type bool     $required
+     * @type bool     $defaultChecked
+     * }
+     */
+    protected function __construct(array $arguments = [])
     {
-        parent::__construct($id, $name, $title, self::INPUT_TYPE, $order, $classes, $styles, $overrideRights);
-        $this->disabled     = $disabled;
-        $this->required     = $required;
-        $this->defaultChecked = $defaultChecked;
-        $checkboxId = SSV_General::escape('checkbox_'.$this->id, 'attr');
+        $arguments += [
+            'order'          => null,
+            'classes'        => [],
+            'styles'         => [],
+            'overrideRights' => [],
+            'disabled'       => false,
+            'required'       => false,
+            'defaultChecked' => false,
+        ];
+        parent::__construct($arguments['id'], $arguments['name'], $arguments['title'], self::INPUT_TYPE, $arguments['order'], $arguments['classes'], $arguments['styles'], $arguments['overrideRights']);
+        $this->disabled       = $arguments['disabled'];
+        $this->required       = $arguments['required'];
+        $this->defaultChecked = $arguments['defaultChecked'];
+        $checkboxId           = SSV_General::escape('checkbox_' . $this->id, 'attr');
         if (!isset($this->classes[$checkboxId])) {
             $this->classes[$checkboxId] = ['validate', 'filled-id'];
         }
@@ -46,16 +68,15 @@ class CheckboxInputField extends InputField
 
     public function getHTML(): string
     {
-        $divId = SSV_General::escape('div_'.$this->id, 'attr');
-        $hiddenId = SSV_General::escape('fallback_'.$this->id, 'attr');
-        $checkboxId = SSV_General::escape('checkbox_'.$this->id, 'attr');
-        $labelId = SSV_General::escape('label_'.$this->id, 'attr');
+        $divId = SSV_General::escape('div_' . $this->name, 'attr');
+        $fallbackId = SSV_General::escape('fallback_' . $this->name, 'attr');
+        $checkboxId = SSV_General::escape('checkbox_' . $this->name, 'attr');
         ob_start();
         ?>
         <div <?= $this->getElementAttributesString($divId) ?>>
-            <input type="hidden" value="false" <?= $this->getElementAttributesString($hiddenId, '_reset') ?>/>
-            <input type="checkbox"  value="true" <?= $this->getElementAttributesString($checkboxId, '', true, true, true) ?>/>
-            <label for="<?= $checkboxId ?>" <?= $this->getElementAttributesString($labelId) ?>><?= SSV_General::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
+            <input type="hidden" <?= $this->getElementAttributesString($fallbackId) ?> value="false"/>
+            <input type="checkbox" <?= $this->getElementAttributesString($checkboxId, '', ['disabled' => true, 'checked' => true, 'required' => true]) ?> />
+            <label for="<?= $checkboxId ?>"><?= SSV_General::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
         </div>
         <?php
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

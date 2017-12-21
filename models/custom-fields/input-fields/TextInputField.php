@@ -3,7 +3,6 @@
 namespace mp_ssv_general\custom_fields\input_fields;
 
 use DateTime;
-use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 
@@ -26,8 +25,19 @@ class TextInputField extends InputField
     public $defaultValue;
     public $placeholder;
 
-    protected function __construct(int $id, string $name, string $title, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [], bool $disabled = false, bool $required = false, mixed $defaultValue = null, string $placeholder = '')
-    {
+    protected function __construct(
+        int $id,
+        string $name,
+        string $title,
+        int $order = null,
+        array $classes = [],
+        array $styles = [],
+        array $overrideRights = [],
+        bool $disabled = false,
+        bool $required = false,
+        mixed $defaultValue = null,
+        string $placeholder = ''
+    ) {
         parent::__construct($id, $name, $title, self::INPUT_TYPE, $order, $classes, $styles, $overrideRights);
         $this->disabled     = $disabled;
         $this->required     = $required;

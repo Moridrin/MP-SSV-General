@@ -1,5 +1,6 @@
 <?php
 namespace mp_ssv_users\options;
+
 use mp_ssv_general\SSV_General;
 use mp_ssv_general\User;
 

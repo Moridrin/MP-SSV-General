@@ -25,7 +25,7 @@ class HeaderField extends Field
 
     public function getHTML(): string
     {
-        $headerId = SSV_General::escape('header_'.$this->id, 'attr');
-        return '<h2 '.$this->getElementAttributesString($headerId).'>'.SSV_General::escape($this->title, 'html').'</h2>';
+        $headerId = SSV_General::escape('header_' . $this->id, 'attr');
+        return '<h2 ' . $this->getElementAttributesString($headerId) . '>' . SSV_General::escape($this->title, 'html') . '</h2>';
     }
 }

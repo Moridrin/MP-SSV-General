@@ -50,6 +50,7 @@ function getTextInputField(container, fieldID, values) {
     tr = getTextInputFields(tr, fieldID, name);
     container.appendChild(tr);
 }
+
 function getSelectInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -64,6 +65,7 @@ function getSelectInputField(container, fieldID, values) {
     tr = getSelectInputFields(tr, fieldID, name, options);
     container.appendChild(tr);
 }
+
 function getCheckboxInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -76,6 +78,7 @@ function getCheckboxInputField(container, fieldID, values) {
     tr = getCheckboxInputFields(tr, fieldID, name);
     container.appendChild(tr);
 }
+
 function getRoleCheckboxInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -88,6 +91,7 @@ function getRoleCheckboxInputField(container, fieldID, values) {
     tr = getRoleCheckboxInputFields(tr, fieldID, name);
     container.appendChild(tr);
 }
+
 function getRoleSelectInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -101,6 +105,7 @@ function getRoleSelectInputField(container, fieldID, values) {
     tr = getRoleSelectInputFields(tr, fieldID, name, options);
     container.appendChild(tr);
 }
+
 function getImageInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -115,6 +120,7 @@ function getImageInputField(container, fieldID, values) {
     tr = getImageInputFields(tr, fieldID, name);
     container.appendChild(tr);
 }
+
 function getHiddenInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -127,6 +133,7 @@ function getHiddenInputField(container, fieldID, values) {
     tr = getHiddenInputFields(tr, fieldID, name);
     container.appendChild(tr);
 }
+
 function getCustomInputField(container, inputType, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -139,6 +146,7 @@ function getCustomInputField(container, inputType, fieldID, values) {
     tr = getCustomInputFields(tr, fieldID, inputType, name);
     container.appendChild(tr);
 }
+
 function getDateInputField(container, fieldID, values) {
     var fieldTitle = '';
     var name = '';
@@ -160,6 +168,7 @@ function getBaseFields(fieldID, fieldTitle) {
     tr.appendChild(getFieldTitle(fieldID, fieldTitle));
     return tr;
 }
+
 function getTextInputFields(tr, fieldID, name) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'text'));
@@ -167,6 +176,7 @@ function getTextInputFields(tr, fieldID, name) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getSelectInputFields(tr, fieldID, name, options) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'select'));
@@ -174,6 +184,7 @@ function getSelectInputFields(tr, fieldID, name, options) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getCheckboxInputFields(tr, fieldID, name) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'checkbox'));
@@ -181,6 +192,7 @@ function getCheckboxInputFields(tr, fieldID, name) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getRoleCheckboxInputFields(tr, fieldID, role) {
     tr.appendChild(getRoleCheckbox(fieldID, role));
     tr.appendChild(getInputType(fieldID, 'role_checkbox'));
@@ -188,6 +200,7 @@ function getRoleCheckboxInputFields(tr, fieldID, role) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getRoleSelectInputFields(tr, fieldID, name, role) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'role_select'));
@@ -195,6 +208,7 @@ function getRoleSelectInputFields(tr, fieldID, name, role) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getImageInputFields(tr, fieldID, name) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'image'));
@@ -202,6 +216,7 @@ function getImageInputFields(tr, fieldID, name) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getHiddenInputFields(tr, fieldID, name, value) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'hidden'));
@@ -209,6 +224,7 @@ function getHiddenInputFields(tr, fieldID, name, value) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getCustomInputFields(tr, fieldID, inputType, name) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, inputType));
@@ -216,6 +232,7 @@ function getCustomInputFields(tr, fieldID, inputType, name) {
     tr.appendChild(getDeleteRow(fieldID));
     return tr;
 }
+
 function getDateInputFields(tr, fieldID, name) {
     tr.appendChild(getName(fieldID, name));
     tr.appendChild(getInputType(fieldID, 'date'));
@@ -229,6 +246,7 @@ function getBR() {
     br.innerHTML = '<br/>';
     return br.childNodes[0];
 }
+
 function getEmpty(fieldID, columnClass) {
     var td = document.createElement("td");
     td.setAttribute("style", "padding: 0;");
@@ -238,6 +256,7 @@ function getEmpty(fieldID, columnClass) {
     }
     return td;
 }
+
 function getFieldIDs(fieldID, isTab) {
     var fieldIDs = document.createElement("input");
     fieldIDs.setAttribute("type", "hidden");
@@ -252,6 +271,7 @@ function getFieldIDs(fieldID, isTab) {
     startTD.appendChild(fieldIDs);
     return startTD;
 }
+
 function getFieldID(fieldID) {
     var fieldIDElement = document.createElement("input");
     fieldIDElement.setAttribute("type", "hidden");
@@ -264,6 +284,7 @@ function getFieldID(fieldID) {
     fieldIDTD.appendChild(fieldIDElement);
     return fieldIDTD;
 }
+
 function getFieldTitle(fieldID, value) {
     var fieldTitle = document.createElement("input");
     fieldTitle.setAttribute("id", fieldID + "_title");
@@ -284,12 +305,13 @@ function getFieldTitle(fieldID, value) {
     fieldTitleTD.appendChild(fieldTitle);
     return fieldTitleTD;
 }
+
 function getInputType(fieldID, value) {
     var inputType = document.createElement("input");
-    inputType.setAttribute("id", fieldID + "_input_type");
-    inputType.setAttribute("name", "custom_field_" + fieldID + "_input_type");
+    inputType.setAttribute("id", fieldID + "_inputType");
+    inputType.setAttribute("name", "custom_field_" + fieldID + "_inputType");
     inputType.setAttribute("style", "width: 100%;");
-    inputType.setAttribute("list", "input_type");
+    inputType.setAttribute("list", "inputType");
     if (value) {
         inputType.setAttribute("value", value);
     }
@@ -298,16 +320,17 @@ function getInputType(fieldID, value) {
     };
     var inputTypeLabel = document.createElement("label");
     inputTypeLabel.setAttribute("style", "white-space: nowrap;");
-    inputTypeLabel.setAttribute("for", fieldID + "_input_type");
+    inputTypeLabel.setAttribute("for", fieldID + "_inputType");
     inputTypeLabel.innerHTML = "Input Type";
     var inputTypeTD = document.createElement("td");
     inputTypeTD.setAttribute("style", "padding: 0;");
-    inputTypeTD.setAttribute("id", fieldID + "_input_type_td");
+    inputTypeTD.setAttribute("id", fieldID + "_inputType_td");
     inputTypeTD.appendChild(inputTypeLabel);
     inputTypeTD.appendChild(getBR());
     inputTypeTD.appendChild(inputType);
     return inputTypeTD;
 }
+
 function getName(fieldID, value) {
     var name = document.createElement("input");
     name.setAttribute("id", fieldID + "_name");
@@ -330,6 +353,7 @@ function getName(fieldID, value) {
     nameTD.appendChild(name);
     return nameTD;
 }
+
 function getRoleCheckbox(fieldID, value) {
     var inputType = createSelect(fieldID, "_name", roles, value);
     inputType.setAttribute("style", "width: 100%;");
@@ -345,6 +369,7 @@ function getRoleCheckbox(fieldID, value) {
     inputTypeTD.appendChild(inputType);
     return inputTypeTD;
 }
+
 function getRoleSelect(fieldID, value) {
     var inputType = createMultiSelect(fieldID, "_options", roles, value);
     inputType.setAttribute("style", "width: 100%;");
@@ -360,6 +385,7 @@ function getRoleSelect(fieldID, value) {
     inputTypeTD.appendChild(inputType);
     return inputTypeTD;
 }
+
 function getOptions(fieldID, value) {
     var options = document.createElement("input");
     options.setAttribute("id", fieldID + "_options");
@@ -383,6 +409,7 @@ function getOptions(fieldID, value) {
     optionsTD.appendChild(options);
     return optionsTD;
 }
+
 function getValue(fieldID, value) {
     var valueField = document.createElement("input");
     valueField.setAttribute("id", fieldID + "_value");
@@ -403,6 +430,7 @@ function getValue(fieldID, value) {
     valueTD.appendChild(valueField);
     return valueTD;
 }
+
 function getDeleteRow(fieldID) {
     var deleteButton = document.createElement("img");
     deleteButton.setAttribute("src", pluginBaseURL + "/general/images/icon-delete.svg");
@@ -417,15 +445,15 @@ function getDeleteRow(fieldID) {
 
 function inputTypeChanged(fieldID) {
     var tr = document.getElementById(fieldID + "_tr");
-    var inputType = document.getElementById(fieldID + "_input_type").value;
+    var inputType = document.getElementById(fieldID + "_inputType").value;
     var name = document.getElementById(fieldID + "_name").value;
     removeField(document.getElementById(fieldID + "_name_td"));
     removeField(document.getElementById(fieldID + "_empty_td"));
     removeField(document.getElementById(fieldID + "_options_td"));
-        if (inputType === 'role_checkbox') {
-        tr.insertBefore(getRoleCheckbox(fieldID, name), document.getElementById(fieldID + "_input_type_td"));
+    if (inputType === 'role_checkbox') {
+        tr.insertBefore(getRoleCheckbox(fieldID, name), document.getElementById(fieldID + "_inputType_td"));
     } else {
-        tr.insertBefore(getName(fieldID, name), document.getElementById(fieldID + "_input_type_td"));
+        tr.insertBefore(getName(fieldID, name), document.getElementById(fieldID + "_inputType_td"));
     }
     if (inputType === 'select') {
         tr.insertBefore(getOptions(fieldID), document.getElementById(fieldID + "_delete_row_td"));
@@ -457,6 +485,7 @@ function createSelect(fieldID, fieldNameExtension, options, selected) {
 
     return select;
 }
+
 function createMultiSelect(fieldID, fieldNameExtension, options, selected) {
     if (selected === null) {
         selected = [];

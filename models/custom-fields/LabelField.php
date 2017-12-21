@@ -2,7 +2,6 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use Exception;
 use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
@@ -24,12 +23,12 @@ class LabelField extends Field
     protected function __construct(int $id, string $title, string $name, int $order = null, string $text = '', array $classes = [], array $styles = [])
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
-        $this->text  = $text;
+        $this->text = $text;
     }
 
     public function getHTML(): string
     {
-        $labelId = SSV_General::escape('label_'.$this->id, 'attr');
-        return '<p '.$this->getElementAttributesString($labelId).'>'.SSV_General::escape($this->text, 'html').'</p><br/>';
+        $labelId = SSV_General::escape('label_' . $this->id, 'attr');
+        return '<p ' . $this->getElementAttributesString($labelId) . '>' . SSV_General::escape($this->text, 'html') . '</p><br/>';
     }
 }

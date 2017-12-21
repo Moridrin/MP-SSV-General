@@ -5,6 +5,7 @@ namespace mp_ssv_general;
 use DateTime;
 use Exception;
 use mp_ssv_users\SSV_Users;
+use wpdb;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -59,8 +60,7 @@ class SSV_General
         User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, $defaultSelected, false);
     }
 
-
-        /**
+    /**
      * This function can be called from anywhere and will redirect the page to the given location.
      *
      * @param string $location is the url where the page should be redirected to.
@@ -73,7 +73,7 @@ class SSV_General
         echo $redirect_script;
     }
 
-        /**
+    /**
      * @param $adminReferer
      *
      * @return bool true if the request is POST, it isn't a reset request and it has the correct admin referer.
@@ -92,11 +92,103 @@ class SSV_General
         return true;
     }
 
-        public static function isValidIBAN($iban)
+    public static function isValidIBAN($iban)
     {
         $iban      = strtolower(str_replace(' ', '', $iban));
-        $Countries = array('al' => 28, 'ad' => 24, 'at' => 20, 'az' => 28, 'bh' => 22, 'be' => 16, 'ba' => 20, 'br' => 29, 'bg' => 22, 'cr' => 21, 'hr' => 21, 'cy' => 28, 'cz' => 24, 'dk' => 18, 'do' => 28, 'ee' => 20, 'fo' => 18, 'fi' => 18, 'fr' => 27, 'ge' => 22, 'de' => 22, 'gi' => 23, 'gr' => 27, 'gl' => 18, 'gt' => 28, 'hu' => 28, 'is' => 26, 'ie' => 22, 'il' => 23, 'it' => 27, 'jo' => 30, 'kz' => 20, 'kw' => 30, 'lv' => 21, 'lb' => 28, 'li' => 21, 'lt' => 20, 'lu' => 20, 'mk' => 19, 'mt' => 31, 'mr' => 27, 'mu' => 30, 'mc' => 27, 'md' => 24, 'me' => 22, 'nl' => 18, 'no' => 15, 'pk' => 24, 'ps' => 29, 'pl' => 28, 'pt' => 25, 'qa' => 29, 'ro' => 24, 'sm' => 27, 'sa' => 24, 'rs' => 22, 'sk' => 24, 'si' => 19, 'es' => 24, 'se' => 24, 'ch' => 21, 'tn' => 24, 'tr' => 26, 'ae' => 23, 'gb' => 22, 'vg' => 24);
-        $Chars     = array('a' => 10, 'b' => 11, 'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15, 'g' => 16, 'h' => 17, 'i' => 18, 'j' => 19, 'k' => 20, 'l' => 21, 'm' => 22, 'n' => 23, 'o' => 24, 'p' => 25, 'q' => 26, 'r' => 27, 's' => 28, 't' => 29, 'u' => 30, 'v' => 31, 'w' => 32, 'x' => 33, 'y' => 34, 'z' => 35);
+        $Countries = array('al' => 28,
+                           'ad' => 24,
+                           'at' => 20,
+                           'az' => 28,
+                           'bh' => 22,
+                           'be' => 16,
+                           'ba' => 20,
+                           'br' => 29,
+                           'bg' => 22,
+                           'cr' => 21,
+                           'hr' => 21,
+                           'cy' => 28,
+                           'cz' => 24,
+                           'dk' => 18,
+                           'do' => 28,
+                           'ee' => 20,
+                           'fo' => 18,
+                           'fi' => 18,
+                           'fr' => 27,
+                           'ge' => 22,
+                           'de' => 22,
+                           'gi' => 23,
+                           'gr' => 27,
+                           'gl' => 18,
+                           'gt' => 28,
+                           'hu' => 28,
+                           'is' => 26,
+                           'ie' => 22,
+                           'il' => 23,
+                           'it' => 27,
+                           'jo' => 30,
+                           'kz' => 20,
+                           'kw' => 30,
+                           'lv' => 21,
+                           'lb' => 28,
+                           'li' => 21,
+                           'lt' => 20,
+                           'lu' => 20,
+                           'mk' => 19,
+                           'mt' => 31,
+                           'mr' => 27,
+                           'mu' => 30,
+                           'mc' => 27,
+                           'md' => 24,
+                           'me' => 22,
+                           'nl' => 18,
+                           'no' => 15,
+                           'pk' => 24,
+                           'ps' => 29,
+                           'pl' => 28,
+                           'pt' => 25,
+                           'qa' => 29,
+                           'ro' => 24,
+                           'sm' => 27,
+                           'sa' => 24,
+                           'rs' => 22,
+                           'sk' => 24,
+                           'si' => 19,
+                           'es' => 24,
+                           'se' => 24,
+                           'ch' => 21,
+                           'tn' => 24,
+                           'tr' => 26,
+                           'ae' => 23,
+                           'gb' => 22,
+                           'vg' => 24,
+        );
+        $Chars     = array('a' => 10,
+                           'b' => 11,
+                           'c' => 12,
+                           'd' => 13,
+                           'e' => 14,
+                           'f' => 15,
+                           'g' => 16,
+                           'h' => 17,
+                           'i' => 18,
+                           'j' => 19,
+                           'k' => 20,
+                           'l' => 21,
+                           'm' => 22,
+                           'n' => 23,
+                           'o' => 24,
+                           'p' => 25,
+                           'q' => 26,
+                           'r' => 27,
+                           's' => 28,
+                           't' => 29,
+                           'u' => 30,
+                           'v' => 31,
+                           'w' => 32,
+                           'x' => 33,
+                           'y' => 34,
+                           'z' => 35,
+        );
 
         if (empty($iban)) {
             return false;
@@ -143,7 +235,7 @@ class SSV_General
         return (int)$mod;
     }
 
-        /**
+    /**
      * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
      * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
      * @param bool|string $resetButton  set to false if you don't want the reset button to be displayed or give string to set custom button text.
@@ -166,7 +258,7 @@ class SSV_General
         return ob_get_clean();
     }
 
-        /**
+    /**
      * @return string HTML
      */
     public static function getCapabilitiesDataList()
@@ -241,7 +333,7 @@ class SSV_General
         return ob_get_clean();
     }
 
-        /**
+    /**
      * @return string HTML
      */
     public static function getInputTypeDataList()
@@ -249,7 +341,7 @@ class SSV_General
         ob_start();
         $inputTypes = array('Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Date', 'Image', 'Hidden');
         ?>
-        <datalist id="input_type">
+        <datalist id="inputType">
             <?php foreach ($inputTypes as $inputType): ?>
                 <option value="<?= mp_ssv_to_snake_case($inputType) ?>"><?= $inputType ?></option>
             <?php endforeach; ?>
@@ -258,7 +350,7 @@ class SSV_General
         return ob_get_clean();
     }
 
-    public static function sanitize(mixed $value, mixed $sanitationType, string $implode = null)
+    public static function sanitize($value, $sanitationType, string $implode = null)
     {
         if (is_array($value)) {
             foreach ($value as $key => &$item) {
@@ -292,15 +384,15 @@ class SSV_General
                 break;
             case 'dateTime':
                 $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
-                $value = $dateTime ? $dateTime->format('Y-m-d H:i') : '';
+                $value    = $dateTime ? $dateTime->format('Y-m-d H:i') : '';
                 break;
             case 'date':
                 $dateTime = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
-                $value = $dateTime ? $dateTime->format('Y-m-d') : '';
+                $value    = $dateTime ? $dateTime->format('Y-m-d') : '';
                 break;
             case 'time':
                 $dateTime = DateTime::createFromFormat('H:i', sanitize_text_field($value));
-                $value = $dateTime ? $dateTime->format('H:i') : '';
+                $value    = $dateTime ? $dateTime->format('H:i') : '';
                 break;
             case 'bool':
             case 'boolean':
@@ -326,7 +418,7 @@ class SSV_General
         return $value;
     }
 
-    public static function escape(mixed $value, mixed $escapeType, string $implode = null)
+    public static function escape($value, $escapeType, string $implode = null)
     {
         if (is_array($value)) {
             foreach ($value as $key => &$item) {
@@ -367,14 +459,14 @@ class SSV_General
                 if (function_exists($function)) {
                     $value = $function($value);
                 } else {
-                    throw new Exception($escapeType.' is an unknown escape type.');
+                    throw new \InvalidArgumentException($escapeType . ' is an unknown escape type.');
                 }
                 break;
         }
         return $value;
     }
 
-        /**
+    /**
      * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
      *
      * @param mixed $variable any variable that you want to be printed.
@@ -416,7 +508,6 @@ class SSV_General
         }
         return null;
     }
-
 
     /**
      * This function checks if the given $variable is recursive.
@@ -462,8 +553,8 @@ class SSV_General
     public static function getListSelect($name, $options, $selected)
     {
         $selected = self::escape($selected, 'html');
-        $options = self::escape($options, 'html');
-        $name = self::escape($name, 'attribute');
+        $options  = self::escape($options, 'html');
+        $name     = self::escape($name, 'attribute');
         ob_start();
         $optionCount = count($options);
         ?>
@@ -490,6 +581,7 @@ class SSV_General
         <script>
             var options = <?= json_encode($selected) ?>;
             document.getElementById('<?= $name ?>').value = options;
+
             function <?= $name ?>_add(val) {
                 options.push(val);
                 document.getElementById('<?= $name ?>').value = options;
@@ -523,5 +615,17 @@ class SSV_General
     public static function currentNavTab($current, $selected)
     {
         return $current == $selected ? 'nav-tab-active' : '';
+    }
+
+    public static function CLEAN_INSTALL()
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $tableName = SSV_General::BASE_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        $tableName = SSV_General::CUSTOMIZED_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        mp_ssv_general_register_plugin();
     }
 }

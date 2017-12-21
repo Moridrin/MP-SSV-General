@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
  */
 class User extends \WP_User
 {
-            /**
+    /**
      * User constructor.
      *
      * @param \WP_User $user the WP_User component used as base for the User
@@ -28,8 +28,8 @@ class User extends \WP_User
     {
         parent::__construct($user);
     }
-    
-        /**
+
+    /**
      * This function searches for a User by its ID.
      *
      * @param int $id is the ID used to find the SSV_User
@@ -47,8 +47,8 @@ class User extends \WP_User
         }
         return $user;
     }
-    
-        /**
+
+    /**
      * @return bool|User
      */
     public static function getCurrent()
@@ -58,8 +58,8 @@ class User extends \WP_User
         }
         return new User(wp_get_current_user());
     }
-        
-        /**
+
+    /**
      * @param $username
      * @param $password
      * @param $email
@@ -86,10 +86,9 @@ class User extends \WP_User
         return self::getByID($id);
     }
 
-    
-        public static function getDefaultFields()
+    public static function getDefaultFields()
     {
-                /** @var HiddenInputField $registrationDateField */
+        /** @var HiddenInputField $registrationDateField */
         $registrationDateField = Field::fromJSON(
             json_encode(
                 array(
@@ -106,91 +105,91 @@ class User extends \WP_User
                 )
             )
         );
-        
-                /** @var TextInputField $usernameField */
+
+        /** @var TextInputField $usernameField */
         $usernameField = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Username',
-                    'field_type'    => 'input',
-                    'input_type'    => 'text',
-                    'name'          => 'username',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'title'          => 'Username',
+                    'field_type'     => 'input',
+                    'input_type'     => 'text',
+                    'name'           => 'username',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        
-                /** @var TextInputField $emailField */
+
+        /** @var TextInputField $emailField */
         $emailField = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Email',
-                    'field_type'    => 'input',
-                    'input_type'    => 'text',
-                    'name'          => 'email',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'title'          => 'Email',
+                    'field_type'     => 'input',
+                    'input_type'     => 'text',
+                    'name'           => 'email',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        
-                /** @var CustomInputField $passwordField */
+
+        /** @var CustomInputField $passwordField */
         $passwordField = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => 'validate',
-                    'style'         => '',
+                    'title'          => 'Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => 'validate',
+                    'style'          => '',
                 )
             )
         );
-        
-                /** @var CustomInputField $confirmPasswordField */
+
+        /** @var CustomInputField $confirmPasswordField */
         $confirmPasswordField = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Confirm Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'password_confirm',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => 'validate',
-                    'style'         => '',
+                    'title'          => 'Confirm Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'password_confirm',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => 'validate',
+                    'style'          => '',
                 )
             )
         );
-        
+
         return array(
             $registrationDateField->name => $registrationDateField,
             $usernameField->name         => $usernameField,
@@ -199,80 +198,80 @@ class User extends \WP_User
             $confirmPasswordField->name  => $confirmPasswordField,
         );
     }
-    
-        public static function getPasswordChangeFields()
+
+    public static function getPasswordChangeFields()
     {
-                /** @var CustomInputField $currentPassword */
+        /** @var CustomInputField $currentPassword */
         $currentPassword = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Current Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'current_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'title'          => 'Current Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'current_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        
-                /** @var CustomInputField $newPassword */
+
+        /** @var CustomInputField $newPassword */
         $newPassword = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'New Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'new_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'title'          => 'New Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'new_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        
-                /** @var CustomInputField $confirmNewPassword */
+
+        /** @var CustomInputField $confirmNewPassword */
         $confirmNewPassword = Field::fromJSON(
             json_encode(
                 array(
                     'container_id'   => '',
                     'order'          => 0,
                     'override_right' => '',
-                    'title'         => 'Confirm New Password',
-                    'field_type'    => 'input',
-                    'input_type'    => 'password',
-                    'name'          => 'confirm_new_password',
-                    'disabled'      => false,
-                    'required'      => true,
-                    'default_value' => '',
-                    'placeholder'   => '',
-                    'class'         => '',
-                    'style'         => '',
+                    'title'          => 'Confirm New Password',
+                    'field_type'     => 'input',
+                    'input_type'     => 'password',
+                    'name'           => 'confirm_new_password',
+                    'disabled'       => false,
+                    'required'       => true,
+                    'default_value'  => '',
+                    'placeholder'    => '',
+                    'class'          => '',
+                    'style'          => '',
                 )
             )
         );
-        
+
         return array(
             $currentPassword->name    => $currentPassword,
             $newPassword->name        => $newPassword,
             $confirmNewPassword->name => $confirmNewPassword,
         );
     }
-    
-        /**
+
+    /**
      * @return bool returns true if this is the current user.
      */
     public function isCurrentUser()
@@ -283,8 +282,8 @@ class User extends \WP_User
             return false;
         }
     }
-    
-        /**
+
+    /**
      * @param $capability
      *
      * @return bool true if this user has the given capability.
@@ -296,8 +295,8 @@ class User extends \WP_User
         }
         return self::getCurrent()->has_cap($capability);
     }
-    
-        /**
+
+    /**
      * @param string $password The plaintext new user password
      *
      * @return bool false, if the $password does not match the member's password
@@ -306,8 +305,8 @@ class User extends \WP_User
     {
         return wp_check_password($password, $this->data->user_pass, $this->ID);
     }
-    
-        /**
+
+    /**
      * This method updates all
      *
      * @param InputField[] $inputFields
@@ -318,8 +317,8 @@ class User extends \WP_User
             $this->updateMeta($field->name, $field->value);
         }
     }
-    
-        /**
+
+    /**
      * This function sets the metadata defined by the key (or an alias of that key).
      * The aliases are:
      *  - email, email_address, member_email => user_email
@@ -363,7 +362,7 @@ class User extends \WP_User
                 wp_update_user(array('ID' => $this->ID, 'last_name' => $value));
             }
             update_user_meta($this->ID, $meta_key, $value);
-            $display_name = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
+            $display_name       = $this->getMeta('first_name') . ' ' . $this->getMeta('last_name');
             $this->display_name = $display_name;
             wp_update_user(array('ID' => $this->ID, 'display_name' => $display_name));
             update_user_meta($this->ID, 'display_name', $display_name);
@@ -375,8 +374,8 @@ class User extends \WP_User
             return true;
         }
     }
-    
-        /**
+
+    /**
      * This function returns the metadata associated with the given key (or an alias of that key).
      * The aliases are:
      *  - email, email_address, member_email => user_email
@@ -401,8 +400,8 @@ class User extends \WP_User
             return $value ?: $default;
         }
     }
-    
-        /**
+
+    /**
      * @param string $target
      *
      * @return string of the full <a> tag.
@@ -415,8 +414,7 @@ class User extends \WP_User
         return "<a href='$href' $target>$label</a>";
     }
 
-    
-        /**
+    /**
      * @return string the url for the users profile
      */
     public function getProfileURL()
@@ -425,4 +423,4 @@ class User extends \WP_User
         $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
     }
-    }
+}

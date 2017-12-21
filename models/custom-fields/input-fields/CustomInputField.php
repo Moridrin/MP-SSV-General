@@ -2,7 +2,6 @@
 
 namespace mp_ssv_general\custom_fields\input_fields;
 
-use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\SSV_General;
@@ -24,8 +23,20 @@ class CustomInputField extends InputField
     public $defaultValue;
     public $placeholder;
 
-    protected function __construct(int $id, string $name, string $title, string $type, int $order = null, array $classes = [], array $styles = [], array $overrideRights = [], bool $disabled = false, bool $required = false, bool $defaultChecked = false)
-    {
+    protected function __construct(
+        int $id,
+        string $name,
+        string $title,
+        string $type,
+        int $order = null,
+        array $classes = [],
+        array $styles = [],
+        array $overrideRights = [],
+        bool $disabled = false,
+        bool $required = false,
+        string $defaultValue = null,
+        string $placeholder = null
+    ) {
         parent::__construct($id, $name, $title, $type, $order, $classes, $styles, $overrideRights);
         $this->disabled     = filter_var($disabled, FILTER_VALIDATE_BOOLEAN);
         $this->required     = filter_var($required, FILTER_VALIDATE_BOOLEAN);
@@ -33,62 +44,14 @@ class CustomInputField extends InputField
         $this->placeholder  = $placeholder;
     }
 
-    /**
-     * @param string $json
-     *
-     * @return CustomInputField
-     * @throws Exception
-     */
-    public static function fromJSON($json)
+    public function getHTML(): string
     {
-        $values = json_decode($json);
-        return new CustomInputField(
-            $values->container_id,
-            $values->order,
-            $values->title,
-            $values->input_type,
-            $values->name,
-            $values->disabled,
-            $values->required,
-            $values->default_value,
-            $values->placeholder,
-            $values->class,
-            $values->style,
-            $values->override_right
-        );
-    }
+        $inputId = SSV_General::escape('checkbox_' . $this->name, 'attr');
+        $labelId = SSV_General::escape('label_' . $this->name, 'attr');
+        $divId   = SSV_General::escape('div_' . $this->name, 'attr');
 
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
-    {
-        $values = array(
-            'container_id'   => $this->containerID,
-            'order'          => $this->order,
-            'title'          => $this->title,
-            'field_type'     => $this->fieldType,
-            'input_type'     => $this->inputType,
-            'name'           => $this->name,
-            'disabled'       => $this->disabled,
-            'required'       => $this->required,
-            'default_value'  => $this->defaultValue,
-            'placeholder'    => $this->placeholder,
-            'class'          => $this->classes,
-            'style'          => $this->styles,
-            'override_right' => $this->overrideRights,
-        );
-        $values = json_encode($values);
-        return $values;
-    }
-
-    /**
-     * @return string the field as HTML object.
-     */
-    public function getHTML()
-    {
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
-        $inputType   = 'type="' . esc_html($this->inputType) . '"';
+        $inputType   = 'type="' . SSV_General::escape($this->inputType, 'attr') . '"';
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : '';
         $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
@@ -103,21 +66,12 @@ class CustomInputField extends InputField
         }
 
         ob_start();
-        if (current_theme_supports('materialize')) {
-            ?>
-            <div>
-                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
-                <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/>
-            </div>
-            <?php
-        } else {
-            ?>
-            <div>
-                <label for="<?= esc_html($this->order) ?>"><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
-                <input <?= $inputType ?> id="<?= esc_html($this->order) ?>" <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?>/><br/>
-            </div>
-            <?php
-        }
+        ?>
+        <div <?= $this->getElementAttributesString($divId) ?>>
+            <label for="<?= $inputId ?>" <?= $this->getElementAttributesString($labelId) ?>><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <input <?= $inputType ?> <?= $this->getElementAttributesString($inputId, '', ['required' => true, 'disabled' => true, 'value' => true]) ?>/>
+        </div>
+        <?php
 
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }

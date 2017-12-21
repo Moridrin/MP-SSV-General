@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
  */
 function mp_ssv_to_camel_case($string, $capitalizeFirstCharacter = false)
 {
-    $string    = str_replace(' ', '', mp_ssv_to_title($string));
+    $string = str_replace(' ', '', mp_ssv_to_title($string));
 
     if (!$capitalizeFirstCharacter) {
         $string[0] = strtolower($string[0]);
