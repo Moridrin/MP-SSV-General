@@ -21,10 +21,10 @@ function ssv_settings_page()
     }
     ?>
     <div class="wrap">
-        <h1>Users Options</h1>
+        <h1>General Options</h1>
         <h2 class="nav-tab-wrapper">
             <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
-            <a href="?page=<?= $_GET['page'] ?>&tab=site-specific-fields" class="nav-tab <?= $active_tab == 'site-specific-fields' ? 'nav-tab-active' : '' ?>">Site Specific Fields</a>
+            <a href="?page=<?= $_GET['page'] ?>&tab=site-specific-fields" class="nav-tab <?= $active_tab == 'site-specific-fields' ? 'nav-tab-active' : '' ?>">Form Fields</a>
             <a href="http://bosso.nl/plugins/ssv-general/" target="_blank" class="nav-tab">
                 Help <img src="<?= SSV_General::URL ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle" height="14">
             </a>
@@ -37,7 +37,7 @@ function ssv_settings_page()
                     require_once "general.php";
                     break;
                 case "site-specific-fields":
-                    require_once "site-specific-fields.php";
+                    require_once "form-fields.php";
                     break;
             }
         }
@@ -56,7 +56,31 @@ function ssv_add_ssv_network_admin_menu()
 
 function ssv_settings_page_network_admin()
 {
-
+    $active_tab = "general";
+    if (isset($_GET['tab'])) {
+        $active_tab = $_GET['tab'];
+    }
+    ?>
+    <div class="wrap">
+        <h1>General Options</h1>
+        <h2 class="nav-tab-wrapper">
+            <a href="?page=<?= $_GET['page'] ?>&tab=general" class="nav-tab <?= $active_tab == 'general' ? 'nav-tab-active' : '' ?>">General</a>
+            <a href="http://bosso.nl/plugins/ssv-general/" target="_blank" class="nav-tab">
+                Help <img src="<?= SSV_General::URL ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle" height="14">
+            </a>
+        </h2>
+        <?php
+        if (is_multisite()) {
+            switch ($active_tab) {
+                default:
+                case "general":
+                    require_once "base-form-fields.php";
+                    break;
+            }
+        }
+        ?>
+    </div>
+    <?php
 }
 
 add_action('network_admin_menu', 'ssv_add_ssv_network_admin_menu', 9);
