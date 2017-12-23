@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable       = SSV_General::BASE_FIELDS_TABLE;
+$baseTable       = SSV_General::SHARED_BASE_FIELDS_TABLE;
 $customizedTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
 
 if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {

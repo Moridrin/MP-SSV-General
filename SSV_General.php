@@ -23,7 +23,8 @@ class SSV_General
     const URL = SSV_GENERAL_URL;
     const BASE_URL = SSV_GENERAL_BASE_URL;
 
-    const BASE_FIELDS_TABLE = SSV_GENERAL_BASE_FIELDS_TABLE;
+    const SHARED_BASE_FIELDS_TABLE = SSV_GENERAL_SHARED_BASE_FIELDS_TABLE;
+    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_GENERAL_SITE_SPECIFIC_BASE_FIELDS_TABLE;
     const CUSTOMIZED_FIELDS_TABLE = SSV_GENERAL_CUSTOMIZED_FIELDS;
 
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
@@ -44,6 +45,7 @@ class SSV_General
         if (!self::$initialized) {
             require_once 'functions.php';
             require_once 'options/options.php';
+            require_once 'forms/forms.php';
             require_once 'models/User.php';
             require_once 'models/Message.php';
             require_once 'models/Form.php';
@@ -619,7 +621,7 @@ class SSV_General
         /** @var wpdb $wpdb */
         global $wpdb;
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = SSV_General::BASE_FIELDS_TABLE;
+        $tableName = SSV_General::SHARED_BASE_FIELDS_TABLE;
         $wpdb->query("DROP TABLE $tableName;");
         $tableName = SSV_General::CUSTOMIZED_FIELDS_TABLE;
         $wpdb->query("DROP TABLE $tableName;");

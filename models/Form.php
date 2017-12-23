@@ -138,9 +138,8 @@ class Form
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table      = SSV_General::BASE_FIELDS_TABLE;
+        $table      = SSV_General::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
-        $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
         ob_start();
         echo SSV_General::getCapabilitiesDataList();
         $columns = json_decode(User::getCurrent()->getMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, array()));
@@ -186,12 +185,12 @@ class Form
             <br/>
             <br/>
             <label>
-                Field Name (or title)
+                Field Title
                 <input type="text" id="custom_field_selector" list="custom_fields"/>
             </label>
             <datalist id="custom_fields">
                 <?php foreach ($baseFields as $field): ?>
-                    <option value="<?= $field->name ?>"><?= $field->title ?></option>
+                    <option><?= $field->bf_title ?></option>
                 <?php endforeach; ?>
             </datalist>
             <button type="button" onclick="mp_ssv_add_new_custom_input_field_customizer()">Add Field</button>
@@ -258,7 +257,7 @@ class Form
             return;
         }
         $form       = new Form();
-        $table      = SSV_General::BASE_FIELDS_TABLE;
+        $table      = SSV_General::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
         $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
 

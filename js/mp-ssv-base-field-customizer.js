@@ -1,5 +1,4 @@
 //noinspection JSUnresolvedVariable
-var roles = JSON.parse(settings.roles);
 var scripts = document.getElementsByTagName("script");
 var pluginBaseURL = scripts[scripts.length - 1].src.split('/').slice(0, -3).join('/');
 var fieldIDs = [];

@@ -44,7 +44,7 @@ abstract class Field
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table = SSV_General::BASE_FIELDS_TABLE;
+        $table = SSV_General::SHARED_BASE_FIELDS_TABLE;
         return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
