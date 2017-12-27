@@ -11,12 +11,8 @@ if (!defined('ABSPATH')) {
 
 class SSV_Global
 {
-    const PATH = SSV_GENERAL_PATH;
-    const URL = SSV_GENERAL_URL;
-
-    const SHARED_BASE_FIELDS_TABLE = SSV_GENERAL_SHARED_BASE_FIELDS_TABLE;
-    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_GENERAL_SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    const CUSTOMIZED_FIELDS_TABLE = SSV_GENERAL_CUSTOMIZED_FIELDS;
+    const PATH = SSV_BASE_FUNCTIONS_PATH;
+    const URL = SSV_BASE_FUNCTIONS_URL;
 
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
@@ -53,86 +49,4 @@ class SSV_Global
         }
         return '';
     }
-
-    public static function CLEAN_INSTALL()
-    {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = SSV_Global::SHARED_BASE_FIELDS_TABLE;
-        $wpdb->query("DROP TABLE $tableName;");
-        $tableName = SSV_Global::CUSTOMIZED_FIELDS_TABLE;
-        $wpdb->query("DROP TABLE $tableName;");
-        mp_ssv_general_register_plugin();
-    }
-}
-
-function mp_ssv_general_admin_scripts()
-{
-    if (isset($_GET["page"]) && $_GET["page"] == "ssv_forms") {
-        wp_enqueue_script('mp-ssv-base-fields-manager', SSV_Global::URL . '/js/mp-ssv-base-fields-manager.js', ['jquery']);
-        wp_enqueue_script('mp-ssv-fields-management', SSV_Global::URL . '/js/mp-ssv-fields-management.js', ['jquery']);
-        wp_localize_script(
-            'mp-ssv-fields-management',
-            'urls',
-            [
-                'plugins'  => plugins_url(),
-                'ajax'    => admin_url('admin-ajax.php'),
-                'base'     => get_home_url(),
-                'basePath' => ABSPATH,
-            ]
-        );
-    } else {
-        wp_enqueue_script('mp-ssv-base-field-customizer', SSV_Global::URL . '/js/mp-ssv-base-field-customizer.js', ['jquery']);
-        wp_enqueue_script('mp-ssv-fields-management', SSV_Global::URL . '/js/mp-ssv-fields-management.js', ['jquery']);
-    }
-    wp_localize_script(
-        'mp-ssv-fields-management',
-        'settings',
-        ['roles'   => json_encode(array_keys(get_editable_roles()))]
-    );
-}
-
-add_action('admin_enqueue_scripts', 'mp_ssv_general_admin_scripts');
-
-function mp_ssv_register_forms_plugin()
-{
-    /** @var wpdb $wpdb */
-    global $wpdb;
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $tableName = SSV_Global::SHARED_BASE_FIELDS_TABLE;
-    $sql
-               = "
-		CREATE TABLE IF NOT EXISTS $tableName (
-			`bf_id` bigint(20) NOT NULL PRIMARY KEY,
-			`bf_name` VARCHAR(50) UNIQUE,
-			`bf_title` VARCHAR(50) NOT NULL,
-			`bf_inputType` VARCHAR(50),
-			`bf_value` VARCHAR(50)
-		) $charset_collate;";
-    $wpdb->query($sql);
-
-    $tableName = SSV_Global::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    $sql
-               = "
-		CREATE TABLE IF NOT EXISTS $tableName (
-			`bf_id` bigint(20) NOT NULL PRIMARY KEY,
-			`bf_name` VARCHAR(50) UNIQUE,
-			`bf_title` VARCHAR(50) NOT NULL,
-			`bf_inputType` VARCHAR(50),
-			`bf_value` VARCHAR(50)
-		) $charset_collate;";
-    $wpdb->query($sql);
-
-    $tableName = SSV_Global::CUSTOMIZED_FIELDS_TABLE;
-    $sql
-               = "
-		CREATE TABLE IF NOT EXISTS $tableName (
-			`cf_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-			`cf_bf_id` bigint(20),
-			`cf_json` TEXT NOT NULL
-		) $charset_collate;";
-    $wpdb->query($sql);
 }

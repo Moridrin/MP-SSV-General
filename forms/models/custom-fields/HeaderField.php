@@ -2,7 +2,7 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use mp_ssv_general\SSV_Base;
+use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -25,7 +25,7 @@ class HeaderField extends Field
 
     public function getHTML(): string
     {
-        $headerId = SSV_Base::escape('header_' . $this->id, 'attr');
-        return '<h2 ' . $this->getElementAttributesString($headerId) . '>' . SSV_Base::escape($this->title, 'html') . '</h2>';
+        $headerId = BaseFunctions::escape('header_' . $this->id, 'attr');
+        return '<h2 ' . $this->getElementAttributesString($headerId) . '>' . BaseFunctions::escape($this->title, 'html') . '</h2>';
     }
 }

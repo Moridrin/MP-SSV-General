@@ -3,7 +3,7 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
-use mp_ssv_general\SSV_Base;
+use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -44,7 +44,7 @@ abstract class Field
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table = SSV_Base::SHARED_BASE_FIELDS_TABLE;
+        $table = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
         return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
@@ -82,15 +82,15 @@ abstract class Field
         $attributesString = 'id="' . $elementId . '"';
         $attributesString .= ' type="' . $this->fieldType . '"';
         if (isset($this->classes[$elementId])) {
-            $attributesString .= ' class="' . SSV_Base::escape($this->classes[$elementId], 'attr', ' ') . '"';
+            $attributesString .= ' class="' . BaseFunctions::escape($this->classes[$elementId], 'attr', ' ') . '"';
         }
         if (isset($this->styles[$elementId])) {
-            $attributesString .= ' style="' . SSV_Base::escape($this->styles[$elementId], 'attr', ' ') . '"';
+            $attributesString .= ' style="' . BaseFunctions::escape($this->styles[$elementId], 'attr', ' ') . '"';
         }
         if ($this instanceof InputField) {
             $currentUserCanOverride = $this->currentUserCanOcerride();
             if ($nameSuffix !== null) {
-                $attributesString .= ' name="' . SSV_Base::escape($this->name . $nameSuffix, 'attr') . '"';
+                $attributesString .= ' name="' . BaseFunctions::escape($this->name . $nameSuffix, 'attr') . '"';
             }
             if (!$currentUserCanOverride && $options['required'] && isset($this->required)) {
                 $attributesString .= $this->required ? 'required="required"' : '';

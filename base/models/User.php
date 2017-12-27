@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_general;
+namespace mp_ssv_general\base;
 
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
@@ -78,9 +78,9 @@ class User extends \WP_User
             return new Message('This email address already exists. Try resetting your password.', Message::ERROR_MESSAGE);
         }
         $id = wp_create_user(
-            SSV_Base::sanitize($username, 'text'),
-            SSV_Base::sanitize($password, 'text'),
-            SSV_Base::sanitize($email, 'email')
+            BaseFunctions::sanitize($username, 'text'),
+            BaseFunctions::sanitize($password, 'text'),
+            BaseFunctions::sanitize($email, 'email')
         );
 
         return self::getByID($id);
@@ -307,18 +307,6 @@ class User extends \WP_User
     }
 
     /**
-     * This method updates all
-     *
-     * @param InputField[] $inputFields
-     */
-    public function update($inputFields)
-    {
-        foreach ($inputFields as $field) {
-            $this->updateMeta($field->name, $field->value);
-        }
-    }
-
-    /**
      * This function sets the metadata defined by the key (or an alias of that key).
      * The aliases are:
      *  - email, email_address, member_email => user_email
@@ -338,7 +326,7 @@ class User extends \WP_User
             return true;
         }
         if ($sanitize) {
-            $value = SSV_Base::sanitize($value, $meta_key);
+            $value = BaseFunctions::sanitize($value, $meta_key);
         }
         if ($this->getMeta($meta_key) == $value) {
             return true;
@@ -420,7 +408,7 @@ class User extends \WP_User
     public function getProfileURL()
     {
         $url = get_edit_user_link($this->ID);
-        $url = apply_filters(SSV_Base::HOOK_USER_PROFILE_URL, $url, $this);
+        $url = apply_filters(BaseFunctions::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
     }
 }

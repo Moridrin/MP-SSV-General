@@ -5,7 +5,7 @@ namespace mp_ssv_general\custom_fields\input_fields;
 use Exception;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_Base;
+use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -161,7 +161,7 @@ class ImageInputField extends InputField
         $errors = array();
         if ($this->required && empty($this->value)) {
             $errors[] = new Message($this->title . ' is required but not set.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
-        } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, SSV_Base::BASE_URL)) {
+        } elseif (!empty($this->value) && !mp_ssv_starts_with($this->value, BaseFunctions::BASE_URL)) {
             $errors[] = new Message($this->title . ' has an incorrect url.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ? true : $errors;

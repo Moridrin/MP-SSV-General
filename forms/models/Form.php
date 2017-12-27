@@ -72,7 +72,7 @@ class Form
         if (!$post) {
             return $form;
         }
-        $customizationTable = SSV_Base::CUSTOMIZED_FIELDS_TABLE;
+        $customizationTable = BaseFunctions::CUSTOMIZED_FIELDS_TABLE;
         $postID             = $post->ID;
         $customizedFields   = $wpdb->get_results("SELECT * FROM $customizationTable WHERE postID = $postID ORDER BY `order` ASC");
         foreach ($customizedFields as $customizedField) {
@@ -138,11 +138,11 @@ class Form
     {
         /** @var \wpdb $wpdb */
         global $wpdb;
-        $table      = SSV_Base::SHARED_BASE_FIELDS_TABLE;
+        $table      = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
         ob_start();
-        echo SSV_Base::getCapabilitiesDataList();
-        $columns = json_decode(User::getCurrent()->getMeta(SSV_Base::USER_OPTION_CUSTOM_FIELD_FIELDS, array()));
+        echo BaseFunctions::getCapabilitiesDataList();
+        $columns = json_decode(User::getCurrent()->getMeta(BaseFunctions::USER_OPTION_CUSTOM_FIELD_FIELDS, array()));
         ?>
         <div style="overflow-x: auto;">
             <table id="custom-fields-placeholder" class="sortable">
@@ -257,7 +257,7 @@ class Form
             return;
         }
         $form       = new Form();
-        $table      = SSV_Base::SHARED_BASE_FIELDS_TABLE;
+        $table      = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $table");
         $baseFields = array_combine(array_column($baseFields, 'name'), $baseFields);
 
@@ -308,7 +308,7 @@ class Form
         }
         //Remove All old fields for post
         $wpdb->delete(
-            SSV_Base::CUSTOMIZED_FIELDS_TABLE,
+            BaseFunctions::CUSTOMIZED_FIELDS_TABLE,
             array(
                 'postID' => $post->ID,
             )
@@ -321,7 +321,7 @@ class Form
         }
         foreach ($fields as $field) {
             $wpdb->insert(
-                SSV_Base::CUSTOMIZED_FIELDS_TABLE,
+                BaseFunctions::CUSTOMIZED_FIELDS_TABLE,
                 array(
                     'postID'      => $post->ID,
                     'containerID' => $form->containerID,
@@ -357,7 +357,7 @@ class Form
             <form action="#" method="POST" enctype="multipart/form-data">
                 <?= $html ?>
                 <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
-                <?= SSV_Base::getFormSecurityFields($adminReferrer, false, false) ?>
+                <?= BaseFunctions::getFormSecurityFields($adminReferrer, false, false) ?>
             </form>
             <?php
             $html = ob_get_clean();
@@ -376,7 +376,7 @@ class Form
                             <?= $childField->getHTML() ?>
                         <?php endforeach; ?>
                         <button type="submit" name="submit" class="btn waves-effect waves-light btn waves-effect waves-light--primary"><?= esc_html($buttonText) ?></button>
-                        <?= SSV_Base::getFormSecurityFields($adminReferrer, false, false); ?>
+                        <?= BaseFunctions::getFormSecurityFields($adminReferrer, false, false); ?>
                     </form>
                 </div>
                 <?php
@@ -473,7 +473,7 @@ class Form
             if ($file_location && !isset($file_location['error'])) {
                 $currentURL      = $this->user->getMeta($name);
                 $currentLocation = $this->user->getMeta($name . '_path');
-                if ($currentURL != '' && mp_ssv_starts_with($currentURL, SSV_Base::BASE_URL) && file_exists($currentLocation)) {
+                if ($currentURL != '' && mp_ssv_starts_with($currentURL, BaseFunctions::BASE_URL) && file_exists($currentLocation)) {
                     unlink($currentLocation);
                 }
                 $this->user->updateMeta($name, $file_location["url"]);

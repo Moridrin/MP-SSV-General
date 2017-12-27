@@ -1,24 +1,19 @@
 <?php
 
-namespace mp_ssv_general;
+namespace mp_ssv_general\base;
 
 use DateTime;
 use Exception;
-use mp_ssv_users\SSV_Users;
-use wpdb;
+use ReflectionClass;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-/**
- * Created by PhpStorm.
- * User: moridrin
- * Date: 26-1-17
- * Time: 15:50
- */
-class SSV_Base
+abstract class BaseFunctions
 {
+    const PATH = SSV_BASE_FUNCTIONS_PATH;
+    const URL = SSV_BASE_FUNCTIONS_URL;
 
     /**
      * This function can be called from anywhere and will redirect the page to the given location.
@@ -295,7 +290,7 @@ class SSV_Base
         ?>
         <datalist id="inputType">
             <?php foreach ($inputTypes as $inputType): ?>
-                <option value="<?= mp_ssv_to_snake_case($inputType) ?>"><?= $inputType ?></option>
+                <option value="<?= self::toSnakeCase($inputType) ?>"><?= $inputType ?></option>
             <?php endforeach; ?>
         </datalist>
         <?php
@@ -432,7 +427,7 @@ class SSV_Base
             ob_start();
             echo $variable . ';';
             $query = ob_get_clean();
-            include_once('lib/SqlFormatter.php');
+            require_once self::PATH.'lib/SqlFormatter.php';
             $print = SqlFormatter::highlight($query);
             $print = trim(preg_replace('/\s+/', ' ', $print));
         } else {
@@ -537,13 +532,6 @@ class SSV_Base
         return (int)$mod;
     }
 
-    /**
-     * This function checks if the given $variable is recursive.
-     *
-     * @param mixed $variable is the variable to be checked.
-     *
-     * @return bool true if the $variable contains circular reference.
-     */
     private static function _hasCircularReference($variable)
     {
         $dump = print_r($variable, true);
@@ -552,5 +540,57 @@ class SSV_Base
         } else {
             return false;
         }
+    }
+
+    public static function toCamelCase(string $string, bool $capitalizeFirstCharacter = false): string
+    {
+        $string = str_replace(' ', '', self::toTitle($string));
+
+        if (!$capitalizeFirstCharacter) {
+            $string[0] = strtolower($string[0]);
+        }
+
+        return $string;
+    }
+
+    public static function toTitle(string $string): string
+    {
+        $string = preg_replace('/(?<!\ )[A-Z]/', ' $0', $string);
+        $string = str_replace('-', ' ', $string);
+        $string = str_replace('_', ' ', $string);
+        $string = ucwords($string);
+        return $string;
+    }
+
+    public static function toSnakeCase(string $string): string
+    {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode('_', $ret);
+    }
+
+    public static function toValue(string $string): string
+    {
+        $string = str_replace(' ', '_', $string);
+        $string = strtolower($string);
+        return $string;
+    }
+
+    public static function replaceAtPos(string $haystack, string $needle, string $replacement, int $position): string
+    {
+        return substr_replace($haystack, $replacement, $position, strlen($needle));
+    }
+
+    public static function startsWith(string $haystack, string $needle): bool
+    {
+        return $needle === '' || strrpos($haystack, $needle, -strlen($haystack)) !== false;
+    }
+
+    public static function endsWith(string $haystack, string $needle): bool
+    {
+        return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
     }
 }

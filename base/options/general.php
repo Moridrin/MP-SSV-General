@@ -1,7 +1,7 @@
 <?php
 namespace mp_ssv_users\options;
 
-use mp_ssv_general\SSV_Base;
+use mp_ssv_general\BaseFunctions;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -17,12 +17,12 @@ $columns = array(
     'style',
 );
 
-if (SSV_Base::isValidPOST(SSV_Base::OPTIONS_ADMIN_REFERER)) {
+if (BaseFunctions::isValidPOST(BaseFunctions::OPTIONS_ADMIN_REFERER)) {
     if (isset($_POST['reset'])) {
-        SSV_Base::resetOptions();
+        BaseFunctions::resetOptions();
     } else {
-        $customFieldFields = isset($_POST['columns']) ? SSV_Base::sanitize($_POST['columns'], $columns) : array();
-        User::getCurrent()->updateMeta(SSV_Base::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
+        $customFieldFields = isset($_POST['columns']) ? BaseFunctions::sanitize($_POST['columns'], $columns) : array();
+        User::getCurrent()->updateMeta(BaseFunctions::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode($customFieldFields), false);
     }
 }
 ?>
@@ -34,7 +34,7 @@ if (SSV_Base::isValidPOST(SSV_Base::OPTIONS_ADMIN_REFERER)) {
             </th>
             <td>
                 <?php
-                $selected = json_decode(User::getCurrent()->getMeta(SSV_Base::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))));
+                $selected = json_decode(User::getCurrent()->getMeta(BaseFunctions::USER_OPTION_CUSTOM_FIELD_FIELDS, json_encode(array('display', 'default', 'placeholder'))));
                 $selected = $selected ?: array();
                 ?>
                 <select id="columns" size="<?= count($columns) ?>" name="columns[]" multiple>
@@ -51,6 +51,6 @@ if (SSV_Base::isValidPOST(SSV_Base::OPTIONS_ADMIN_REFERER)) {
             </td>
         </tr>
     </table>
-    <?= SSV_Base::getFormSecurityFields(SSV_Base::OPTIONS_ADMIN_REFERER, true, 'Reset Preference'); ?>
+    <?= BaseFunctions::getFormSecurityFields(BaseFunctions::OPTIONS_ADMIN_REFERER, true, 'Reset Preference'); ?>
 </form>
 

@@ -4,7 +4,7 @@ namespace mp_ssv_general\custom_fields\input_fields;
 
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_Base;
+use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -46,12 +46,12 @@ class CustomInputField extends InputField
 
     public function getHTML(): string
     {
-        $inputId = SSV_Base::escape('checkbox_' . $this->name, 'attr');
-        $labelId = SSV_Base::escape('label_' . $this->name, 'attr');
-        $divId   = SSV_Base::escape('div_' . $this->name, 'attr');
+        $inputId = BaseFunctions::escape('checkbox_' . $this->name, 'attr');
+        $labelId = BaseFunctions::escape('label_' . $this->name, 'attr');
+        $divId   = BaseFunctions::escape('div_' . $this->name, 'attr');
 
         $value       = !empty($this->value) ? $this->value : $this->defaultValue;
-        $inputType   = 'type="' . SSV_Base::escape($this->inputType, 'attr') . '"';
+        $inputType   = 'type="' . BaseFunctions::escape($this->inputType, 'attr') . '"';
         $name        = 'name="' . esc_html($this->name) . '"';
         $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : '';
         $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
@@ -98,7 +98,7 @@ class CustomInputField extends InputField
         switch (strtolower($this->inputType)) {
             case 'iban':
                 $this->value = str_replace(' ', '', strtoupper($this->value));
-                if (!empty($this->value) && !SSV_Base::isValidIBAN($this->value)) {
+                if (!empty($this->value) && !BaseFunctions::isValidIBAN($this->value)) {
                     $errors[] = new Message($this->title . ' field is not a valid IBAN.', current_user_can($this->overrideRights) ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
                 }
                 break;

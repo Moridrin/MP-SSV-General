@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_forms;
+namespace mp_ssv_forms\models;
 
 use wpdb;
 
@@ -8,22 +8,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-$currentDir = getcwd();
-chdir(__DIR__ . DIRECTORY_SEPARATOR . '../..');
-define('SSV_FORMS_ACTIVATOR_PLUGIN', getcwd() . DIRECTORY_SEPARATOR . glob('ss?-*.php')[0]);
-define('SSV_FORMS_ACTIVATOR_PLUGIN_RELATIVE', str_replace(ABSPATH . 'wp-content/plugins/', '', SSV_FORMS_ACTIVATOR_PLUGIN));
-chdir($currentDir);
-define('SSV_FORMS_PATH', plugin_dir_path(__FILE__));
-define('SSV_FORMS_URL', plugins_url() . '/' . plugin_basename(__DIR__));
-global $wpdb;
-define('SSV_FORMS_SHARED_BASE_FIELDS_TABLE', $wpdb->base_prefix . "ssv_shared_base_fields");
-define('SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE', $wpdb->prefix . "ssv_base_fields");
-define('SSV_FORMS_CUSTOMIZED_FIELDS', $wpdb->prefix . "ssv_customized_fields");
-
 abstract class SSV_Forms
 {
     const PATH = SSV_FORMS_PATH;
     const URL = SSV_FORMS_URL;
+
+    const OPTIONS_ADMIN_REFERER = 'ssv_forms__options_admin_referer';
 
     const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
     const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
@@ -92,6 +82,14 @@ abstract class SSV_Forms
                     'ajax'     => admin_url('admin-ajax.php'),
                     'base'     => get_home_url(),
                     'basePath' => ABSPATH,
+                ]
+            );
+            wp_localize_script(
+                'mp-ssv-fields-management',
+                'actions',
+                [
+                    'save'  => 'mp_ssv_general_forms_save_shared_base_field',
+                    'delete'     => 'mp_ssv_general_forms_delete_shared_base_fields',
                 ]
             );
             wp_localize_script(
