@@ -5,7 +5,7 @@ namespace mp_ssv_general\custom_fields;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 use mp_ssv_general\User;
 
 if (!defined('ABSPATH')) {
@@ -47,7 +47,7 @@ abstract class InputField extends Field
     {
         $values = json_decode($json);
         $tmp    = json_decode($json, true);
-        SSV_General::var_export(json_decode($json, true));
+        SSV_Base::var_export(json_decode($json, true));
         switch ($values->inputType) {
 //            case TextInputField::INPUT_TYPE:
 //                return new TextInputField(...json_decode($json, true));
@@ -113,10 +113,10 @@ abstract class InputField extends Field
             $this->value = $value->getMeta($this->name);
         } elseif (is_array($value)) {
             if (isset($value[$this->name])) {
-                $this->value = SSV_General::sanitize($value[$this->name], $this->inputType);
+                $this->value = SSV_Base::sanitize($value[$this->name], $this->inputType);
             }
         } else {
-            $this->value = SSV_General::sanitize($value, $this->inputType);
+            $this->value = SSV_Base::sanitize($value, $this->inputType);
         }
     }
 
@@ -128,7 +128,7 @@ abstract class InputField extends Field
     public function updateName($id, $postID)
     {
         global $wpdb;
-        $table = SSV_General::CUSTOMIZED_FIELDS_TABLE;
+        $table = SSV_Base::CUSTOMIZED_FIELDS_TABLE;
         $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
         $json  = $wpdb->get_var($sql);
         if (empty($json)) {

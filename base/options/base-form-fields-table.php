@@ -1,6 +1,6 @@
 <?php
 
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -8,27 +8,27 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable = SSV_General::SHARED_BASE_FIELDS_TABLE;
+$baseTable = SSV_Base::SHARED_BASE_FIELDS_TABLE;
 $baseFields = $wpdb->get_results("SELECT * FROM $baseTable");
-echo SSV_General::getInputTypeDataList(['Role Checkbox', 'Role Select']);
+echo SSV_Base::getInputTypeDataList(['Role Checkbox', 'Role Select']);
 ?>
 <h1 class="wp-heading-inline">Shared Form Fields</h1>
 <a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>
 <p>These fields will be available for all sites.</p>
 <?php if (!current_user_can('add_custom_fields')): ?>
-<div class="notice">
-    <p>You are not allowed to add custom fields.</p>
-</div>
+    <div class="notice">
+        <p>You are not allowed to add custom fields.</p>
+    </div>
 <?php endif; ?>
 <?php if (!current_user_can('edit_custom_fields')): ?>
-<div class="notice">
-    <p>You are not allowed to edit existing custom fields.</p>
-</div>
+    <div class="notice">
+        <p>You are not allowed to edit existing custom fields.</p>
+    </div>
 <?php endif; ?>
 <?php if (!current_user_can('remove_custom_fields')): ?>
-<div class="notice">
-    <p>You are not allowed to remove custom fields.</p>
-</div>
+    <div class="notice">
+        <p>You are not allowed to remove custom fields.</p>
+    </div>
 <?php endif; ?>
 <form method="post" action="#">
     <div style="overflow-x: auto;">
@@ -42,7 +42,7 @@ echo SSV_General::getInputTypeDataList(['Role Checkbox', 'Role Select']);
             </div>
             <br class="clear">
         </div>
-        <table class="wp-list-table widefat plugins">
+        <table class="wp-list-table widefat striped">
             <thead>
             <tr>
                 <td id="cb" class="manage-column column-cb check-column">
@@ -58,37 +58,37 @@ echo SSV_General::getInputTypeDataList(['Role Checkbox', 'Role Select']);
             </tr>
             </thead>
             <tbody id="the-list">
-                <?php foreach($baseFields as $id => $baseField): ?>
-                <tr id="<?= $id ?>_tr" class="inactive">
-                    <th id="<?= $id ?>_id_td" class="check-column">
-                        <input type="checkbox" id="<?= $id ?>_id" name="custom_field_<?= $id ?>_id" value="<?= $id ?>">
+            <?php foreach($baseFields as $baseField): ?>
+                <tr id="<?= $baseField->bf_id ?>_tr" class="inactive">
+                    <th id="<?= $baseField->bf_id ?>_id_td" class="check-column">
+                        <input type="checkbox" id="<?= $baseField->bf_id ?>_id" name="selected_field_ids[]" value="<?= $baseField->bf_id ?>">
                     </th>
-                    <td id="<?= $id ?>_field_title_td">
+                    <td id="<?= $baseField->bf_id ?>_field_title_td">
                         <strong><?= $baseField->bf_title ?></strong>
                         <div class="row-actions">
-                            <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="editRow('<?= $id ?>')" class="editinline" aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
-                            <span class="trash"><a href="javascript:void(0)" onclick="deleteRow('<?= $id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
+                            <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="inlineEdit('<?= $baseField->bf_id ?>')" class="editinline" aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
+                            <span class="trash"><a href="javascript:void(0)" onclick="deleteRow('<?= $baseField->bf_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
                         </div>
                     </td>
-                    <td id="<?= $id ?>_name_td">
+                    <td id="<?= $baseField->bf_id ?>_name_td">
                         <?= $baseField->bf_name ?>
                     </td>
-                    <td id="<?= $id ?>_inputType_td">
+                    <td id="<?= $baseField->bf_id ?>_inputType_td">
                         <?= $baseField->bf_inputType ?>
                     </td>
                     <?php if ($baseField->bf_inputType === 'select'): ?>
-                    <td class="options_td" id="<?= $id ?>_options_td">
-                        <?= $baseField->bf_options ?>
-                    </td>
+                        <td class="value_td" id="<?= $baseField->bf_id ?>_value_td">
+                            <?= $baseField->bf_value ?>
+                        </td>
                     <?php elseif ($baseField->bf_inputType === 'hidden'): ?>
-                    <td class="options_td" id="<?= $id ?>_options_td">
-                        <?= $baseField->bf_value ?>
-                    </td>
+                        <td class="_value_td" id="<?= $baseField->bf_id ?>_value_td">
+                            <?= $baseField->bf_value ?>
+                        </td>
                     <?php else: ?>
-                    <td id="<?= $id ?>_empty_td"></td>
+                        <td id="<?= $baseField->bf_id ?>_empty_td"></td>
                     <?php endif; ?>
                 </tr>
-                <?php endforeach; ?>
+            <?php endforeach; ?>
             </tbody>
             <tfoot>
             <tr>
@@ -117,5 +117,5 @@ echo SSV_General::getInputTypeDataList(['Role Checkbox', 'Role Select']);
             i++;
         }
     </script>
-    <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER, true, false); ?>
+    <?= SSV_Base::getFormSecurityFields(SSV_Base::OPTIONS_ADMIN_REFERER, false, false) ?>
 </form>

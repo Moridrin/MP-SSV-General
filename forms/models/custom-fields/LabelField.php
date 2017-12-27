@@ -2,7 +2,7 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -28,7 +28,7 @@ class LabelField extends Field
 
     public function getHTML(): string
     {
-        $labelId = SSV_General::escape('label_' . $this->id, 'attr');
-        return '<p ' . $this->getElementAttributesString($labelId) . '>' . SSV_General::escape($this->text, 'html') . '</p><br/>';
+        $labelId = SSV_Base::escape('label_' . $this->id, 'attr');
+        return '<p ' . $this->getElementAttributesString($labelId) . '>' . SSV_Base::escape($this->text, 'html') . '</p><br/>';
     }
 }

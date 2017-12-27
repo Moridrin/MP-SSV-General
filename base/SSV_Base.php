@@ -17,57 +17,15 @@ if (!defined('ABSPATH')) {
  * Date: 26-1-17
  * Time: 15:50
  */
-class SSV_General
+class SSV_Base
 {
-    const PATH = SSV_GENERAL_PATH;
-    const URL = SSV_GENERAL_URL;
-    const BASE_URL = SSV_GENERAL_BASE_URL;
-
-    const SHARED_BASE_FIELDS_TABLE = SSV_GENERAL_SHARED_BASE_FIELDS_TABLE;
-    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_GENERAL_SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    const CUSTOMIZED_FIELDS_TABLE = SSV_GENERAL_CUSTOMIZED_FIELDS;
-
-    const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
-    const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
-    const HOOK_RESET_OPTIONS = 'ssv_general__hook_reset_options';
-
-    const HOOK_USERS_SAVE_MEMBER = 'ssv_users__hook_save_member';
-    const HOOK_USERS_NEW_EVENT = 'ssv_events__hook_new_event';
-    const HOOK_EVENTS_NEW_REGISTRATION = 'ssv_events__hook_new_registration';
-
-    const USER_OPTION_CUSTOM_FIELD_FIELDS = 'ssv_general__custom_field_fields';
-    const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
-
-    private static $initialized = false;
-
-    public static function _init()
-    {
-        if (!self::$initialized) {
-            require_once 'functions.php';
-            require_once 'options/options.php';
-            require_once 'forms/forms.php';
-            require_once 'models/User.php';
-            require_once 'models/Message.php';
-            require_once 'models/Form.php';
-            self::$initialized = true;
-        }
-    }
-
-    /**
-     * This function sets all the options for this plugin back to their default value
-     */
-    public static function resetOptions()
-    {
-        $defaultSelected = json_encode(array('display', 'default', 'placeholder'));
-        User::getCurrent()->updateMeta(SSV_General::USER_OPTION_CUSTOM_FIELD_FIELDS, $defaultSelected, false);
-    }
 
     /**
      * This function can be called from anywhere and will redirect the page to the given location.
      *
      * @param string $location is the url where the page should be redirected to.
      */
-    public static function redirect($location)
+    public static function redirect(string $location)
     {
         $redirect_script = '<script type="text/javascript">';
         $redirect_script .= 'window.location = "' . $location . '"';
@@ -76,11 +34,13 @@ class SSV_General
     }
 
     /**
-     * @param $adminReferer
+     * This checks if the request is a POST request and if it has the correct admin referer.
      *
-     * @return bool true if the request is POST, it isn't a reset request and it has the correct admin referer.
+     * @param string $adminReferer
+     *
+     * @return bool
      */
-    public static function isValidPOST($adminReferer)
+    public static function isValidPOST(string $adminReferer): bool
     {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             return false;
@@ -94,7 +54,14 @@ class SSV_General
         return true;
     }
 
-    public static function isValidIBAN($iban)
+    /**
+     * This checks if the provided string is a correct IBAN.
+     *
+     * @param string $iban
+     *
+     * @return bool
+     */
+    public static function isValidIBAN(string $iban): bool
     {
         $iban      = strtolower(str_replace(' ', '', $iban));
         $Countries = array('al' => 28,
@@ -223,20 +190,6 @@ class SSV_General
         }
     }
 
-    public static function bcmod($x, $y)
-    {
-        $take = 5;
-        $mod  = '';
-
-        do {
-            $a   = (int)$mod . substr($x, 0, $take);
-            $x   = substr($x, $take);
-            $mod = $a % $y;
-        } while (strlen($x));
-
-        return (int)$mod;
-    }
-
     /**
      * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
      * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
@@ -244,7 +197,7 @@ class SSV_General
      *
      * @return string HTML
      */
-    public static function getFormSecurityFields($adminReferer, $saveButton = true, $resetButton = true)
+    public static function getFormSecurityFields(string $adminReferer, $saveButton = true, $resetButton = true): string
     {
         ob_start();
         ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
@@ -263,7 +216,7 @@ class SSV_General
     /**
      * @return string HTML
      */
-    public static function getCapabilitiesDataList()
+    public static function getCapabilitiesDataList(): string
     {
         ob_start();
         if (function_exists('members_get_capabilities')) {
@@ -508,47 +461,6 @@ class SSV_General
         return null;
     }
 
-    /**
-     * This function checks if the given $variable is recursive.
-     *
-     * @param mixed $variable is the variable to be checked.
-     *
-     * @return bool true if the $variable contains circular reference.
-     */
-    private static function _hasCircularReference($variable)
-    {
-        $dump = print_r($variable, true);
-        if (strpos($dump, '*RECURSION*') !== false) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static function getLoginURL()
-    {
-        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        if (is_plugin_active('ssv-users/ssv-users.php')) {
-            $loginPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_LOGIN_FIELDS);
-            if (count($loginPages) > 0) {
-                return add_query_arg('redirect_to', get_permalink(), get_permalink($loginPages[0]));
-            }
-        }
-        return site_url() . '/wp-login.php?redirect_to=' . site_url();
-    }
-
-    public static function getChangePasswordURL()
-    {
-        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        if (is_plugin_active('ssv-users/ssv-users.php')) {
-            $changePasswordPages = SSV_Users::getPagesWithTag(SSV_Users::TAG_CHANGE_PASSWORD);
-            if (count($changePasswordPages) > 0) {
-                return add_query_arg('redirect_to', get_site_url(), get_permalink($changePasswordPages[0]));
-            }
-        }
-        return '';
-    }
-
     public static function getListSelect($name, $options, $selected)
     {
         $selected = self::escape($selected, 'html');
@@ -611,20 +523,34 @@ class SSV_General
         return ob_get_clean();
     }
 
-    public static function currentNavTab($current, $selected)
+    private static function bcmod($x, $y)
     {
-        return $current == $selected ? 'nav-tab-active' : '';
+        $take = 5;
+        $mod  = '';
+
+        do {
+            $a   = (int)$mod . substr($x, 0, $take);
+            $x   = substr($x, $take);
+            $mod = $a % $y;
+        } while (strlen($x));
+
+        return (int)$mod;
     }
 
-    public static function CLEAN_INSTALL()
+    /**
+     * This function checks if the given $variable is recursive.
+     *
+     * @param mixed $variable is the variable to be checked.
+     *
+     * @return bool true if the $variable contains circular reference.
+     */
+    private static function _hasCircularReference($variable)
     {
-        /** @var wpdb $wpdb */
-        global $wpdb;
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = SSV_General::SHARED_BASE_FIELDS_TABLE;
-        $wpdb->query("DROP TABLE $tableName;");
-        $tableName = SSV_General::CUSTOMIZED_FIELDS_TABLE;
-        $wpdb->query("DROP TABLE $tableName;");
-        mp_ssv_general_register_plugin();
+        $dump = print_r($variable, true);
+        if (strpos($dump, '*RECURSION*') !== false) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

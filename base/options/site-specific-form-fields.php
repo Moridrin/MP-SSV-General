@@ -2,7 +2,7 @@
 
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -10,14 +10,14 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$sharedBaseTable = SSV_General::SHARED_BASE_FIELDS_TABLE;
-$siteSpecificBaseTable = SSV_General::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-$customizedTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
-if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
+$sharedBaseTable = SSV_Base::SHARED_BASE_FIELDS_TABLE;
+$siteSpecificBaseTable = SSV_Base::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+$customizedTable = SSV_Base::CUSTOMIZED_FIELDS_TABLE;
+if (SSV_Base::isValidPOST(SSV_Base::OPTIONS_ADMIN_REFERER)) {
     if (isset($_POST['reset'])) {
-        SSV_General::resetOptions();
+        SSV_Base::resetOptions();
     } else {
-        $fieldIds = SSV_General::sanitize($_POST['field_ids'], 'int');
+        $fieldIds = SSV_Base::sanitize($_POST['field_ids'], 'int');
         $fieldIds = is_array($fieldIds) ? $fieldIds : [];
 
         if (current_user_can('remove_custom_fields')) {
@@ -116,7 +116,7 @@ $siteSpecificBaseFields = $wpdb->get_results("SELECT * FROM $siteSpecificBaseTab
 ?>
 <h1>Site Specific Form Fields</h1>
 <?php
-echo SSV_General::getInputTypeDataList();
+echo SSV_Base::getInputTypeDataList();
 ?>
 <?php if (!current_user_can('add_custom_fields')): ?>
     <div class="notice">
@@ -150,5 +150,5 @@ echo SSV_General::getInputTypeDataList();
         mp_ssv_add_site_specific_input_field('site-specific-base-fields-placeholder', <?= $baseField->bf_id ?>, '<?= $baseField->bf_title ?>', '<?= $baseField->bf_name ?>', '<?= $baseField->bf_inputType ?>', '<?= $baseField->bf_options ?>', '<?= $baseField->bf_value ?>');
         <?php endforeach; ?>
     </script>
-    <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER, true, false); ?>
+    <?= SSV_Base::getFormSecurityFields(SSV_Base::OPTIONS_ADMIN_REFERER, true, false); ?>
 </form>

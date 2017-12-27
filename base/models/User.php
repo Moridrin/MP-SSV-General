@@ -78,9 +78,9 @@ class User extends \WP_User
             return new Message('This email address already exists. Try resetting your password.', Message::ERROR_MESSAGE);
         }
         $id = wp_create_user(
-            SSV_General::sanitize($username, 'text'),
-            SSV_General::sanitize($password, 'text'),
-            SSV_General::sanitize($email, 'email')
+            SSV_Base::sanitize($username, 'text'),
+            SSV_Base::sanitize($password, 'text'),
+            SSV_Base::sanitize($email, 'email')
         );
 
         return self::getByID($id);
@@ -338,7 +338,7 @@ class User extends \WP_User
             return true;
         }
         if ($sanitize) {
-            $value = SSV_General::sanitize($value, $meta_key);
+            $value = SSV_Base::sanitize($value, $meta_key);
         }
         if ($this->getMeta($meta_key) == $value) {
             return true;
@@ -420,7 +420,7 @@ class User extends \WP_User
     public function getProfileURL()
     {
         $url = get_edit_user_link($this->ID);
-        $url = apply_filters(SSV_General::HOOK_USER_PROFILE_URL, $url, $this);
+        $url = apply_filters(SSV_Base::HOOK_USER_PROFILE_URL, $url, $this);
         return $url;
     }
 }

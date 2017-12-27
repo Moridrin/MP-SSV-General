@@ -2,7 +2,7 @@
 
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -10,14 +10,14 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$baseTable       = SSV_General::SHARED_BASE_FIELDS_TABLE;
-$customizedTable = SSV_General::CUSTOMIZED_FIELDS_TABLE;
+$baseTable       = SSV_Base::SHARED_BASE_FIELDS_TABLE;
+$customizedTable = SSV_Base::CUSTOMIZED_FIELDS_TABLE;
 
-if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
+if (SSV_Base::isValidPOST(SSV_Base::OPTIONS_ADMIN_REFERER)) {
     if (isset($_POST['reset'])) {
-        SSV_General::resetOptions();
+        SSV_Base::resetOptions();
     } else {
-        $fieldIDs = SSV_General::sanitize($_POST['field_ids'], 'int');
+        $fieldIDs = SSV_Base::sanitize($_POST['field_ids'], 'int');
         $fieldIDs = is_array($fieldIDs) ? $fieldIDs : array();
 
         if (current_user_can('remove_custom_fields')) {
@@ -83,7 +83,7 @@ if (SSV_General::isValidPOST(SSV_General::OPTIONS_ADMIN_REFERER)) {
 }
 $baseFields = $wpdb->get_results("SELECT * FROM $baseTable");
 $baseFields = array_combine(array_column($baseFields, 'ID'), $baseFields);
-echo SSV_General::getInputTypeDataList();
+echo SSV_Base::getInputTypeDataList();
 ?>
 <?php if (!current_user_can('add_custom_fields')): ?>
     <div class="notice">
@@ -123,5 +123,5 @@ echo SSV_General::getInputTypeDataList();
             </td>
         </tr>
     </table>
-    <?= SSV_General::getFormSecurityFields(SSV_General::OPTIONS_ADMIN_REFERER, true, false); ?>
+    <?= SSV_Base::getFormSecurityFields(SSV_Base::OPTIONS_ADMIN_REFERER, true, false); ?>
 </form>

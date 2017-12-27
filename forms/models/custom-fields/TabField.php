@@ -2,7 +2,7 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -24,7 +24,7 @@ class TabField extends Field
     {
         parent::__construct($id, $title, self::FIELD_TYPE, $name, $order, $classes, $styles);
         $this->fields = $fields;
-        $tabId        = SSV_General::escape('tab_' . $this->id, 'attr');
+        $tabId        = SSV_Base::escape('tab_' . $this->id, 'attr');
         if (!isset($this->classes[$tabId])) {
             $this->classes[$tabId] = ['tab'];
         }
@@ -40,11 +40,11 @@ class TabField extends Field
 
     public function getHTML(): string
     {
-        $tabId = SSV_General::escape('tab_' . $this->id, 'attr');
-        $aId   = SSV_General::escape('a_' . $this->id, 'attr');
+        $tabId = SSV_Base::escape('tab_' . $this->id, 'attr');
+        $aId   = SSV_Base::escape('a_' . $this->id, 'attr');
         if (isset($_POST['tab']) && $_POST['tab'] == $this->order) {
             $this->classes[$tabId][] = 'active';
         }
-        return '<li ' . $this->getElementAttributesString($tabId) . '><a ' . $this->getElementAttributesString($aId) . '>' . SSV_General::escape($this->title, 'html') . '</a></li>';
+        return '<li ' . $this->getElementAttributesString($tabId) . '><a ' . $this->getElementAttributesString($aId) . '>' . SSV_Base::escape($this->title, 'html') . '</a></li>';
     }
 }

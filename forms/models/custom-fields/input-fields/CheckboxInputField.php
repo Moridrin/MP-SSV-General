@@ -4,7 +4,7 @@ namespace mp_ssv_general\custom_fields\input_fields;
 
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
-use mp_ssv_general\SSV_General;
+use mp_ssv_general\SSV_Base;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -54,7 +54,7 @@ class CheckboxInputField extends InputField
         $this->disabled       = $arguments['disabled'];
         $this->required       = $arguments['required'];
         $this->defaultChecked = $arguments['defaultChecked'];
-        $checkboxId           = SSV_General::escape('checkbox_' . $this->id, 'attr');
+        $checkboxId           = SSV_Base::escape('checkbox_' . $this->id, 'attr');
         if (!isset($this->classes[$checkboxId])) {
             $this->classes[$checkboxId] = ['validate', 'filled-id'];
         }
@@ -68,15 +68,15 @@ class CheckboxInputField extends InputField
 
     public function getHTML(): string
     {
-        $divId = SSV_General::escape('div_' . $this->name, 'attr');
-        $fallbackId = SSV_General::escape('fallback_' . $this->name, 'attr');
-        $checkboxId = SSV_General::escape('checkbox_' . $this->name, 'attr');
+        $divId = SSV_Base::escape('div_' . $this->name, 'attr');
+        $fallbackId = SSV_Base::escape('fallback_' . $this->name, 'attr');
+        $checkboxId = SSV_Base::escape('checkbox_' . $this->name, 'attr');
         ob_start();
         ?>
         <div <?= $this->getElementAttributesString($divId) ?>>
             <input type="hidden" <?= $this->getElementAttributesString($fallbackId) ?> value="false"/>
             <input type="checkbox" <?= $this->getElementAttributesString($checkboxId, '', ['disabled' => true, 'checked' => true, 'required' => true]) ?> />
-            <label for="<?= $checkboxId ?>"><?= SSV_General::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
+            <label for="<?= $checkboxId ?>"><?= SSV_Base::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
         </div>
         <?php
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));

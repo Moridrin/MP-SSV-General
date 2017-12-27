@@ -1,4 +1,7 @@
 <?php
+
+use mp_ssv_general\SqlFormatter;
+
 if (!defined('ABSPATH')) {
     exit;
 }
