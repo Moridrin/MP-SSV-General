@@ -24,6 +24,10 @@ if (!class_exists(Message::class)) {
 
 function mp_ssv_base_admin_enquire_scripts()
 {
+    wp_enqueue_script('select2', BaseFunctions::URL . '/lib/js/select2.js', ['jquery']);
+    wp_enqueue_script('select2-init', BaseFunctions::URL . '/js/select2-init.js', ['jquery']);
+    wp_enqueue_style('select2', BaseFunctions::URL . '/lib/css/select2.css');
+
     wp_enqueue_script('mp-ssv-general-functions', BaseFunctions::URL . '/js/mp-ssv-general-functions.js', ['jquery']);
 }
 
