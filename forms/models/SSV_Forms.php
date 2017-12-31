@@ -134,7 +134,7 @@ abstract class SSV_Forms
             if (isset($_GET['tab'])) {
                 $activeTab = $_GET['tab'];
             }
-            wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/mp-ssv-forms-manager.js', ['jquery']);
+            wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
             wp_localize_script(
                 'mp-ssv-forms-manager',
                 'urls',
@@ -156,7 +156,8 @@ abstract class SSV_Forms
         }
 
         if (isset($_GET["page"]) && $_GET["page"] == "ssv_forms_add_new_form") {
-            wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/mp-ssv-forms-manager.js', ['jquery']);
+            wp_enqueue_style('mp-ssv-forms-manager-css', SSV_Forms::URL . '/css/forms-editor.css');
+            wp_enqueue_script('mp-ssv-forms-manager-js', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
         }
     }
 

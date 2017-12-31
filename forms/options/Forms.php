@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 
 require_once 'templates/base-form-fields-table.php';
 require_once 'templates/forms-table.php';
+require_once 'templates/form-editor.php';
 
 abstract class Forms
 {
@@ -62,7 +63,7 @@ abstract class Forms
     public static function setupSiteSpecificMenu()
     {
         add_menu_page('SSV Forms', 'SSV Forms', 'ssv_not_allowed', 'ssv_forms');
-        add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms_forms_manager', [self::class, 'showFormsPage']);
+        add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms', [self::class, 'showFormsPage']);
         add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showNewFormPage']);
         add_submenu_page('ssv_forms', 'Manage Fields', 'Manage Fields', 'edit_posts', 'ssv_forms_base_fields_manager', [self::class, 'showSiteBaseFieldsPage']);
     }
@@ -111,52 +112,12 @@ abstract class Forms
 
     public static function showNewFormPage()
     {
-        ?>
-        <div class="wrap">
-            <h1 class="wp-heading-inline">Add New Form</h1>
-            <hr class="wp-header-end">
-            <form name="post" action="admin.php?page=ssv_forms_forms_manager" method="post" id="post">
-                <div id="poststuff">
-                    <div id="post-body" class="metabox-holder columns-2">
-                        <div id="post-body-content" style="position: relative;">
-                            <div id="titlediv">
-                                <div id="titlewrap">
-                                    <label id="title-prompt-text" for="title">Enter title here</label>
-                                    <input type="text" name="post_title" size="30" value="" id="title" spellcheck="true" autocomplete="off">
-                                </div>
-                                <div class="inside">
-                                    <div id="edit-slug-box" class="hide-if-no-js">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="postbox-container-1" class="postbox-container">
-                            <div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
-                                <div id="postimagediv" class="postbox ">
-                                    <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Featured Image</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                    <h2 class="hndle ui-sortable-handle"><span>Featured Image</span></h2>
-                                    <div class="inside">
-                                        <p class="hide-if-no-js"><a href="http://sportal.moridrin.com/wp-admin/media-upload.php?post_id=113&amp;type=image&amp;TB_iframe=1" id="set-post-thumbnail" class="thickbox">Set featured image</a></p>
-                                        <input type="hidden" id="_thumbnail_id" name="_thumbnail_id" value="-1">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="postbox-container-2" class="postbox-container">
-                            <div id="postimagediv" class="postbox " style="display: block;">
-                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Featured Image</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                <h2 class="hndle ui-sortable-handle"><span>Featured Image</span></h2>
-                                <div class="inside">
-                                    <p class="hide-if-no-js"><a href="http://sportal.moridrin.com/wp-admin/media-upload.php?post_id=120&amp;type=image&amp;TB_iframe=1" id="set-post-thumbnail" class="thickbox">Set featured image</a></p>
-                                    <input type="hidden" id="_thumbnail_id" name="_thumbnail_id" value="-1">
-                                </div>
-                            </div>
-                        </div>
-                        <br class="clear">
-                    </div>
-            </form>
-        </div>
-        <?php
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $sharedBaseFieldsTable = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+        $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+        $sharedBaseFields = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
+        show_form_editor($sharedBaseFields);
     }
 
     public static function showSiteBaseFieldsPage()
