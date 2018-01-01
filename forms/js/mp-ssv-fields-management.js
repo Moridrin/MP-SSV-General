@@ -101,19 +101,19 @@ let fieldsManager = {
             '          <label>' +
             '              <span class="title">Title</span>' +
             '              <span class="input-text-wrap">' +
-            '                  <input type="text" id="' + fieldId + '_title" name="title" value="' + title + '" data-old-value="' + title + '">' +
+            '                  <input type="text" id="' + fieldId + '_title" name="title" value="' + title + '" autocomplete="off" data-old-value="' + title + '">' +
             '              </span>' +
             '          </label>' +
             '          <label>' +
             '              <span class="title">Name</span>' +
             '              <span class="input-text-wrap">' +
-            '                  <input type="text" id="' + fieldId + '_name" name="name" value="' + name + '" data-old-value="' + name + '">' +
+            '                  <input type="text" id="' + fieldId + '_name" name="name" value="' + name + '" autocomplete="off" data-old-value="' + name + '">' +
             '              </span>' +
             '          </label>' +
             '          <label>' +
             '              <span class="title">InputType</span>' +
             '              <span class="input-text-wrap">' +
-            '                  <input type="text" id="' + fieldId + '_inputType" name="inputType" list="inputType" value="' + inputType + '" oninput="fieldsManager.inputTypeChanged(' + fieldId + ')" data-old-value="' + inputType + '">' +
+            '                  <input type="text" id="' + fieldId + '_inputType" name="inputType" list="inputType" value="' + inputType + '" autocomplete="off" oninput="fieldsManager.inputTypeChanged(' + fieldId + ')" data-old-value="' + inputType + '">' +
             '              </span>' +
             '          </label>' +
             '      </div>' +
@@ -147,7 +147,7 @@ let fieldsManager = {
             '   <label>' +
             '       <span class="title">Value</span>' +
             '       <span class="input-text-wrap">' +
-            '            <input type="text" id="' + fieldId + '_value" name="value" value="' + value + '" data-old-value="' + value + '">' +
+            '            <input type="text" id="' + fieldId + '_value" name="value" value="' + value + '" autocomplete="off" data-old-value="' + value + '">' +
             '       </span>' +
             '   </label>' +
             '</div>'

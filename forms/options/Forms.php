@@ -27,7 +27,7 @@ abstract class Forms
         ?>
         <div class="wrap">
             <?php
-            if (BaseFunctions::isValidPOST(SSV_Forms::OPTIONS_ADMIN_REFERER)) {
+            if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
                 if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                     mp_ssv_general_forms_delete_shared_base_fields(false);
                 } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
@@ -45,11 +45,12 @@ abstract class Forms
             }
             /** @var wpdb $wpdb */
             global $wpdb;
-            $order      = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
-            $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_title', 'text');
+            $order      = isset($_GET['order']) ? BaseFunctions::sanitize($_GET['order'], 'text') : 'asc';
+            $orderBy    = isset($_GET['orderby']) ? BaseFunctions::sanitize($_GET['orderby'], 'text') : 'bf_title';
             $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
             $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
-            $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
+            //            $baseFields = self::addBaseFields($baseFields, $order, $orderBy);
+            $addNew = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
             ?>
             <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
             <p>These fields will be available for all sites.</p>
@@ -58,6 +59,58 @@ abstract class Forms
             ?>
         </div>
         <?php
+    }
+
+    public static function getWordPressBaseFields(): array
+    {
+        return json_decode(
+            json_encode(
+                [
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'username',
+                        'bf_title'     => 'Username',
+                        'bf_inputType' => 'text',
+                        'bf_value'     => null,
+                    ],
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'first_name',
+                        'bf_title'     => 'First Name',
+                        'bf_inputType' => 'text',
+                        'bf_value'     => null,
+                    ],
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'last_name',
+                        'bf_title'     => 'Last Name',
+                        'bf_inputType' => 'text',
+                        'bf_value'     => null,
+                    ],
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'email',
+                        'bf_title'     => 'Email',
+                        'bf_inputType' => 'email',
+                        'bf_value'     => null,
+                    ],
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'password',
+                        'bf_title'     => 'Password',
+                        'bf_inputType' => 'password',
+                        'bf_value'     => null,
+                    ],
+                    [
+                        'bf_id'        => null,
+                        'bf_name'      => 'password_confirm',
+                        'bf_title'     => 'Confirm Password',
+                        'bf_inputType' => 'password',
+                        'bf_value'     => null,
+                    ],
+                ]
+            )
+        );
     }
 
     public static function setupSiteSpecificMenu()
@@ -73,7 +126,26 @@ abstract class Forms
         ?>
         <div class="wrap">
             <?php
-            if (BaseFunctions::isValidPOST(SSV_Forms::OPTIONS_ADMIN_REFERER)) {
+            if (BaseFunctions::isValidPOST(SSV_Forms::EDIT_FORM_ADMIN_REFERER)) {
+                /** @var wpdb $wpdb */
+                global $wpdb;
+                $wpdb->replace(
+                    SSV_Forms::SITE_SPECIFIC_FORMS_TABLE,
+                    [
+                        'f_id'     => $_POST['form_id'],
+                        'f_tag'    => $_POST['form_tag'],
+                        'f_title'  => $_POST['form_title'],
+                        'f_fields' => $_POST['form_fields'],
+                    ]
+                );
+                $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+                $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+                $baseFieldNames              = $_POST['fields'];
+                $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($baseFieldNames)");
+                foreach ($baseFields as $baseField) {
+                }
+                BaseFunctions::var_export($_POST, 1);
+            } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
                 if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                     mp_ssv_general_forms_delete_site_specific_base_fields(false);
                 } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
@@ -114,10 +186,13 @@ abstract class Forms
     {
         /** @var wpdb $wpdb */
         global $wpdb;
-        $sharedBaseFieldsTable = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+        $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-        $sharedBaseFields = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
-        show_form_editor($sharedBaseFields);
+        $formsTable                  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+        $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
+//        $baseFields                  = self::addBaseFields($baseFields);
+        $newId = $wpdb->get_row("SELECT MAX(f_id) FROM $formsTable") + 1;
+        show_form_editor($newId, $baseFields);
     }
 
     public static function showSiteBaseFieldsPage()
@@ -152,7 +227,7 @@ abstract class Forms
     /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function showSiteBaseFieldsSharedTab()
     {
-        if (BaseFunctions::isValidPOST(SSV_Forms::OPTIONS_ADMIN_REFERER)) {
+        if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                 mp_ssv_general_forms_delete_shared_base_fields(false);
             } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
@@ -174,7 +249,8 @@ abstract class Forms
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_title', 'text');
         $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
-        $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
+//        $baseFields = self::addBaseFields($baseFields, $order, $orderBy);
+        $addNew = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
         ?>
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
         <p>These fields will be available for all sites.</p>
@@ -185,7 +261,7 @@ abstract class Forms
     /** @noinspection PhpUnusedPrivateMethodInspection */
     private static function showSiteBaseFieldsSiteSpecificTab()
     {
-        if (BaseFunctions::isValidPOST(SSV_Forms::OPTIONS_ADMIN_REFERER)) {
+        if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                 mp_ssv_general_forms_delete_site_specific_base_fields(false);
             } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
@@ -238,7 +314,7 @@ abstract class Forms
                         i++;
                     }
                 </script>
-                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::OPTIONS_ADMIN_REFERER, false, false) ?>
+                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false) ?>
                 <?php
             }
             ?>
@@ -264,7 +340,7 @@ abstract class Forms
                         i++;
                     }
                 </script>
-                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::OPTIONS_ADMIN_REFERER, false, false) ?>
+                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false) ?>
                 <?php
             }
             ?>

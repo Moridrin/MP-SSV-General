@@ -14,7 +14,8 @@ abstract class SSV_Forms
     const PATH = SSV_FORMS_PATH;
     const URL = SSV_FORMS_URL;
 
-    const OPTIONS_ADMIN_REFERER = 'ssv_forms__options_admin_referer';
+    const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
+    const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
 
     const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
     const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
@@ -85,10 +86,10 @@ abstract class SSV_Forms
             $sql
                        = "
             CREATE TABLE IF NOT EXISTS $tableName (
-                `bf_id` bigint(20) NOT NULL PRIMARY KEY,
-                `bf_tag` VARCHAR(50) UNIQUE,
-                `bf_title` VARCHAR(50) NOT NULL,
-                `bf_fields` VARCHAR(255),
+                `f_id` bigint(20) NOT NULL PRIMARY KEY,
+                `f_tag` VARCHAR(50) UNIQUE,
+                `f_title` VARCHAR(50) NOT NULL,
+                `f_fields` VARCHAR(255),
             ) $charset_collate;";
             $wpdb->query($sql);
             restore_current_blog();
@@ -168,7 +169,13 @@ abstract class SSV_Forms
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $tableName = self::SHARED_BASE_FIELDS_TABLE;
         $wpdb->query("DROP TABLE $tableName;");
+        $tableName = self::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
         $tableName = self::CUSTOMIZED_FIELDS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        $tableName = self::SHARED_FORMS_TABLE;
+        $wpdb->query("DROP TABLE $tableName;");
+        $tableName = self::SITE_SPECIFIC_FORMS_TABLE;
         $wpdb->query("DROP TABLE $tableName;");
         self::setup($networkWide);
     }

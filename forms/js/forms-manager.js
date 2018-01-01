@@ -14,10 +14,21 @@
             }
         });
 
+        $('.hndle').click(function () {
+            $(this.nextSibling.nextSibling).toggle();
+            $(this.parentNode).toggleClass('closed');
+        });
+
+        $('.handlediv').click(function () {
+            $(this.nextSibling.nextSibling.nextSibling.nextSibling).toggle();
+            $(this.parentNode).toggleClass('closed');
+        });
+
         let formFieldsListTop = document.getElementById('formFieldsListTop');
         let formFieldsListBottom = document.getElementById('formFieldsListBottom');
         let formFieldsList = document.getElementById('formFieldsList');
         let baseFieldsList = document.getElementById('baseFieldsList');
+        let wordPressBaseFieldsList = document.getElementById('wordPressBaseFieldsList');
         let dragElement = null;
 
         function handleDragStart(e) {
@@ -67,7 +78,7 @@
                 e.stopPropagation();
             }
             let dropElement = null;
-            if (dragElement.parentNode === baseFieldsList) {
+            if (dragElement.parentNode === baseFieldsList || dragElement.parentNode === wordPressBaseFieldsList) {
                 let field = JSON.parse(dragElement.dataset.field);
                 let fieldType = dragElement.dataset.fieldType;
                 console.log(field);
@@ -75,10 +86,12 @@
                 dropElement.setAttribute('draggable', 'true');
                 dropElement.setAttribute('class', 'formField');
                 dropElement.innerHTML =
-                    '<td>'+field.bf_title+'</td>' +
-                    '<td>'+fieldType+'</td>' +
-                    '<td>'+field.bf_inputType+'</td>' +
-                    '<td>'+field.bf_value+'</td>'
+                    '<td>' +
+                    '   <input type="hidden" name="fields[]" value="' + field.bf_name + '">' + field.bf_title +
+                    '</td>' +
+                    '<td>' + fieldType + '</td>' +
+                    '<td>' + field.bf_inputType + '</td>' +
+                    '<td>' + field.bf_value + '</td>'
                 ;
             } else {
                 dropElement = dragElement.cloneNode(true);
@@ -92,8 +105,8 @@
                 formFieldsList.insertBefore(dropElement, this);
                 removeField(document.getElementById('no-items'));
             }
-            addDragHandlers(dropElement);
-            addDropHandlers(dropElement);
+            addDragEvents(dropElement);
+            addDropEvents(dropElement);
             return false;
         }
         function handleDragEnd(e) {
@@ -117,28 +130,28 @@
                     emptyRow.setAttribute('class', 'no-items');
                     emptyRow.innerHTML = '<td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>';
                     formFieldsList.appendChild(emptyRow);
-                    addDropHandlers(emptyRow);
+                    addDropEvents(emptyRow);
                 }
             }
         }
-        function addDragHandlers(elem) {
+        function addDragEvents(elem) {
             elem.addEventListener('dragstart', handleDragStart, false);
             elem.addEventListener('dragend', handleDragEnd, false);
         }
-        function addDropHandlers(elem) {
+        function addDropEvents(elem) {
             elem.addEventListener('dragenter', handleDragEnter, false);
             elem.addEventListener('dragover', handleDragOver, false);
             elem.addEventListener('dragleave', handleDragLeave, false);
             elem.addEventListener('drop', handleDrop, false);
         }
 
-        addDropHandlers(formFieldsListTop);
-        addDropHandlers(formFieldsListBottom);
+        addDropEvents(formFieldsListTop);
+        addDropEvents(formFieldsListBottom);
         let noItemsTr = document.getElementById('no-items');
         if (noItemsTr) {
-            addDropHandlers(noItemsTr);
+            addDropEvents(noItemsTr);
         }
-        let baseFields = document.querySelectorAll('#baseFieldsList .baseField');
-        [].forEach.call(baseFields, addDragHandlers);
+        let baseFields = document.querySelectorAll('.baseField');
+        [].forEach.call(baseFields, addDragEvents);
     });
 })(jQuery);

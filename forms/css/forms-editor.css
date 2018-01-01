@@ -1,16 +1,12 @@
-#postfields .inside {
+.postbox .inside {
     padding: 0;
     margin: 0;
 }
 
+#wordPressBaseFieldsList,
 #baseFieldsList {
     margin-bottom: 0;
 }
-
-/*#baseFieldsList,*/
-/*#formFieldsList {*/
-    /*margin: 0;*/
-/*}*/
 
 .baseField,
 .formField {
