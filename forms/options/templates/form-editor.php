@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 
 require_once 'customized-form-fields-table.php';
 
-function show_form_editor(int $id, array $baseFields, array $formFields = [])
+function show_form_editor(int $id, string $title, array $baseFields, array $formFields = [])
 {
     ?>
     <div class="wrap">
@@ -23,7 +23,7 @@ function show_form_editor(int $id, array $baseFields, array $formFields = [])
                         <div id="titlediv">
                             <div id="titlewrap">
                                 <label id="title-prompt-text" for="title">Enter title here</label>
-                                <input type="text" name="form_title" size="30" value="" id="title" spellcheck="true" autocomplete="off">
+                                <input type="text" name="form_title" size="30" value="<?= $title ?>" id="title" spellcheck="true" autocomplete="off">
                                 <input type="hidden" name="form_tag" value="[ssv-form-<?= $id ?>]">
                                 <input type="hidden" name="form_id" value="<?= $id ?>">
                             </div>
@@ -42,7 +42,7 @@ function show_form_editor(int $id, array $baseFields, array $formFields = [])
                                             </div>
                                             <div id="publishing-action">
                                                 <?= BaseFunctions::getFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
-                                                <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="Publish">
+                                                <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="<?= empty($title) ? 'Publish' : 'Update' ?>">
                                             </div>
                                             <div class="clear"></div>
                                         </div>

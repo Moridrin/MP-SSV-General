@@ -41,7 +41,7 @@ abstract class Forms
     {
         add_menu_page('SSV Forms', 'SSV Forms', 'ssv_not_allowed', 'ssv_forms');
         add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms', [self::class, 'showFormsPage']);
-        add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showNewFormPage']);
+        add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showEditFormPage']);
         add_submenu_page('ssv_forms', 'Manage Fields', 'Manage Fields', 'edit_posts', 'ssv_forms_base_fields_manager', [self::class, 'showSiteBaseFieldsPage']);
     }
 
@@ -137,66 +137,70 @@ abstract class Forms
 
     public static function showFormsPage()
     {
-        ?>
-        <div class="wrap">
-            <?php
-            if (BaseFunctions::isValidPOST(SSV_Forms::EDIT_FORM_ADMIN_REFERER)) {
+        if (isset($_GET['action']) && $_GET['action'] === 'edit') {
+            self::showEditFormPage();
+        } else {
+            ?>
+            <div class="wrap">
+                <?php
+                if (BaseFunctions::isValidPOST(SSV_Forms::EDIT_FORM_ADMIN_REFERER)) {
+                    /** @var wpdb $wpdb */
+                    global $wpdb;
+                    $wpdb->replace(
+                        SSV_Forms::SITE_SPECIFIC_FORMS_TABLE,
+                        [
+                            'f_id'     => $_POST['form_id'],
+                            'f_tag'    => $_POST['form_tag'],
+                            'f_title'  => $_POST['form_title'],
+                            'f_fields' => json_encode($_POST['form_fields']),
+                        ]
+                    );
+                } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
+                    if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
+                        mp_ssv_general_forms_delete_site_specific_base_fields(false);
+                    } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
+                        $value = isset($_POST['value']) ? $_POST['value'] : null;
+                        if (is_array($value)) {
+                            $value = implode(';', $value);
+                        }
+                        $_POST['values'] = [
+                            'bf_id'        => $_POST['_inline_edit'],
+                            'bf_name'      => $_POST['name'],
+                            'bf_title'     => $_POST['title'],
+                            'bf_inputType' => $_POST['inputType'],
+                            'bf_value'     => $value,
+                        ];
+                        mp_ssv_general_forms_save_site_specific_base_field(false);
+                    } else {
+                        echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
+                    }
+                }
                 /** @var wpdb $wpdb */
                 global $wpdb;
-                $wpdb->replace(
-                    SSV_Forms::SITE_SPECIFIC_FORMS_TABLE,
-                    [
-                        'f_id'     => $_POST['form_id'],
-                        'f_tag'    => $_POST['form_tag'],
-                        'f_title'  => $_POST['form_title'],
-                        'f_fields' => json_encode($_POST['form_fields']),
-                    ]
-                );
-            } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
-                if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                    mp_ssv_general_forms_delete_site_specific_base_fields(false);
-                } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
-                    $value = isset($_POST['value']) ? $_POST['value'] : null;
-                    if (is_array($value)) {
-                        $value = implode(';', $value);
-                    }
-                    $_POST['values'] = [
-                        'bf_id'        => $_POST['_inline_edit'],
-                        'bf_name'      => $_POST['name'],
-                        'bf_title'     => $_POST['title'],
-                        'bf_inputType' => $_POST['inputType'],
-                        'bf_value'     => $value,
-                    ];
-                    mp_ssv_general_forms_save_site_specific_base_field(false);
-                } else {
-                    echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
-                }
-            }
-            /** @var wpdb $wpdb */
-            global $wpdb;
-            $order   = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
-            $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');
-            $table   = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-            $forms   = $wpdb->get_results("SELECT * FROM $table ORDER BY $orderBy $order");
-            $addNew  = '<a href="?page=ssv_forms_add_new_form" class="page-title-action">Add New</a>';
-            ?>
-            <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
-            <p>These forms will only be available for <?= get_bloginfo() ?>.</p>
-            <form method="post" action="#">
-                <?php
-                show_forms_table($forms, $order, $orderBy, current_user_can('manage_site_specific_forms'));
-                if (current_user_can('manage_site_specific_forms')) {
-                    echo BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
-                }
+                $order   = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
+                $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');
+                $table   = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+                $forms   = $wpdb->get_results("SELECT * FROM $table ORDER BY $orderBy $order");
+                $addNew  = '<a href="?page=ssv_forms_add_new_form" class="page-title-action">Add New</a>';
                 ?>
-            </form>
+                <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
+                <p>These forms will only be available for <?= get_bloginfo() ?>.</p>
+                <form method="post" action="#">
+                    <?php
+                    show_forms_table($forms, $order, $orderBy, current_user_can('manage_site_specific_forms'));
+                    if (current_user_can('manage_site_specific_forms')) {
+                        echo BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
+                    }
+                    ?>
+                </form>
+                <?php
+                ?>
+            </div>
             <?php
-            ?>
-        </div>
-        <?php
+        }
     }
 
-    public static function showNewFormPage()
+    public static function showEditFormPage()
     {
         /** @var wpdb $wpdb */
         global $wpdb;
@@ -204,8 +208,17 @@ abstract class Forms
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $formsTable                  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
         $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
-        $newId                       = $wpdb->get_row("SELECT MAX(f_id) AS maxId FROM $formsTable")->maxId + 1;
-        show_form_editor($newId, $baseFields);
+        if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
+            $id         = $_GET['id'];
+            $formName   = $wpdb->get_var("SELECT f_title FROM $formsTable WHERE f_id = $id");
+            $fieldNames = json_decode($wpdb->get_var("SELECT f_fields FROM $formsTable WHERE f_id = $id"));
+            $formFields = self::getFormFields($fieldNames);
+        } else {
+            $id         = $wpdb->get_var("SELECT MAX(f_id) AS maxId FROM $formsTable") + 1;
+            $formName   = '';
+            $formFields = [];
+        }
+        show_form_editor($id, $formName, $baseFields, $formFields);
     }
 
     public static function showSiteBaseFieldsPage()
@@ -336,31 +349,39 @@ abstract class Forms
 
     private static function getFormHTML(stdClass $form): string
     {
-        $fields              = json_decode($form->f_fields);
-        $wordPressBaseFields = self::getWordPressBaseFields();
-        $formFields          = array_filter(
-            $wordPressBaseFields,
-            function ($field) use ($fields) {
-                return in_array($field->bf_name, $fields);
-            }
-        );
-        /** @var wpdb $wpdb */
-        global $wpdb;
-        $fields                      = '"' . implode('", "', $fields) . '"';
-        $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-        $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-        $formFields                  = array_merge($formFields, $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($fields)"));
+        $formFields = self::getFormFields(json_decode($form->f_fields));
         ob_start();
         foreach ($formFields as $field) {
-            $field = json_decode(json_encode($field), true);
+            $field    = json_decode(json_encode($field), true);
             $newField = [];
             foreach ($field as $key => $value) {
                 $newField[str_replace('bf_', '', $key)] = $value;
             }
-            require_once 'templates/fields/text-input.php';
-            show_text_input_field($newField);
+            switch ($newField['inputType']) {
+                case 'text':
+                    require_once 'templates/fields/text-input.php';
+                    show_text_input_field($newField);
+                    break;
+            }
         }
         return ob_get_clean();
+    }
+
+    private static function getFormFields(array $fieldNames): array
+    {
+        $wordPressBaseFields = self::getWordPressBaseFields();
+        $formFields          = array_filter(
+            $wordPressBaseFields,
+            function ($field) use ($fieldNames) {
+                return in_array($field->bf_name, $fieldNames);
+            }
+        );
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $fieldNames                  = '"' . implode('", "', $fieldNames) . '"';
+        $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+        $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+        return array_merge($formFields, $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($fieldNames)"));
     }
 }
 

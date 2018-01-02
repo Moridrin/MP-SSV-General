@@ -98,8 +98,8 @@ abstract class SSV_Forms
 
     public static function enquireAdminScripts()
     {
-        if (isset($_GET["page"]) && $_GET["page"] == "ssv_forms_base_fields_manager") {
-            $activeTab = "shared";
+        if (isset($_GET['page']) && $_GET['page'] == 'ssv_forms_base_fields_manager') {
+            $activeTab = 'shared';
             if (isset($_GET['tab'])) {
                 $activeTab = $_GET['tab'];
             }
@@ -130,8 +130,8 @@ abstract class SSV_Forms
             );
         }
 
-        if (isset($_GET["page"]) && $_GET["page"] == "ssv_forms_forms_manager") {
-            $activeTab = "shared";
+        if (isset($_GET['page']) && $_GET['page'] == 'ssv_forms_forms_manager') {
+            $activeTab = 'shared';
             if (isset($_GET['tab'])) {
                 $activeTab = $_GET['tab'];
             }
@@ -156,7 +156,7 @@ abstract class SSV_Forms
             );
         }
 
-        if (isset($_GET["page"]) && $_GET["page"] == "ssv_forms_add_new_form") {
+        if (isset($_GET['page']) && ($_GET['page'] === 'ssv_forms_edit_form' || ($_GET['page'] === 'ssv_forms' && isset($_GET['action']) && $_GET['action'] === 'edit'))) {
             wp_enqueue_style('mp-ssv-forms-manager-css', SSV_Forms::URL . '/css/forms-editor.css');
             wp_enqueue_script('mp-ssv-forms-manager-js', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
         }

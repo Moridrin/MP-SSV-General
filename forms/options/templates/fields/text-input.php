@@ -28,14 +28,14 @@ function show_text_input_field(array $field)
     if (current_theme_supports('materialize')) {
         ?>
         <div <?= Field::getElementAttributesString($field, $divId) ?>>
-            <input type="text" <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/>
+            <input <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/>
             <label <?= Field::getElementAttributesString($field, $labelId) ?>for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
         </div>
         <?php
     } else {
         ?>
-        <label <?= Field::getElementAttributesString($field, $labelId) ?>for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
-        <input type="text" <?= Field::getElementAttributesString($field, $inputId, '', ['disabled' => true, 'checked' => true, 'required' => true]) ?>/>
+        <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
+        <input <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/>
         <?php
     }
 }

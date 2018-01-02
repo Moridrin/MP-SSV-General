@@ -60,9 +60,8 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                             <strong><?= $form->f_title ?></strong>
                             <div class="row-actions">
                                 <?php if ($canManage): ?>
-                                    <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $form->f_id ?>')" class="editinline"
-                                                                          aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
-                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $form->f_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
+                                    <span class="edit"><a href="admin.php?page=ssv_forms&action=edit&id=<?= $form->f_id ?>" class="edit" aria-label="Edit “<?= $form->f_title ?>”">Edit</a> | </span>
+                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $form->f_id ?>')" class="submitdelete" aria-label="Delete “<?= $form->f_title ?>”">Delete</a></span>
                                 <?php endif; ?>
                             </div>
                         </td>

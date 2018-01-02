@@ -6,7 +6,6 @@ if (!defined('ABSPATH')) {
 
 function show_customized_form_fields_table(array $fields)
 {
-    $canManage = false;
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
@@ -21,29 +20,14 @@ function show_customized_form_fields_table(array $fields)
             <tbody id="formFieldsList">
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
-                    <tr id="<?= $field->bf_id ?>_tr" class="inactive formField">
-                        <td id="<?= $field->bf_id ?>_field_title_td">
+                    <tr draggable="true" class="formField">
+                        <td>
+                            <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
                             <strong><?= $field->bf_title ?></strong>
-                            <div class="row-actions">
-                                <?php if ($canManage): ?>
-                                    <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
-                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
-                                <?php endif; ?>
-                            </div>
                         </td>
-                        <td id="<?= $field->bf_id ?>_name_td">
-                            <?= $field->bf_name ?>
-                        </td>
-                        <td id="<?= $field->bf_id ?>_inputType_td">
-                            <?= $field->bf_inputType ?>
-                        </td>
-                        <?php if ($field->bf_inputType === 'select' || $field->bf_inputType === 'hidden' || $field->bf_inputType === 'role_select'): ?>
-                            <td class="value_td" id="<?= $field->bf_id ?>_value_td">
-                                <?= $field->bf_value ?>
-                            </td>
-                        <?php else: ?>
-                            <td id="<?= $field->bf_id ?>_empty_td"></td>
-                        <?php endif; ?>
+                        <td>Input</td>
+                        <td><?= $field->bf_inputType ?></td>
+                        <td><?= $field->bf_value ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

@@ -13,6 +13,9 @@
                 $label.show();
             }
         });
+        if ($input.val() !== '') {
+            $label.hide();
+        }
 
         $('.hndle').click(function () {
             $(this.nextSibling.nextSibling).toggle();
@@ -87,7 +90,8 @@
                 dropElement.setAttribute('class', 'formField');
                 dropElement.innerHTML =
                     '<td>' +
-                    '   <input type="hidden" name="form_fields[]" value="' + field.bf_name + '">' + field.bf_title +
+                    '   <input type="hidden" name="form_fields[]" value="' + field.bf_name + '">' +
+                    '   <strong>' + field.bf_title + '</strong>' +
                     '</td>' +
                     '<td>' + fieldType + '</td>' +
                     '<td>' + field.bf_inputType + '</td>' +
@@ -153,5 +157,8 @@
         }
         let baseFields = document.querySelectorAll('.baseField');
         [].forEach.call(baseFields, addDragEvents);
+        let formFields = document.querySelectorAll('.formField');
+        [].forEach.call(formFields, addDragEvents);
+        [].forEach.call(formFields, addDropEvents);
     });
 })(jQuery);

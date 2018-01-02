@@ -13,7 +13,7 @@ abstract class Field
     public static function getElementAttributesString(array $field, string $elementId, string $nameSuffix = null, array $options = []): string
     {
         $field            += [
-            'fieldType'      => 'input',
+            'inputType'      => 'text',
             'classes'        => [],
             'styles'         => [],
             'overrideRights' => [],
@@ -31,8 +31,8 @@ abstract class Field
         ];
         $currentUserCanOverride = self::currentUserCanOverride($field['overrideRights']);
         $attributesString = 'id="' . $elementId . '"';
-        if (isset($options['type'])) {
-            $attributesString .= ' type="' . $field['fieldType'] . '"';
+        if ($options['type']) {
+            $attributesString .= ' type="' . $field['inputType'] . '"';
         }
         if (isset($field['classes'][$elementId])) {
             $attributesString .= ' class="' . BaseFunctions::escape($field['classes'][$elementId], 'attr', ' ') . '"';
