@@ -86,10 +86,10 @@ abstract class SSV_Forms
             $sql
                        = "
             CREATE TABLE IF NOT EXISTS $tableName (
-                `f_id` bigint(20) NOT NULL PRIMARY KEY,
+                `f_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `f_tag` VARCHAR(50) UNIQUE,
                 `f_title` VARCHAR(50) NOT NULL,
-                `f_fields` VARCHAR(255),
+                `f_fields` VARCHAR(255)
             ) $charset_collate;";
             $wpdb->query($sql);
             restore_current_blog();

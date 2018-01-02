@@ -4,6 +4,7 @@ namespace mp_ssv_forms\options;
 
 use mp_ssv_forms\models\SSV_Forms;
 use mp_ssv_general\base\BaseFunctions;
+use stdClass;
 use wpdb;
 
 if (!defined('ABSPATH')) {
@@ -17,9 +18,31 @@ require_once 'templates/form-editor.php';
 abstract class Forms
 {
 
+    public static function filterContent($content)
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $table = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+        $forms = $wpdb->get_results("SELECT * FROM $table");
+        foreach ($forms as $form) {
+            if (strpos($content, $form->f_tag) !== false) {
+                $content = str_replace($form->f_tag, self::getFormHTML($form), $content);
+            }
+        }
+        return $content;
+    }
+
     public static function setupNetworkMenu()
     {
         add_menu_page('SSV Forms', 'SSV Forms', 'edit_posts', 'ssv_forms', [self::class, 'showSharedBaseFieldsPage']);
+    }
+
+    public static function setupSiteSpecificMenu()
+    {
+        add_menu_page('SSV Forms', 'SSV Forms', 'ssv_not_allowed', 'ssv_forms');
+        add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms', [self::class, 'showFormsPage']);
+        add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showNewFormPage']);
+        add_submenu_page('ssv_forms', 'Manage Fields', 'Manage Fields', 'edit_posts', 'ssv_forms_base_fields_manager', [self::class, 'showSiteBaseFieldsPage']);
     }
 
     public static function showSharedBaseFieldsPage()
@@ -49,8 +72,7 @@ abstract class Forms
             $orderBy    = isset($_GET['orderby']) ? BaseFunctions::sanitize($_GET['orderby'], 'text') : 'bf_title';
             $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
             $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
-            //            $baseFields = self::addBaseFields($baseFields, $order, $orderBy);
-            $addNew = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
+            $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
             ?>
             <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
             <p>These fields will be available for all sites.</p>
@@ -113,14 +135,6 @@ abstract class Forms
         );
     }
 
-    public static function setupSiteSpecificMenu()
-    {
-        add_menu_page('SSV Forms', 'SSV Forms', 'ssv_not_allowed', 'ssv_forms');
-        add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms', [self::class, 'showFormsPage']);
-        add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showNewFormPage']);
-        add_submenu_page('ssv_forms', 'Manage Fields', 'Manage Fields', 'edit_posts', 'ssv_forms_base_fields_manager', [self::class, 'showSiteBaseFieldsPage']);
-    }
-
     public static function showFormsPage()
     {
         ?>
@@ -135,16 +149,9 @@ abstract class Forms
                         'f_id'     => $_POST['form_id'],
                         'f_tag'    => $_POST['form_tag'],
                         'f_title'  => $_POST['form_title'],
-                        'f_fields' => $_POST['form_fields'],
+                        'f_fields' => json_encode($_POST['form_fields']),
                     ]
                 );
-                $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-                $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-                $baseFieldNames              = $_POST['fields'];
-                $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($baseFieldNames)");
-                foreach ($baseFields as $baseField) {
-                }
-                BaseFunctions::var_export($_POST, 1);
             } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
                 if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                     mp_ssv_general_forms_delete_site_specific_base_fields(false);
@@ -168,15 +175,22 @@ abstract class Forms
             /** @var wpdb $wpdb */
             global $wpdb;
             $order   = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
-            $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_title', 'text');
+            $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');
             $table   = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
             $forms   = $wpdb->get_results("SELECT * FROM $table ORDER BY $orderBy $order");
             $addNew  = '<a href="?page=ssv_forms_add_new_form" class="page-title-action">Add New</a>';
             ?>
             <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
             <p>These forms will only be available for <?= get_bloginfo() ?>.</p>
+            <form method="post" action="#">
+                <?php
+                show_forms_table($forms, $order, $orderBy, current_user_can('manage_site_specific_forms'));
+                if (current_user_can('manage_site_specific_forms')) {
+                    echo BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
+                }
+                ?>
+            </form>
             <?php
-            self::showFormsManager($forms, $order, $orderBy, current_user_can('manage_site_specific_forms'));
             ?>
         </div>
         <?php
@@ -190,8 +204,7 @@ abstract class Forms
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $formsTable                  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
         $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
-//        $baseFields                  = self::addBaseFields($baseFields);
-        $newId = $wpdb->get_row("SELECT MAX(f_id) FROM $formsTable") + 1;
+        $newId                       = $wpdb->get_row("SELECT MAX(f_id) AS maxId FROM $formsTable")->maxId + 1;
         show_form_editor($newId, $baseFields);
     }
 
@@ -249,8 +262,7 @@ abstract class Forms
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_title', 'text');
         $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
-//        $baseFields = self::addBaseFields($baseFields, $order, $orderBy);
-        $addNew = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
+        $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="mp_ssv_add_new_base_input_field()">Add New</a>';
         ?>
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
         <p>These fields will be available for all sites.</p>
@@ -322,33 +334,36 @@ abstract class Forms
         <?php
     }
 
-    private static function showFormsManager($forms, $order, $orderBy, $hasManageRight)
+    private static function getFormHTML(stdClass $form): string
     {
-        ?>
-        <form method="post" action="#">
-            <?php
-            show_forms_table($forms, $order, $orderBy, $hasManageRight);
-            if ($hasManageRight) {
-                ?>
-                <script>
-                    let i = <?= count($forms) > 0 ? max(array_column($forms, 'bf_id')) + 1 : 1 ?>;
-
-                    function mp_ssv_add_new_form() {
-                        event.preventDefault();
-                        mp_ssv_add_form('the-list', i, '', '', '');
-                        document.getElementById(i + '_title').focus();
-                        i++;
-                    }
-                </script>
-                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false) ?>
-                <?php
+        $fields              = json_decode($form->f_fields);
+        $wordPressBaseFields = self::getWordPressBaseFields();
+        $formFields          = array_filter(
+            $wordPressBaseFields,
+            function ($field) use ($fields) {
+                return in_array($field->bf_name, $fields);
             }
-            ?>
-        </form>
-        <?php
+        );
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $fields                      = '"' . implode('", "', $fields) . '"';
+        $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+        $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+        $formFields                  = array_merge($formFields, $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($fields)"));
+        ob_start();
+        foreach ($formFields as $field) {
+            $field = json_decode(json_encode($field), true);
+            $newField = [];
+            foreach ($field as $key => $value) {
+                $newField[str_replace('bf_', '', $key)] = $value;
+            }
+            require_once 'templates/fields/text-input.php';
+            show_text_input_field($newField);
+        }
+        return ob_get_clean();
     }
-
 }
 
 add_action('network_admin_menu', [Forms::class, 'setupNetworkMenu'], 9);
 add_action('admin_menu', [Forms::class, 'setupSiteSpecificMenu'], 9);
+add_filter('the_content', [Forms::class, 'filterContent'], 9);

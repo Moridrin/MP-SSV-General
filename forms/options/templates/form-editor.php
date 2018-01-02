@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 
 require_once 'customized-form-fields-table.php';
 
-function show_form_editor(int $id, array $baseFields)
+function show_form_editor(int $id, array $baseFields, array $formFields = [])
 {
     ?>
     <div class="wrap">
@@ -41,6 +41,7 @@ function show_form_editor(int $id, array $baseFields)
                                                 <a class="submitdelete deletion" href="#">Move to Trash</a>
                                             </div>
                                             <div id="publishing-action">
+                                                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
                                                 <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="Publish">
                                             </div>
                                             <div class="clear"></div>
@@ -90,7 +91,7 @@ function show_form_editor(int $id, array $baseFields)
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>
                                 <div class="inside" style="margin: 0; padding: 0;">
                                     <?php
-                                    show_customized_form_fields_table([]);
+                                    show_customized_form_fields_table($formFields);
                                     ?>
                                 </div>
                             </div>
@@ -99,7 +100,6 @@ function show_form_editor(int $id, array $baseFields)
                     <br class="clear">
                 </div>
             </div>
-            <?= BaseFunctions::getFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
         </form>
     </div>
     <?php

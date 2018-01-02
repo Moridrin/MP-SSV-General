@@ -6,13 +6,13 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_forms_table(array $forms, string $order = 'asc', string $orderBy = 'bf_title', bool $canManage = false)
+function show_forms_table(array $forms, string $order = 'asc', string $orderBy = 'f_title', bool $canManage = false)
 {
     $newOrder     = $order === 'asc' ? 'desc' : 'asc';
-    $orderByTitle = ($orderBy === 'bf_title' ? 'sorted' : '');
-    $orderByTag   = ($orderBy === 'bf_tag' ? 'sorted' : '');
-    $orderTitle   = ($orderBy === 'bf_title' ? $newOrder : $order);
-    $orderTag     = ($orderBy === 'bf_tag' ? $newOrder : $order);
+    $orderByTitle = ($orderBy === 'f_title' ? 'sorted' : '');
+    $orderByTag   = ($orderBy === 'f_tag' ? 'sorted' : '');
+    $orderTitle   = ($orderBy === 'f_title' ? $newOrder : $order);
+    $orderTag     = ($orderBy === 'f_tag' ? $newOrder : $order);
     ?>
     <div style="overflow-x: auto;">
         <?php if ($canManage): ?>
@@ -37,10 +37,10 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                     <?php endif; ?>
                 </td>
                 <th scope="col" id="title" class="manage-column column-name column-primary sortable <?= BaseFunctions::escape($orderTitle, 'attr') ?> <?= $orderByTitle ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=f_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="name" class="manage-column column-name sortable <?= BaseFunctions::escape($orderTag, 'attr') ?> <?= $orderByTag ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_tag&order=<?= BaseFunctions::escape($orderTag, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=f_tag&order=<?= BaseFunctions::escape($orderTag, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
                 </th>
                 <td scope="col" id="input_type" class="manage-column column-name">
                     <span>Fields</span>
@@ -50,27 +50,27 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
             <tbody id="the-list">
             <?php if (!empty($forms)): ?>
                 <?php foreach ($forms as $form): ?>
-                    <tr id="<?= $form->bf_id ?>_tr" class="inactive">
-                        <th id="<?= $form->bf_id ?>_id_td" class="check-column">
+                    <tr id="<?= $form->f_id ?>_tr" class="inactive">
+                        <th id="<?= $form->f_id ?>_id_td" class="check-column">
                             <?php if ($canManage): ?>
-                                <input type="checkbox" id="<?= $form->bf_id ?>_id" name="fieldIds[]" value="<?= $form->bf_id ?>">
+                                <input type="checkbox" id="<?= $form->f_id ?>_id" name="fieldIds[]" value="<?= $form->f_id ?>">
                             <?php endif; ?>
                         </th>
-                        <td id="<?= $form->bf_id ?>_field_title_td">
-                            <strong><?= $form->bf_title ?></strong>
+                        <td id="<?= $form->f_id ?>_field_title_td">
+                            <strong><?= $form->f_title ?></strong>
                             <div class="row-actions">
                                 <?php if ($canManage): ?>
-                                    <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $form->bf_id ?>')" class="editinline"
+                                    <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $form->f_id ?>')" class="editinline"
                                                                           aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
-                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $form->bf_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
+                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $form->f_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
                                 <?php endif; ?>
                             </div>
                         </td>
-                        <td id="<?= $form->bf_id ?>_name_td">
-                            <?= $form->bf_tag ?>
+                        <td id="<?= $form->f_id ?>_name_td">
+                            <?= $form->f_tag ?>
                         </td>
-                        <td id="<?= $form->bf_id ?>_inputType_td">
-                            <?= $form->bf_fields ?>
+                        <td id="<?= $form->f_id ?>_inputType_td">
+                            <?= $form->f_fields ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -89,10 +89,10 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                     <?php endif; ?>
                 </td>
                 <th scope="col" id="title" class="manage-column column-name column-primary sortable <?= BaseFunctions::escape($orderTitle, 'attr') ?> <?= $orderByTitle ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=f_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="name" class="manage-column column-name sortable <?= BaseFunctions::escape($orderTag, 'attr') ?> <?= $orderByTag ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_tag&order=<?= BaseFunctions::escape($orderTag, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=f_tag&order=<?= BaseFunctions::escape($orderTag, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
                 </th>
                 <td scope="col" id="input_type" class="manage-column column-name">
                     <span>Fields</span>

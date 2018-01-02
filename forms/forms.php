@@ -26,3 +26,4 @@ if (!class_exists(Forms::class)) {
 }
 
 require_once 'ajax.php';
+require_once 'models/Field.php';

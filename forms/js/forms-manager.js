@@ -87,7 +87,7 @@
                 dropElement.setAttribute('class', 'formField');
                 dropElement.innerHTML =
                     '<td>' +
-                    '   <input type="hidden" name="fields[]" value="' + field.bf_name + '">' + field.bf_title +
+                    '   <input type="hidden" name="form_fields[]" value="' + field.bf_name + '">' + field.bf_title +
                     '</td>' +
                     '<td>' + fieldType + '</td>' +
                     '<td>' + field.bf_inputType + '</td>' +

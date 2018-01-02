@@ -3,6 +3,7 @@
 namespace mp_ssv_general\custom_fields\input_fields;
 
 use DateTime;
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 
@@ -25,64 +26,64 @@ class TextInputField extends InputField
     public $defaultValue;
     public $placeholder;
 
-    protected function __construct(
-        int $id,
-        string $name,
-        string $title,
-        int $order = null,
-        array $classes = [],
-        array $styles = [],
-        array $overrideRights = [],
-        bool $disabled = false,
-        bool $required = false,
-        mixed $defaultValue = null,
-        string $placeholder = ''
-    ) {
-        parent::__construct($id, $name, $title, self::INPUT_TYPE, $order, $classes, $styles, $overrideRights);
-        $this->disabled     = $disabled;
-        $this->required     = $required;
-        $this->defaultValue = $defaultValue;
-        $this->placeholder  = $placeholder;
+    /**
+     * @param array $arguments {
+     *
+     * @type int    $id
+     * @type string $name
+     * @type string $title
+     * @type int    $order
+     * @type array  $classes
+     * @type array  $styles
+     * @type array  $overrideRights
+     * @type bool   $disabled
+     * @type bool   $required
+     * @type mixed  $defaultValue
+     * }
+     */
+    protected function __construct(array $arguments = [])
+    {
+        $arguments += [
+            'order'          => null,
+            'classes'        => [],
+            'styles'         => [],
+            'overrideRights' => [],
+            'disabled'       => false,
+            'required'       => false,
+            'defaultChecked' => false,
+        ];
+        parent::__construct($arguments['id'], $arguments['name'], $arguments['title'], self::INPUT_TYPE, $arguments['order'], $arguments['classes'], $arguments['styles'], $arguments['overrideRights']);
+        $this->disabled     = $arguments['disabled'];
+        $this->required     = $arguments['required'];
+        $this->defaultValue = $arguments['defaultValue'];
+        $this->placeholder  = $arguments['placeholder'];
     }
 
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML(): string
     {
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $value       = !empty($this->value) ? $this->value : $this->defaultValue;
-        $id          = !empty($this->order) ? 'id="' . esc_html($this->order) . '"' : '';
-        $name        = 'name="' . $this->name . '"';
-        $class       = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate"';
-        $style       = !empty($this->styles) ? 'style="' . esc_html($this->styles) . '"' : '';
-        $placeholder = !empty($this->placeholder) ? 'placeholder="' . esc_html($this->placeholder) . '"' : '';
-        $value       = !empty($value) ? 'value="' . esc_html($value) . '"' : '';
-        $disabled    = disabled($this->disabled, true, false);
-        $required    = $this->required ? 'required="required"' : '';
-
-        if (!empty($this->overrideRights) && current_user_can($this->overrideRights)) {
-            $disabled = '';
-            $required = '';
-        }
-
+        $divId      = BaseFunctions::escape('div_' . $this->name, 'attr');
+        $input = BaseFunctions::escape('input_' . $this->name, 'attr');
+        $label = BaseFunctions::escape('label_' . $this->name, 'attr');
         ob_start();
         if (current_theme_supports('materialize')) {
             ?>
-            <div class="input-field">
-                <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/>
-                <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label>
+            <div <?= $this->getElementAttributesString($divId) ?>>
+                <input type="text" <?= $this->getElementAttributesString($input, '', ['disabled' => true, 'checked' => true, 'required' => true]) ?>/>
+                <label <?= $this->getElementAttributesString($label) ?>for="<?= $label ?>"><?= BaseFunctions::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
             </div>
             <?php
         } else {
             ?>
-            <label><?= esc_html($this->title) ?><?= $this->required ? '*' : '' ?></label><br/>
-            <input type="text" <?= $id ?> <?= $name ?> <?= $class ?> <?= $style ?> <?= $value ?> <?= $disabled ?> <?= $placeholder ?> <?= $required ?> title="<?= esc_html($this->title) ?>"/><br/>
+            <label <?= $this->getElementAttributesString($label) ?>for="<?= $label ?>"><?= BaseFunctions::escape($this->title, 'html') ?><?= $this->required ? '*' : '' ?></label>
+            <input type="checkbox" <?= $this->getElementAttributesString($input, '', ['disabled' => true, 'checked' => true, 'required' => true]) ?>/>
             <?php
         }
-
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 

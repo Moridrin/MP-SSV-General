@@ -3,7 +3,7 @@
 namespace mp_ssv_general\custom_fields;
 
 use Exception;
-use mp_ssv_general\BaseFunctions;
+use mp_ssv_general\base\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -51,7 +51,7 @@ abstract class Field
     public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);
-        switch ($values->fieldType) {
+        switch ($values->type) {
             case InputField::FIELD_TYPE:
                 return InputField::fromJSON($json);
             case TabField::FIELD_TYPE:
@@ -61,7 +61,7 @@ abstract class Field
             case LabelField::FIELD_TYPE:
                 return new LabelField(...json_decode($json, true));
         }
-        throw new Exception($values->field_type . ' is an unknown field type');
+        throw new Exception($values->type . ' is an unknown field type');
     }
 
     public function toJSON(): string
@@ -71,38 +71,41 @@ abstract class Field
 
 //    abstract public function getHTML(): string;
 
-    protected function getElementAttributesString(string $elementId, string $nameSuffix = null, array $options = []): string
+    public static function getElementAttributesString($field, string $elementId, string $nameSuffix = null, array $options = []): string
     {
         $options          += [
+            'type'     => false,
             'required' => false,
             'disabled' => false,
             'checked'  => false,
             'value'    => false,
         ];
         $attributesString = 'id="' . $elementId . '"';
-        $attributesString .= ' type="' . $this->fieldType . '"';
-        if (isset($this->classes[$elementId])) {
-            $attributesString .= ' class="' . BaseFunctions::escape($this->classes[$elementId], 'attr', ' ') . '"';
+        if (isset($options['type'])) {
+            $attributesString .= ' type="' . $field->fieldType . '"';
         }
-        if (isset($this->styles[$elementId])) {
-            $attributesString .= ' style="' . BaseFunctions::escape($this->styles[$elementId], 'attr', ' ') . '"';
+        if (isset($field->classes[$elementId])) {
+            $attributesString .= ' class="' . BaseFunctions::escape($field->classes[$elementId], 'attr', ' ') . '"';
         }
-        if ($this instanceof InputField) {
-            $currentUserCanOverride = $this->currentUserCanOcerride();
+        if (isset($field->styles[$elementId])) {
+            $attributesString .= ' style="' . BaseFunctions::escape($field->styles[$elementId], 'attr', ' ') . '"';
+        }
+        if ($field instanceof InputField) {
+            $currentUserCanOverride = $field->currentUserCanOcerride();
             if ($nameSuffix !== null) {
-                $attributesString .= ' name="' . BaseFunctions::escape($this->name . $nameSuffix, 'attr') . '"';
+                $attributesString .= ' name="' . BaseFunctions::escape($field->name . $nameSuffix, 'attr') . '"';
             }
-            if (!$currentUserCanOverride && $options['required'] && isset($this->required)) {
-                $attributesString .= $this->required ? 'required="required"' : '';
+            if (!$currentUserCanOverride && $options['required'] && isset($field->required)) {
+                $attributesString .= $field->required ? 'required="required"' : '';
             }
-            if (!$currentUserCanOverride && $options['disabled'] && isset($this->disabled)) {
-                $attributesString .= disabled($this->disabled, true, false);
+            if (!$currentUserCanOverride && $options['disabled'] && isset($field->disabled)) {
+                $attributesString .= disabled($field->disabled, true, false);
             }
-            if ($options['checked'] && isset($this->checked)) {
-                $attributesString .= checked($this->checked, true, false);
+            if ($options['checked'] && isset($field->checked)) {
+                $attributesString .= checked($field->checked, true, false);
             }
             if ($options['value']) {
-                $attributesString .= checked($this->getValue(), true, false);
+                $attributesString .= checked($field->getValue(), true, false);
             }
         }
         return $attributesString;

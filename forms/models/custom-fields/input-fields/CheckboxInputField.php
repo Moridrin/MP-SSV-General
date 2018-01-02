@@ -2,9 +2,8 @@
 
 namespace mp_ssv_general\custom_fields\input_fields;
 
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\custom_fields\InputField;
-use mp_ssv_general\Message;
-use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -68,7 +67,7 @@ class CheckboxInputField extends InputField
 
     public function getHTML(): string
     {
-        $divId = BaseFunctions::escape('div_' . $this->name, 'attr');
+        $divId      = BaseFunctions::escape('div_' . $this->name, 'attr');
         $fallbackId = BaseFunctions::escape('fallback_' . $this->name, 'attr');
         $checkboxId = BaseFunctions::escape('checkbox_' . $this->name, 'attr');
         ob_start();
@@ -82,6 +81,7 @@ class CheckboxInputField extends InputField
         return trim(preg_replace('/\s\s+/', ' ', ob_get_clean()));
     }
 
+    /*
     public function getFilterRow(): string
     {
         ob_start();
@@ -94,9 +94,6 @@ class CheckboxInputField extends InputField
         return $this->getFilterRowBase(ob_get_clean());
     }
 
-    /**
-     * @return Message[]|bool array of errors or true if no errors.
-     */
     public function isValid()
     {
         $errors = array();
@@ -104,5 +101,5 @@ class CheckboxInputField extends InputField
             $errors[] = new Message($this->title . ' is required but checked.', $this->currentUserCanOcerride() ? Message::SOFT_ERROR_MESSAGE : Message::ERROR_MESSAGE);
         }
         return empty($errors) ?: $errors;
-    }
+    }*/
 }

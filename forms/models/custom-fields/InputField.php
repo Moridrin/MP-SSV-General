@@ -2,17 +2,16 @@
 
 namespace mp_ssv_general\custom_fields;
 
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
-use mp_ssv_general\Message;
-use mp_ssv_general\BaseFunctions;
-use mp_ssv_general\User;
+use mp_ssv_general\custom_fields\input_fields\TextInputField;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-//require_once 'input-fields/TextInputField.php';
+require_once 'input-fields/TextInputField.php';
 require_once 'input-fields/CheckboxInputField.php';
 //require_once 'input-fields/SelectInputField.php';
 //require_once 'input-fields/ImageInputField.php';
@@ -45,16 +44,14 @@ abstract class InputField extends Field
 
     public static function fromJSON(string $json): Field
     {
-        $values = json_decode($json);
-        $tmp    = json_decode($json, true);
-        BaseFunctions::var_export(json_decode($json, true));
-        switch ($values->inputType) {
-//            case TextInputField::INPUT_TYPE:
-//                return new TextInputField(...json_decode($json, true));
+        $values = json_decode($json, true);
+        switch ($values['inputType']) {
+            case TextInputField::INPUT_TYPE:
+                return new TextInputField($values);
 //            case SelectInputField::INPUT_TYPE:
 //                return new SelectInputField(...json_decode($json, true));
             case CheckboxInputField::INPUT_TYPE:
-                return new CheckboxInputField($tmp);
+                return new CheckboxInputField($values);
 //            case DateInputField::INPUT_TYPE:
 //                return new DateInputField(...json_decode($json, true));
 //            case RoleCheckboxInputField::INPUT_TYPE:
@@ -72,6 +69,7 @@ abstract class InputField extends Field
 
     public abstract function getHTML(): string;
 
+    /*
     public abstract function getFilterRow(): string;
 
     public function getFilterRowBase(string $filter): string
@@ -94,16 +92,15 @@ abstract class InputField extends Field
         return ob_get_clean();
     }
 
-    /**
-     * @return Message[]|bool array of errors or true if no errors.
-     */
     public abstract function isValid();
+    */
 
     public function getValue(): mixed
     {
         return $this->value;
     }
 
+    /*
     public function setValue($value): void
     {
         if ($this instanceof HiddenInputField) {
@@ -154,16 +151,7 @@ abstract class InputField extends Field
             )
         );
     }
-
-    public function currentUserCanOcerride(): bool
-    {
-        foreach ($this->overrideRights as $overrideRight) {
-            if (current_user_can($overrideRight)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    */
 
     function __toString(): string
     {
