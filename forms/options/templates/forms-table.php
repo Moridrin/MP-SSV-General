@@ -53,7 +53,7 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                     <tr id="<?= $form->f_id ?>_tr" class="inactive">
                         <th id="<?= $form->f_id ?>_id_td" class="check-column">
                             <?php if ($canManage): ?>
-                                <input type="checkbox" id="<?= $form->f_id ?>_id" name="fieldIds[]" value="<?= $form->f_id ?>">
+                                <input type="checkbox" id="<?= $form->f_id ?>_id" name="formIds[]" value="<?= $form->f_id ?>">
                             <?php endif; ?>
                         </th>
                         <td id="<?= $form->f_id ?>_field_title_td">
@@ -61,7 +61,7 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                             <div class="row-actions">
                                 <?php if ($canManage): ?>
                                     <span class="edit"><a href="admin.php?page=ssv_forms&action=edit&id=<?= $form->f_id ?>" class="edit" aria-label="Edit “<?= $form->f_title ?>”">Edit</a> | </span>
-                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $form->f_id ?>')" class="submitdelete" aria-label="Delete “<?= $form->f_title ?>”">Delete</a></span>
+                                    <span class="trash"><a href="javascript:void(0)" onclick="formsManager.deleteRow('<?= $form->f_id ?>')" class="submitdelete" aria-label="Delete “<?= $form->f_title ?>”">Delete</a></span>
                                 <?php endif; ?>
                             </div>
                         </td>
@@ -69,13 +69,13 @@ function show_forms_table(array $forms, string $order = 'asc', string $orderBy =
                             <?= $form->f_tag ?>
                         </td>
                         <td id="<?= $form->f_id ?>_inputType_td">
-                            <?= $form->f_fields ?>
+                            <?= implode(', ', json_decode($form->f_fields, true)) ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr id="no-items" class="no-items">
-                    <td class="colspanchange" colspan="4">No Base Fields found</td>
+                    <td class="colspanchange" colspan="4">No Forms found</td>
                 </tr>
             <?php endif; ?>
             </tbody>

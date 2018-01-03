@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 
 require_once 'customized-form-fields-table.php';
 
-function show_form_editor(int $id, string $title, array $baseFields, array $formFields = [])
+function show_form_editor(int $id, string $title, array $sharedBaseFields, array $siteSpecificBaseFields, array $formFields = [])
 {
     ?>
     <div class="wrap">
@@ -23,7 +23,7 @@ function show_form_editor(int $id, string $title, array $baseFields, array $form
                         <div id="titlediv">
                             <div id="titlewrap">
                                 <label id="title-prompt-text" for="title">Enter title here</label>
-                                <input type="text" name="form_title" size="30" value="<?= $title ?>" id="title" spellcheck="true" autocomplete="off">
+                                <input type="text" name="form_title" size="30" value="<?= $title ?>" id="title" spellcheck="true" autocomplete="off" required="required">
                                 <input type="hidden" name="form_tag" value="[ssv-form-<?= $id ?>]">
                                 <input type="hidden" name="form_id" value="<?= $id ?>">
                             </div>
@@ -55,25 +55,43 @@ function show_form_editor(int $id, string $title, array $baseFields, array $form
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>WordPress User Fields</span></h2>
                                 <div class="inside">
                                     <ul id="wordPressBaseFieldsList">
-                                        <?php foreach (Forms::getWordPressBaseFields() as $baseField): ?>
-                                            <li class="baseField" draggable="true" data-field='<?= json_encode($baseField) ?>' data-field-type="Input">
-                                                <span><strong><?= $baseField->bf_title ?></strong></span>
-                                                <span style="float: right"><?= $baseField->bf_inputType ?></span>
+                                        <?php foreach (Forms::getWordPressBaseFields() as $wordPressBaseField): ?>
+                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField) ?>' data-field-type="Input">
+                                                <span><strong><?= $wordPressBaseField->bf_title ?></strong></span>
+                                                <span style="float: right"><?= $wordPressBaseField->bf_inputType ?></span>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
                                 </div>
                             </div>
                             <div class="postbox">
-                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: SSV Forms Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Forms Fields</span></h2>
+                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: SSV Shared Forms Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
+                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Shared Forms Fields</span></h2>
                                 <div class="inside">
-                                    <ul id="baseFieldsList">
-                                        <?php if (!empty($baseFields)): ?>
-                                            <?php foreach ($baseFields as $baseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($baseField) ?>' data-field-type="Input">
-                                                    <span><strong><?= $baseField->bf_title ?></strong></span>
-                                                    <span style="float: right"><?= $baseField->bf_inputType ?></span>
+                                    <ul id="sharedBaseFieldsList">
+                                        <?php if (!empty($sharedBaseFields)): ?>
+                                            <?php foreach ($sharedBaseFields as $sharedBaseField): ?>
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField) ?>' data-field-type="Input">
+                                                    <span><strong><?= $sharedBaseField->bf_title ?></strong></span>
+                                                    <span style="float: right"><?= $sharedBaseField->bf_inputType ?></span>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_base_fields_manager">Click Here</a> to create one.</li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="postbox">
+                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: SSV Site Specific Forms Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
+                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Site Specific Forms Fields</span></h2>
+                                <div class="inside">
+                                    <ul id="siteSpecificBaseFieldsList">
+                                        <?php if (!empty($siteSpecificBaseFields)): ?>
+                                            <?php foreach ($siteSpecificBaseFields as $siteSpecificBaseField): ?>
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField) ?>' data-field-type="Input">
+                                                    <span><strong><?= $siteSpecificBaseField->bf_title ?></strong></span>
+                                                    <span style="float: right"><?= $siteSpecificBaseField->bf_inputType ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>

@@ -7,11 +7,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_text_input_field(array $field)
+function show_default_input_field(array $field)
 {
     $field += [
         'defaultValue' => null,
-        'required' => false,
+        'required'     => false,
     ];
     if (strtolower($field['defaultValue']) === 'now') {
         $field['defaultValue '] = (new DateTime($field['defaultValue']))->format('Y-m-d');
@@ -34,8 +34,8 @@ function show_text_input_field(array $field)
         <?php
     } else {
         ?>
-        <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
-        <input <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/>
+        <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
+        <input <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/><br/>
         <?php
     }
 }

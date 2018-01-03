@@ -80,7 +80,11 @@ function show_base_form_fields_table(array $fields, string $order = 'asc', strin
                             <td id="<?= $field->bf_id ?>_inputType_td">
                                 <?= $field->bf_inputType ?>
                             </td>
-                            <?php if ($field->bf_inputType === 'select' || $field->bf_inputType === 'hidden' || $field->bf_inputType === 'role_select'): ?>
+                            <?php if ($field->bf_inputType === 'select' || $field->bf_inputType === 'role_select'): ?>
+                                <td class="value_td" id="<?= $field->bf_id ?>_value_td">
+                                    <?= $field->bf_options ?>
+                                </td>
+                            <?php elseif ($field->bf_inputType === 'hidden'): ?>
                                 <td class="value_td" id="<?= $field->bf_id ?>_value_td">
                                     <?= $field->bf_value ?>
                                 </td>

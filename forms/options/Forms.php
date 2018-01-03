@@ -156,21 +156,8 @@ abstract class Forms
                         ]
                     );
                 } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
-                    if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                        mp_ssv_general_forms_delete_site_specific_base_fields(false);
-                    } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
-                        $value = isset($_POST['value']) ? $_POST['value'] : null;
-                        if (is_array($value)) {
-                            $value = implode(';', $value);
-                        }
-                        $_POST['values'] = [
-                            'bf_id'        => $_POST['_inline_edit'],
-                            'bf_name'      => $_POST['name'],
-                            'bf_title'     => $_POST['title'],
-                            'bf_inputType' => $_POST['inputType'],
-                            'bf_value'     => $value,
-                        ];
-                        mp_ssv_general_forms_save_site_specific_base_field(false);
+                    if ($_POST['action'] === 'delete-selected') {
+                        mp_ssv_general_forms_delete_shared_forms(false);
                     } else {
                         echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
                     }
@@ -207,7 +194,8 @@ abstract class Forms
         $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $formsTable                  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $baseFields                  = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined ORDER BY bf_title");
+        $baseSharedFields            = $wpdb->get_results("SELECT * FROM $sharedBaseFieldsTable ORDER BY bf_title");
+        $baseSiteSpecificFields      = $wpdb->get_results("SELECT * FROM $siteSpecificBaseFieldsTable ORDER BY bf_title");
         if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
             $id         = $_GET['id'];
             $formName   = $wpdb->get_var("SELECT f_title FROM $formsTable WHERE f_id = $id");
@@ -218,7 +206,7 @@ abstract class Forms
             $formName   = '';
             $formFields = [];
         }
-        show_form_editor($id, $formName, $baseFields, $formFields);
+        show_form_editor($id, $formName, $baseSharedFields, $baseSiteSpecificFields, $formFields);
     }
 
     public static function showSiteBaseFieldsPage()
@@ -263,6 +251,7 @@ abstract class Forms
                     'bf_title'     => $_POST['title'],
                     'bf_inputType' => $_POST['inputType'],
                     'bf_value'     => isset($_POST['value']) ? $_POST['value'] : null,
+                    'bf_options'     => isset($_POST['options']) ? $_POST['options'] : null,
                 ];
                 mp_ssv_general_forms_save_shared_base_field(false);
             } else {
@@ -358,9 +347,17 @@ abstract class Forms
                 $newField[str_replace('bf_', '', $key)] = $value;
             }
             switch ($newField['inputType']) {
-                case 'text':
-                    require_once 'templates/fields/text-input.php';
-                    show_text_input_field($newField);
+                case 'hidden':
+                    require_once 'templates/fields/hidden.php';
+                    show_hidden_input_field($newField);
+                    break;
+                case 'select':
+                    require_once 'templates/fields/select.php';
+                    show_select_input_field($newField);
+                    break;
+                default:
+                    require_once 'templates/fields/input.php';
+                    show_default_input_field($newField);
                     break;
             }
         }
@@ -385,6 +382,6 @@ abstract class Forms
     }
 }
 
-add_action('network_admin_menu', [Forms::class, 'setupNetworkMenu'], 9);
-add_action('admin_menu', [Forms::class, 'setupSiteSpecificMenu'], 9);
-add_filter('the_content', [Forms::class, 'filterContent'], 9);
+add_action('network_admin_menu', [Forms::class, 'setupNetworkMenu']);
+add_action('admin_menu', [Forms::class, 'setupSiteSpecificMenu']);
+add_filter('the_content', [Forms::class, 'filterContent']);

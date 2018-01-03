@@ -5,8 +5,11 @@ let fieldsManager = {
         let name = document.getElementById(fieldId + '_name_td').innerText;
         let inputType = document.getElementById(fieldId + '_inputType_td').innerText;
         let value = '';
-        if (inputType === 'select' || inputType === 'hidden' || inputType === 'role_select') {
+        if (inputType === 'hidden') {
             value = document.getElementById(fieldId + '_value_td').innerText;
+        } else if (inputType === 'select' || inputType === 'role_select') {
+            value = document.getElementById(fieldId + '_value_td').innerText;
+            value = jQuery.parseJSON(value);
         }
         tr.setAttribute('class', 'inline-edit-row inline-edit-row-base-field quick-edit-row quick-edit-row-base-field inline-edit-base-field inline-editor');
         fieldsManager.updateTrForInlineEdit(tr, fieldId, title, name, inputType, value, false);
@@ -17,17 +20,17 @@ let fieldsManager = {
         let name = document.getElementById(fieldId + '_name').dataset.oldValue;
         let inputType = document.getElementById(fieldId + '_inputType').dataset.oldValue;
         let value = '';
-        if (inputType === 'select' || inputType === 'hidden') {
+        if (inputType === 'hidden') {
             value = document.getElementById(fieldId + '_value').dataset.oldValue;
-        } else if (inputType === 'role_select') {
-            let select = document.getElementById(fieldId + '_value');
+        } else if (inputType === 'select' || inputType === 'role_select') {
+            let select = document.getElementById(fieldId + '_options');
             let selected = [];
             for (let i = 0; i < select.length; i++) {
                 if (select.options[i].selected) {
                     selected.push(select.options[i].value);
                 }
             }
-            value = selected.join(';');
+            value = JSON.stringify(selected);
         }
         fieldsManager.updateTrForDisplay(fieldId, title, name, inputType, value);
     },
@@ -37,19 +40,22 @@ let fieldsManager = {
         let name = document.getElementById(fieldId + '_name').value;
         let inputType = document.getElementById(fieldId + '_inputType').value;
         let value = '';
-        if (inputType === 'select' || inputType === 'hidden') {
+        let options = '';
+        if (inputType === 'hidden') {
             value = document.getElementById(fieldId + '_value').value;
-        } else if (inputType === 'role_select') {
-            let select = document.getElementById(fieldId + '_value');
-            let selected = [];
+            options = null;
+            fieldsManager.updateTrForDisplay(fieldId, title, name, inputType, value);
+        } else if (inputType === 'select' || inputType === 'role_select') {
+            let select = document.getElementById(fieldId + '_options');
+            options = [];
             for (let i = 0; i < select.length; i++) {
                 if (select.options[i].selected) {
-                    selected.push(select.options[i].value);
+                    options.push(select.options[i].value);
                 }
             }
-            value = selected.join(';');
+            value = null;
+            fieldsManager.updateTrForDisplay(fieldId, title, name, inputType, JSON.stringify(options));
         }
-        fieldsManager.updateTrForDisplay(fieldId, title, name, inputType, value);
         jQuery.post(
             urls.ajax,
             {
@@ -59,6 +65,7 @@ let fieldsManager = {
                     bf_name: name,
                     bf_title: title,
                     bf_inputType: inputType,
+                    bf_options: options,
                     bf_value: value,
                 },
             }
@@ -173,9 +180,9 @@ let fieldsManager = {
             '<legend class="inline-edit-legend">Value / Options</legend>' +
             '<div class="inline-edit-col">' +
             '   <label>' +
-            '       <span class="title">Value</span>' +
+            '       <span class="title">Options</span>' +
             '       <span class="input-text-wrap">' +
-            '            <select id="' + fieldId + '_value" name="value[]" class="form-control" multiple="multiple" style="width: 100%; height: 90px;">'
+            '            <select id="' + fieldId + '_options" name="options[]" class="form-control" multiple="multiple" style="width: 100%; height: 90px;">'
         ;
         options.forEach(function (option) {
             if (selected.indexOf(option) !== -1) {
@@ -191,7 +198,7 @@ let fieldsManager = {
             '</div>'
         ;
         document.getElementById(fieldId + '_value_container').innerHTML = html;
-        jQuery('#' + fieldId + '_value').select2({
+        jQuery('#' + fieldId + '_options').select2({
             tags: tags,
             tokenSeparators: [';']
         });

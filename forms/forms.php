@@ -14,8 +14,6 @@ if (!class_exists(SSV_Forms::class)) {
     define('SSV_FORMS_SHARED_BASE_FIELDS_TABLE', $wpdb->base_prefix . 'ssv_shared_base_fields');
     define('SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE', $wpdb->prefix . 'ssv_base_fields');
     define('SSV_FORMS_CUSTOMIZED_FIELDS', $wpdb->prefix . 'ssv_customized_fields');
-
-    define('SSV_FORMS_SHARED_FORMS_TABLE', $wpdb->base_prefix . 'ssv_shared_forms');
     define('SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE', $wpdb->prefix . 'ssv_forms');
 
     require_once 'models/SSV_Forms.php';

@@ -286,7 +286,7 @@ abstract class BaseFunctions
     public static function getInputTypeDataList(array $exclude = []): string
     {
         ob_start();
-        $inputTypes = array_diff(['Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Date', 'Image', 'Hidden'], $exclude);
+        $inputTypes = array_diff(['Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Date', 'File', 'Hidden'], $exclude);
         ?>
         <datalist id="inputType">
             <?php foreach ($inputTypes as $inputType): ?>

@@ -12,7 +12,7 @@ abstract class Field
 {
     public static function getElementAttributesString(array $field, string $elementId, string $nameSuffix = null, array $options = []): string
     {
-        $field            += [
+        $field                  += [
             'inputType'      => 'text',
             'classes'        => [],
             'styles'         => [],
@@ -22,15 +22,18 @@ abstract class Field
             'checked'        => false,
             'value'          => null,
         ];
-        $options          += [
+        $options                += [
             'type'     => false,
             'required' => false,
             'disabled' => false,
             'checked'  => false,
             'value'    => false,
+            'selected'    => false,
+            'multiple' => false,
+            'size'     => false,
         ];
         $currentUserCanOverride = self::currentUserCanOverride($field['overrideRights']);
-        $attributesString = 'id="' . $elementId . '"';
+        $attributesString       = 'id="' . $elementId . '"';
         if ($options['type']) {
             $attributesString .= ' type="' . $field['inputType'] . '"';
         }
@@ -41,10 +44,10 @@ abstract class Field
             $attributesString .= ' style="' . BaseFunctions::escape($field['styles'][$elementId], 'attr', ' ') . '"';
         }
         if ($nameSuffix !== null) {
-            $attributesString .= ' name="' . BaseFunctions::escape($field['name']. $nameSuffix, 'attr') . '"';
+            $attributesString .= ' name="' . BaseFunctions::escape($field['name'] . $nameSuffix, 'attr') . '"';
         }
         if (!$currentUserCanOverride && $options['required'] && $field['required']) {
-            $attributesString .= $field['required ']? 'required="required"' : '';
+            $attributesString .= $field['required '] ? 'required="required"' : '';
         }
         if (!$currentUserCanOverride && $options['disabled'] && $field['disabled']) {
             $attributesString .= disabled($field['disabled'], true, false);
@@ -53,7 +56,13 @@ abstract class Field
             $attributesString .= checked($field['checked'], true, false);
         }
         if ($options['value']) {
-            $attributesString .= checked($field['getValue'](), true, false);
+            $attributesString .= ' ' . $field['value'];
+        }
+        if ($options['multiple']) {
+            $attributesString .= ' multiple';
+        }
+        if ($options['size']) {
+            $attributesString .= ' size="' . $options['size'] . '"';
         }
         return $attributesString;
     }
