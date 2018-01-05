@@ -30,7 +30,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                         </div>
                     </div>
                     <div id="postbox-container-1" class="postbox-container">
-                        <div id="side-sortables" class="meta-box-sortables ui-sortable" style="">
+                        <div class="meta-box-sortables ui-sortable" style="">
                             <div id="submitdiv" class="postbox ">
                                 <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Publish</span><span class="toggle-indicator" aria-hidden="true"></span></button>
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Publish</span></h2>
@@ -103,7 +103,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                         </div>
                     </div>
                     <div id="postbox-container-2" class="postbox-container">
-                        <div id="normal-sortables" class="meta-box-sortables ui-sortable">
+                        <div class="meta-box-sortables ui-sortable">
                             <div id="postform" class="postbox">
                                 <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Form</span><span class="toggle-indicator" aria-hidden="true"></span></button>
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>

@@ -17,17 +17,18 @@ function show_customized_form_fields_table(array $fields)
                 <th scope="col" id="author" class="manage-column column-author">Value</th>
             </tr>
             </thead>
-            <tbody id="formFieldsList">
+            <tbody id="the-list">
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
-                    <tr draggable="true" class="formField">
+                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-properties='{"title":"Username","fieldType":"Input","inputType":"text","value":"","classes":{"div":"class a","label":"b d","input":"c"},"styles":{"div":"height: 10px;","label":"height: 11px;","input":"height: 12px;"}}'>
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
-                            <strong><?= $field->bf_title ?></strong>
+                            <strong id="<?= $field->bf_id ?>_title"><?= $field->bf_title ?></strong>
+                            <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
                         </td>
-                        <td>Input</td>
-                        <td><?= $field->bf_inputType ?></td>
-                        <td><?= $field->bf_value ?></td>
+                        <td id="<?= $field->bf_id ?>_fieldType">Input</td>
+                        <td id="<?= $field->bf_id ?>_inputType"><?= $field->bf_inputType ?></td>
+                        <td id="<?= $field->bf_id ?>_value"><?= $field->bf_value ?></td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>

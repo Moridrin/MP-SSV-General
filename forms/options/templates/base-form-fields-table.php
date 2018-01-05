@@ -68,9 +68,8 @@ function show_base_form_fields_table(array $fields, string $order = 'asc', strin
                                 <strong><?= $field->bf_title ?></strong>
                                 <div class="row-actions">
                                     <?php if ($canManage): ?>
-                                        <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $field->bf_id ?>')" class="editinline"
-                                                                              aria-label="Quick edit “Hello world!” inline">Quick&nbsp;Edit</a> | </span>
-                                        <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_id ?>')" class="submitdelete" aria-label="Move “Hello world!” to the Trash">Trash</a></span>
+                                        <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick&nbsp;Edit</a> | </span>
+                                        <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_id ?>')" class="submitdelete" aria-label="Delete “<?= $field->bf_title ?>”">Trash</a></span>
                                     <?php endif; ?>
                                 </div>
                             </td>

@@ -91,8 +91,8 @@ abstract class SSV_Forms
         $action    = isset($_GET['action']) ? $_GET['action'] : null;
         $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'shared';
         if ($page === 'ssv_forms_base_fields_manager') {
-            wp_enqueue_script('mp-ssv-base-fields-manager', SSV_Forms::URL . '/js/mp-ssv-base-fields-manager.js', ['jquery']);
-            wp_enqueue_script('mp-ssv-fields-management', SSV_Forms::URL . '/js/mp-ssv-fields-management.js', ['jquery']);
+            wp_enqueue_script('mp-ssv-base-fields-manager', SSV_Forms::URL . '/js/base-fields-manager.js', ['jquery']);
+            wp_enqueue_script('mp-ssv-fields-management', SSV_Forms::URL . '/js/fields-management.js', ['jquery']);
             wp_localize_script(
                 'mp-ssv-fields-management',
                 'urls',
@@ -133,15 +133,29 @@ abstract class SSV_Forms
             wp_localize_script(
                 'mp-ssv-forms-manager',
                 'actions',
-                [
-                    'delete' => 'mp_ssv_general_forms_delete_shared_forms',
-                ]
+                ['delete' => 'mp_ssv_general_forms_delete_shared_forms']
             );
         }
 
         if ($page === 'ssv_forms_add_new_form' || ($page === 'ssv_forms' && $action === 'edit')) {
             wp_enqueue_style('mp-ssv-forms-manager-css', SSV_Forms::URL . '/css/forms-editor.css');
             wp_enqueue_script('mp-ssv-form-editor', SSV_Forms::URL . '/js/form-editor.js', ['jquery']);
+            wp_enqueue_script('mp-ssv-fields-customizer', SSV_Forms::URL . '/js/fields-customizer.js', ['jquery']);
+            wp_localize_script(
+                'mp-ssv-fields-customizer',
+                'urls',
+                [
+                    'plugins'  => plugins_url(),
+                    'ajax'     => admin_url('admin-ajax.php'),
+                    'base'     => get_home_url(),
+                    'basePath' => ABSPATH,
+                ]
+            );
+            wp_localize_script(
+                'mp-ssv-fields-customizer',
+                'actions',
+                ['save'   => 'mp_ssv_general_forms_save_customized_field']
+            );
         }
     }
 
