@@ -22,14 +22,22 @@ function show_select_input_field(array $field)
     $options                = json_decode($field['options']);
     $value                  = BaseFunctions::escape($field['value'], 'html');
     $inputElementAttributes = [
-        'disabled' => true,
-        'multiple' => false,
-        'size'     => true,
+        'disabled',
+        'multiple',
+        'size',
+        'type',
+        'value',
+        'checked',
+        'required',
+        'autocomplete',
+        'placeholder',
+        'list',
+        'pattern',
     ];
     if (current_theme_supports('materialize')) {
         ?>
         <div <?= Field::getElementAttributesString($field, $divId) ?>>
-            <select <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>>
+            <select <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>>
                 <?php foreach ($options as $option): ?>
                     <option value="<?= BaseFunctions::escape($option, 'html') ?>" <?= selected($option, $value) ?>><?= $option ?></option>
                 <?php endforeach; ?>
@@ -40,7 +48,7 @@ function show_select_input_field(array $field)
     } else {
         ?>
         <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
-        <select <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>>
+        <select <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>>
             <?php foreach ($options as $option): ?>
                 <?php $option = BaseFunctions::escape($option, 'html'); ?>
                 <option value="<?= $option ?>" <?= selected($option, $value) ?>><?= $option ?></option>

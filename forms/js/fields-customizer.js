@@ -1,22 +1,134 @@
+let fieldTypesObjects = {
+    'text': [
+        'div',
+        'label',
+        'input',
+    ],
+    'email': [
+        'div',
+        'label',
+        'input',
+    ],
+    'password': [
+        'div',
+        'label',
+        'input',
+    ],
+    'checkbox': [
+        'div',
+        'label',
+        'input',
+    ],
+    'date': [
+        'div',
+        'label',
+        'input',
+    ],
+    'file': [
+        'div',
+        'label',
+        'input',
+    ],
+    'select': [
+        'div',
+        'label',
+        'input',
+    ],
+    'number': [
+        'div',
+        'label',
+        'input',
+    ],
+    'custom': [
+        'div',
+        'label',
+        'input',
+    ],
+};
 let propertiesForField = {
     'text': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
+        'autocomplete',
+        'placeholder',
+        'list',
+        'pattern',
+    ],
+    'email': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
         'autocomplete',
         'placeholder',
         'list',
         'pattern',
     ],
     'password': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
         'autocomplete',
         'list',
         'pattern',
     ],
+    'checkbox': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
+    ],
+    'date': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
+        'autocomplete',
+        'placeholder',
+        'pattern',
+    ],
+    'file': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
+    ],
+    'select': [
+        'title',
+        'classes',
+        'styles',
+        'required',
+        'autocomplete',
+        'placeholder',
+        'list',
+        'pattern',
+    ],
     'number': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
         'placeholder',
         'step',
         'min',
         'max',
     ],
     'custom': [
+        'title',
+        'classes',
+        'defaultValue',
+        'styles',
+        'required',
         'autocomplete',
         'placeholder',
         'list',
@@ -39,16 +151,25 @@ let fieldsCustomizer = {
             propertyKeys = propertiesForField[tr.dataset.inputType];
         }
         let html =
+            '<input type="hidden" name="form_fields[]" value="' + tr.dataset.baseFieldName + '">' +
             '<td colspan="5" class="colspanchange">' +
             '   <fieldset class="inline-edit-col-left" style="width: 50%;">' +
             '       <legend class="inline-edit-legend">Quick Edit</legend>' +
             '       <div class="inline-edit-col">'
         ;
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Title', 'title', 'text', properties.title);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'div Classes', 'div_classes', 'textarea', properties.classes['div']);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Label Classes', 'label_classes', 'textarea', properties.classes['label']);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Input Classes', 'input_classes', 'textarea', properties.classes['input']);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Required', 'required', 'checkbox', properties.required);
+        if (propertyKeys.includes('title')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Title', 'title', 'text', properties.title);
+        }
+        if (propertyKeys.includes('classes')) {
+            for (let i = 0; i < fieldTypesObjects[tr.dataset.inputType].length; ++i) {
+                let id = fieldTypesObjects[tr.dataset.inputType][i];
+                let title = id.charAt(0).toUpperCase() + id.slice(1);
+                html += fieldsCustomizer.getCustomizationFieldInput(fieldId, title + ' Classes', id + '_classes', 'textarea', properties.classes[id]);
+            }
+        }
+        if (propertyKeys.includes('required')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Required', 'required', 'checkbox', properties.required);
+        }
         if (propertyKeys.includes('placeholder')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Placeholder', 'placeholder', 'text', properties.placeholder);
         }
@@ -64,10 +185,16 @@ let fieldsCustomizer = {
             '   <fieldset class="inline-edit-col-right" style="width: 50%; margin-top: 32px;">' +
             '       <div class="inline-edit-col">'
         ;
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Value', 'value', 'text', properties.value);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'div Styles', 'div_styles', 'textarea', properties.styles['div']);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Label Styles', 'label_styles', 'textarea', properties.styles['label']);
-        html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Input Styles', 'input_styles', 'textarea', properties.styles['input']);
+        if (propertyKeys.includes('defaultValue')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Default Value', 'defaultValue', 'text', properties.defaultValue);
+        }
+        if (propertyKeys.includes('styles')) {
+            for (let i = 0; i < fieldTypesObjects[tr.dataset.inputType].length; ++i) {
+                let id = fieldTypesObjects[tr.dataset.inputType][i];
+                let title = id.charAt(0).toUpperCase() + id.slice(1);
+                html += fieldsCustomizer.getCustomizationFieldInput(fieldId, title + ' Styles', id + '_styles', 'textarea', properties.styles[id]);
+            }
+        }
         if (propertyKeys.includes('autocomplete')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Autocomplete', 'autocomplete', 'checkbox', properties.autocomplete);
         }
@@ -114,7 +241,7 @@ let fieldsCustomizer = {
                 'label': document.getElementById(fieldId + '_label_styles').value,
                 'input': document.getElementById(fieldId + '_input_styles').value,
             },
-            'value': document.getElementById(fieldId + '_value').value,
+            'defaultValue': document.getElementById(fieldId + '_defaultValue').value,
             'required': document.getElementById(fieldId + '_required').checked,
         };
         let inputType = tr.dataset.inputType;
@@ -125,15 +252,25 @@ let fieldsCustomizer = {
             propertyFields = propertiesForField['custom'];
         }
         for (let i = 0; i < propertyFields.length; ++i) {
-            let element = document.getElementById(fieldId + '_'  + propertyFields[i]);
-            if (element.tagName.toLocaleLowerCase() === 'input') {
+            if (propertyFields[i] === 'classes' || propertyFields[i] === 'styles') {
+                let fieldTypeObjects = null;
+                if (typeof(fieldTypesObjects[inputType]) !== 'undefined') {
+                    fieldTypeObjects = fieldTypesObjects[inputType];
+                } else {
+                    fieldTypeObjects = fieldTypesObjects['custom'];
+                }
+                properties[propertyFields[i]] = {};
+                for (let j = 0; j < fieldTypeObjects.length; ++j) {
+                    let element = document.getElementById(fieldId + '_' + fieldTypeObjects[j] + '_' + propertyFields[i]);
+                    properties[propertyFields[i]][fieldTypeObjects[j]] = element.value;
+                }
+            } else {
+                let element = document.getElementById(fieldId + '_' + propertyFields[i]);
                 if (element.getAttribute('type') === 'checkbox') {
                     properties[propertyFields[i]] = element.checked;
                 } else {
                     properties[propertyFields[i]] = element.value;
                 }
-            } else if (element.tagName.toLocaleLowerCase() === 'textarea') {
-                properties[propertyFields[i]] = element.value;
             }
         }
         tr.dataset.properties = JSON.stringify(properties);
@@ -158,15 +295,15 @@ let fieldsCustomizer = {
         let inputType = tr.dataset.inputType;
         let properties = JSON.parse(tr.dataset.properties);
         let title = properties['title'];
-        let value = properties['value'];
+        let defaultValue = properties['defaultValue'];
         tr.innerHTML =
             '<td>' +
             '   <input type="hidden" name="form_fields[]" value="' + name + '">' +
             '   <strong>' + title + '</strong>' +
-            '<span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit(' + fieldId + ')" class="editinline" aria-label="Quick edit “' + title + '” inline">Quick Edit</a></span>' +
+            '<span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit(\'' + fieldId + '\')" class="editinline" aria-label="Quick edit “' + title + '” inline">Quick Edit</a></span>' +
             '</td>' +
             '<td>' + inputType + '</td>' +
-            '<td>' + value + '</td>'
+            '<td>' + defaultValue + '</td>'
         ;
         tr.setAttribute('class', 'inactive');
         tr.setAttribute('draggable', 'draggable');
@@ -181,17 +318,24 @@ let fieldsCustomizer = {
         if (type === 'textarea') {
             html += '<textarea id="' + fieldId + '_' + name + '" name="' + name + '">' + value + '</textarea>';
         } else if (type === 'checkbox') {
-            console.log(value);
             let checked = value === true || value === 'true' ? 'checked="checked"' : '';
             html += '<input type="hidden" name="' + name + '" value="false">';
             html += '<input type="checkbox" id="' + fieldId + '_' + name + '" name="' + name + '" value="true" ' + checked + '>';
         } else {
-            html += '<input type="' + type + '" id="' + fieldId + '_' + name + '" name="' + name + '" value="' + value + '" autocomplete="off">';
+            html += '<input type="' + type + '" id="' + fieldId + '_' + name + '" name="' + name + '" value="' + value + '" autocomplete="off" onkeydown="fieldsCustomizer.onInlineEditKeyDown(\'' + fieldId + '\')">';
         }
         html +=
             '   </span>' +
             '</label>'
         ;
         return html;
+    },
+
+    onInlineEditKeyDown: function (fieldId) {
+        if (event.keyCode === 13) {
+            fieldsCustomizer.saveInlineEdit(fieldId);
+            event.preventDefault();
+            return false;
+        }
     }
 };

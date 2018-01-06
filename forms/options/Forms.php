@@ -357,7 +357,7 @@ abstract class Forms
                     break;
                 default:
                     require_once 'templates/fields/input.php';
-                    show_default_input_field($newField);
+                    show_default_input_field($form->f_id, $newField);
                     break;
             }
         }

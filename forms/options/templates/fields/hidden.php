@@ -21,5 +21,5 @@ function show_hidden_input_field(array $field)
         'type' => true,
         'value' => true,
     ];
-    ?><input <?= Field::getElementAttributesString($field, $inputId, '', $inputElementAttributes) ?>/><?php
+    ?><input <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>/><?php
 }

@@ -1,5 +1,6 @@
 <?php
 
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -17,7 +18,7 @@ function show_customized_form_fields_table(int $formId, array $fields)
             <tr id="formFieldsListTop">
                 <th scope="col" id="author" class="manage-column column-author">Title</th>
                 <th scope="col" id="author" class="manage-column column-author">Input Type</th>
-                <th scope="col" id="author" class="manage-column column-author">Value</th>
+                <th scope="col" id="author" class="manage-column column-author">Default Value</th>
             </tr>
             </thead>
             <tbody id="the-list">
@@ -30,7 +31,7 @@ function show_customized_form_fields_table(int $formId, array $fields)
                             'title' => $field->bf_title,
                             'classes' => ['div' => '', 'label' => '', 'input' => ''],
                             'styles' => ['div' => '', 'label' => '', 'input' => ''],
-                            'value' => '',
+                            'defaultValue' => '',
                             'required' => false,
                             'placeholder' => '',
                             'autocomplete' => true,
@@ -52,10 +53,16 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
                             <strong id="<?= $field->bf_id ?>_title"><?= $field->bf_title ?></strong>
-                            <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
+                            <?php if ($field->bf_inputType !== 'hidden'): ?>
+                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
+                            <?php endif; ?>
                         </td>
                         <td id="<?= $field->bf_id ?>_inputType"><?= $field->bf_inputType ?></td>
-                        <td id="<?= $field->bf_id ?>_value"><?= $field->bf_value ?></td>
+                        <?php if ($field->bf_inputType !== 'hidden'): ?>
+                            <td id="<?= $field->bf_id ?>_defaultValue"><?= $properties['defaultValue'] ?></td>
+                        <?php else: ?>
+                            <td id="<?= $field->bf_id ?>_value"><?= $field->bf_value ?></td>
+                        <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
@@ -68,7 +75,7 @@ function show_customized_form_fields_table(int $formId, array $fields)
             <tr id="formFieldsListBottom">
                 <th scope="col" id="author" class="manage-column column-author">Title</th>
                 <th scope="col" id="author" class="manage-column column-author">Input Type</th>
-                <th scope="col" id="author" class="manage-column column-author">Value</th>
+                <th scope="col" id="author" class="manage-column column-author">Default Value</th>
             </tr>
             </tfoot>
         </table>
