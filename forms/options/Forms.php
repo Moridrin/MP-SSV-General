@@ -2,8 +2,8 @@
 
 namespace mp_ssv_forms\options;
 
-use mp_ssv_general\forms\SSV_Forms;
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\forms\SSV_Forms;
 use stdClass;
 use wpdb;
 
@@ -94,6 +94,7 @@ abstract class Forms
                         'bf_title'     => 'Username',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                     [
                         'bf_id'        => 'b_1',
@@ -101,6 +102,7 @@ abstract class Forms
                         'bf_title'     => 'First Name',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                     [
                         'bf_id'        => 'b_2',
@@ -108,6 +110,7 @@ abstract class Forms
                         'bf_title'     => 'Last Name',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                     [
                         'bf_id'        => 'b_3',
@@ -115,6 +118,7 @@ abstract class Forms
                         'bf_title'     => 'Email',
                         'bf_inputType' => 'email',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                     [
                         'bf_id'        => 'b_4',
@@ -122,6 +126,7 @@ abstract class Forms
                         'bf_title'     => 'Password',
                         'bf_inputType' => 'password',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                     [
                         'bf_id'        => 'b_5',
@@ -129,6 +134,7 @@ abstract class Forms
                         'bf_title'     => 'Confirm Password',
                         'bf_inputType' => 'password',
                         'bf_value'     => null,
+                        'bf_options'   => null,
                     ],
                 ]
             )
@@ -251,7 +257,7 @@ abstract class Forms
                     'bf_title'     => $_POST['title'],
                     'bf_inputType' => $_POST['inputType'],
                     'bf_value'     => isset($_POST['value']) ? $_POST['value'] : null,
-                    'bf_options'     => isset($_POST['options']) ? $_POST['options'] : null,
+                    'bf_options'   => isset($_POST['options']) ? $_POST['options'] : null,
                 ];
                 mp_ssv_general_forms_save_shared_base_field(false);
             } else {
@@ -353,7 +359,11 @@ abstract class Forms
                     break;
                 case 'select':
                     require_once 'templates/fields/select.php';
-                    show_select_input_field($newField);
+                    show_select_input_field($form->f_id, $newField);
+                    break;
+                case 'checkbox':
+                    require_once 'templates/fields/checkbox.php';
+                    show_checkbox_input_field($form->f_id, $newField);
                     break;
                 default:
                     require_once 'templates/fields/input.php';

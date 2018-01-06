@@ -49,7 +49,7 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         }
                     }
                     ?>
-                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-properties='<?= json_encode($properties) ?>'>
+                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-options='<?= $field->bf_options ?>' data-properties='<?= json_encode($properties) ?>'>
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
                             <strong id="<?= $field->bf_id ?>_title"><?= $field->bf_title ?></strong>

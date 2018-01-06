@@ -80,8 +80,8 @@ let propertiesForField = {
     ],
     'checkbox': [
         'title',
-        'classes',
         'defaultValue',
+        'classes',
         'styles',
         'required',
     ],
@@ -105,12 +105,11 @@ let propertiesForField = {
     'select': [
         'title',
         'classes',
+        'defaultValue',
         'styles',
         'required',
-        'autocomplete',
-        'placeholder',
-        'list',
-        'pattern',
+        'multiple',
+        'size',
     ],
     'number': [
         'title',
@@ -179,6 +178,9 @@ let fieldsCustomizer = {
         if (propertyKeys.includes('min')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Min', 'min', 'number', properties.max);
         }
+        if (propertyKeys.includes('size')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Size', 'size', 'number', properties.size);
+        }
         html +=
             '       </div>' +
             '   </fieldset>' +
@@ -186,7 +188,13 @@ let fieldsCustomizer = {
             '       <div class="inline-edit-col">'
         ;
         if (propertyKeys.includes('defaultValue')) {
-            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Default Value', 'defaultValue', 'text', properties.defaultValue);
+            if (tr.dataset.inputType === 'select') {
+                html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Default Value', 'defaultValue', 'select', properties.defaultValue, JSON.parse(tr.dataset.options));
+            } else if (tr.dataset.inputType === 'checkbox') {
+                html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Label', 'defaultValue', 'text', properties.defaultValue);
+            } else {
+                html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Default Value', 'defaultValue', 'text', properties.defaultValue);
+            }
         }
         if (propertyKeys.includes('styles')) {
             for (let i = 0; i < fieldTypesObjects[tr.dataset.inputType].length; ++i) {
@@ -206,6 +214,9 @@ let fieldsCustomizer = {
         }
         if (propertyKeys.includes('max')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Max', 'max', 'number', properties.max);
+        }
+        if (propertyKeys.includes('multiple')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Multiple', 'multiple', 'checkbox', properties.multiple);
         }
         html +=
             '      </div>' +
@@ -229,21 +240,7 @@ let fieldsCustomizer = {
     saveInlineEdit: function (fieldId) {
         let tr = document.getElementById(fieldId + '_tr');
         let formId = document.getElementById('form_id').value;
-        let properties = {
-            'title': document.getElementById(fieldId + '_title').value,
-            'classes': {
-                'div': document.getElementById(fieldId + '_div_classes').value,
-                'label': document.getElementById(fieldId + '_label_classes').value,
-                'input': document.getElementById(fieldId + '_input_classes').value,
-            },
-            'styles': {
-                'div': document.getElementById(fieldId + '_div_styles').value,
-                'label': document.getElementById(fieldId + '_label_styles').value,
-                'input': document.getElementById(fieldId + '_input_styles').value,
-            },
-            'defaultValue': document.getElementById(fieldId + '_defaultValue').value,
-            'required': document.getElementById(fieldId + '_required').checked,
-        };
+        let properties = {};
         let inputType = tr.dataset.inputType;
         let propertyFields = null;
         if (typeof(propertiesForField[inputType]) !== 'undefined') {
@@ -265,6 +262,7 @@ let fieldsCustomizer = {
                     properties[propertyFields[i]][fieldTypeObjects[j]] = element.value;
                 }
             } else {
+                console.log(fieldId + '_' + propertyFields[i]);
                 let element = document.getElementById(fieldId + '_' + propertyFields[i]);
                 if (element.getAttribute('type') === 'checkbox') {
                     properties[propertyFields[i]] = element.checked;
@@ -309,7 +307,7 @@ let fieldsCustomizer = {
         tr.setAttribute('draggable', 'draggable');
     },
 
-    getCustomizationFieldInput: function (fieldId, title, name, type, value) {
+    getCustomizationFieldInput: function (fieldId, title, name, type, value, options) {
         let html =
             '<label>' +
             '   <span class="title">' + title + '</span>' +
@@ -317,6 +315,14 @@ let fieldsCustomizer = {
         ;
         if (type === 'textarea') {
             html += '<textarea id="' + fieldId + '_' + name + '" name="' + name + '">' + value + '</textarea>';
+        } else if (type === 'number') {
+            html += '<input type="number" id="' + fieldId + '_' + name + '" name="' + name + '" value="' + value + '" autocomplete="off" onkeydown="fieldsCustomizer.onInlineEditKeyDown(\'' + fieldId + '\')" style="width: 100%;">';
+        } else if (type === 'select') {
+            html += '<select id="' + fieldId + '_' + name + '" name="' + name + '" style="width: 100%;">';
+            for (let i = 0; i < options.length; ++i) {
+                html += '<option>' + options[i] + '</option>';
+            }
+            html += '</select>';
         } else if (type === 'checkbox') {
             let checked = value === true || value === 'true' ? 'checked="checked"' : '';
             html += '<input type="hidden" name="' + name + '" value="false">';

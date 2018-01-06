@@ -29,21 +29,6 @@ abstract class Field
             'selected'       => false,
             'size'           => 1,
         ];
-        $options                += [
-            'type',
-            'required',
-            'disabled',
-            'checked',
-            'value',
-            'selected',
-            'multiple',
-            'size',
-            'for',
-            'autocomplete',
-            'placeholder',
-            'list',
-            'pattern',
-        ];
         $currentUserCanOverride = self::currentUserCanOverride($field['overrideRights']);
         $attributesString       = 'id="' . BaseFunctions::escape($element . '_' . $field['name'], 'attr') . '"';
         if (in_array('type', $options)) {

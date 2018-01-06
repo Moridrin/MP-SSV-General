@@ -2,13 +2,16 @@
 
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\Field;
+use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_select_input_field(array $field)
+function show_select_input_field(string $formId, array $field)
 {
+    /** @var wpdb $wpdb */
+    global $wpdb;
     $field += [
         'defaultValue' => null,
         'required'     => false,
@@ -16,29 +19,37 @@ function show_select_input_field(array $field)
     if (strtolower($field['defaultValue']) === 'now') {
         $field['defaultValue '] = (new DateTime($field['defaultValue']))->format('Y-m-d');
     }
-    $divId                  = BaseFunctions::escape('div_' . $field['name'], 'attr');
-    $inputId                = BaseFunctions::escape('input_' . $field['name'], 'attr');
-    $labelId                = BaseFunctions::escape('label_' . $field['name'], 'attr');
-    $options                = json_decode($field['options']);
-    $value                  = BaseFunctions::escape($field['value'], 'html');
+    $divId           = BaseFunctions::escape('div_' . $field['name'], 'attr');
+    $inputId         = BaseFunctions::escape('input_' . $field['name'], 'attr');
+    $labelId         = BaseFunctions::escape('label_' . $field['name'], 'attr');
+    $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
+    $name            = $field['name'];
+    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+    if ($customizedField !== null) {
+        $field                 = json_decode($customizedField, true) + $field;
+        $field['required']     = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
+        $field['multiple']     = filter_var($field['multiple'], FILTER_VALIDATE_BOOLEAN);
+    }
+    $field['options'] = json_decode($field['options']);
+    if (empty($field['value']) && !empty($field['defaultValue'])) {
+        $value = BaseFunctions::escape($field['defaultValue'], 'html');
+    } else {
+        $value = BaseFunctions::escape($field['value'], 'html');
+    }
     $inputElementAttributes = [
         'disabled',
         'multiple',
         'size',
         'type',
         'value',
-        'checked',
         'required',
-        'autocomplete',
         'placeholder',
-        'list',
-        'pattern',
     ];
     if (current_theme_supports('materialize')) {
         ?>
         <div <?= Field::getElementAttributesString($field, $divId) ?>>
             <select <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>>
-                <?php foreach ($options as $option): ?>
+                <?php foreach ($field['options'] as $option): ?>
                     <option value="<?= BaseFunctions::escape($option, 'html') ?>" <?= selected($option, $value) ?>><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
@@ -47,13 +58,15 @@ function show_select_input_field(array $field)
         <?php
     } else {
         ?>
-        <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
-        <select <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>>
-            <?php foreach ($options as $option): ?>
-                <?php $option = BaseFunctions::escape($option, 'html'); ?>
-                <option value="<?= $option ?>" <?= selected($option, $value) ?>><?= $option ?></option>
-            <?php endforeach; ?>
-        </select><br/>
+        <div <?= Field::getElementAttributesString($field, $divId) ?>>
+            <label <?= Field::getElementAttributesString($field, $labelId) ?> for="<?= $labelId ?>"><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
+            <select <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>>
+                <?php foreach ($field['options'] as $option): ?>
+                    <?php $option = BaseFunctions::escape($option, 'html'); ?>
+                    <option value="<?= $option ?>" <?= selected($option, $value) ?>><?= $option ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
         <?php
     }
 }
