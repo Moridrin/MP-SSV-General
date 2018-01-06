@@ -1,13 +1,15 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_customized_form_fields_table(array $fields)
+function show_customized_form_fields_table(int $formId, array $fields)
 {
+    /** @var wpdb $wpdb */
+    global $wpdb;
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
@@ -21,8 +23,32 @@ function show_customized_form_fields_table(array $fields)
             <tbody id="the-list">
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
-                <?php BaseFunctions::var_export($field); ?>
-                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-properties='<?=json_encode($field)?>'>
+                    <?php
+                    $table      = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
+                    $name       = $field->bf_name;
+                    $properties = [
+                            'title' => $field->bf_title,
+                            'classes' => ['div' => '', 'label' => '', 'input' => ''],
+                            'styles' => ['div' => '', 'label' => '', 'input' => ''],
+                            'value' => '',
+                            'required' => false,
+                            'placeholder' => '',
+                            'autocomplete' => true,
+                            'list' => '',
+                            'pattern' => '',
+                            'step' => null,
+                            'min' => null,
+                            'max' => null,
+                    ];
+                    $customizedField     = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+                    if ($customizedField !== null) {
+                        $customizedField = json_decode($customizedField, true);
+                        foreach ($customizedField as $key => $value) {
+                            $properties[$key] = $value;
+                        }
+                    }
+                    ?>
+                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-properties='<?= json_encode($properties) ?>'>
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
                             <strong id="<?= $field->bf_id ?>_title"><?= $field->bf_title ?></strong>

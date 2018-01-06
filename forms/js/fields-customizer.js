@@ -55,6 +55,9 @@ let fieldsCustomizer = {
         if (propertyKeys.includes('pattern')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Pattern', 'pattern', 'text', properties.pattern);
         }
+        if (propertyKeys.includes('min')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Min', 'min', 'number', properties.max);
+        }
         html +=
             '       </div>' +
             '   </fieldset>' +
@@ -70,6 +73,12 @@ let fieldsCustomizer = {
         }
         if (propertyKeys.includes('list')) {
             html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'List', 'list', 'text', properties.list);
+        }
+        if (propertyKeys.includes('step')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Step', 'step', 'number', properties.step);
+        }
+        if (propertyKeys.includes('max')) {
+            html += fieldsCustomizer.getCustomizationFieldInput(fieldId, 'Max', 'max', 'number', properties.max);
         }
         html +=
             '      </div>' +
@@ -92,6 +101,7 @@ let fieldsCustomizer = {
 
     saveInlineEdit: function (fieldId) {
         let tr = document.getElementById(fieldId + '_tr');
+        let formId = document.getElementById('form_id').value;
         let properties = {
             'title': document.getElementById(fieldId + '_title').value,
             'classes': {
@@ -128,15 +138,17 @@ let fieldsCustomizer = {
         }
         tr.dataset.properties = JSON.stringify(properties);
         fieldsCustomizer.updateTrForDisplay(fieldId);
-        // jQuery.post(
-        //     urls.ajax,
-        //     {
-        //         action: actions.save,
-        //         values: {
-        //             properties: properties
-        //         },
-        //     }
-        // );
+        jQuery.post(
+            urls.ajax,
+            {
+                action: actions.save,
+                values: {
+                    cf_f_id: formId,
+                    cf_bf_name: tr.dataset.baseFieldName,
+                    cf_json: properties,
+                },
+            }
+        );
         event.preventDefault();
     },
 
@@ -169,7 +181,8 @@ let fieldsCustomizer = {
         if (type === 'textarea') {
             html += '<textarea id="' + fieldId + '_' + name + '" name="' + name + '">' + value + '</textarea>';
         } else if (type === 'checkbox') {
-            let checked = value === true ? 'checked="checked"' : '';
+            console.log(value);
+            let checked = value === true || value === 'true' ? 'checked="checked"' : '';
             html += '<input type="hidden" name="' + name + '" value="false">';
             html += '<input type="checkbox" id="' + fieldId + '_' + name + '" name="' + name + '" value="true" ' + checked + '>';
         } else {

@@ -27,6 +27,27 @@ if (!function_exists('mp_ssv_general_forms_save_shared_base_field')) {
     add_action('wp_ajax_mp_ssv_general_forms_save_shared_base_field', 'mp_ssv_general_forms_save_shared_base_field');
 }
 
+if (!function_exists('mp_ssv_general_forms_save_customized_field')) {
+    function mp_ssv_general_forms_save_customized_field(bool $die = true)
+    {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        $_POST['values']['cf_json'] = json_encode($_POST['values']['cf_json']);
+        $wpdb->replace(
+            SSV_Forms::CUSTOMIZED_FIELDS_TABLE,
+            $_POST['values']
+        );
+        BaseFunctions::var_export($wpdb->last_query);
+        BaseFunctions::var_export($wpdb->last_error);
+        // TODO update user meta if name is changed.
+        if ($die) {
+            wp_die();
+        }
+    }
+
+    add_action('wp_ajax_mp_ssv_general_forms_save_customized_field', 'mp_ssv_general_forms_save_customized_field');
+}
+
 if (!function_exists('mp_ssv_general_forms_delete_shared_base_fields')) {
     function mp_ssv_general_forms_delete_shared_base_fields(bool $die = true)
     {

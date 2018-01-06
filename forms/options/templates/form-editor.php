@@ -25,7 +25,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <label id="title-prompt-text" for="title">Enter title here</label>
                                 <input type="text" name="form_title" size="30" value="<?= $title ?>" id="title" spellcheck="true" autocomplete="off" required="required">
                                 <input type="hidden" name="form_tag" value="[ssv-form-<?= $id ?>]">
-                                <input type="hidden" name="form_id" value="<?= $id ?>">
+                                <input type="hidden" id="form_id" name="form_id" value="<?= $id ?>">
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>
                                 <div class="inside" style="margin: 0; padding: 0;">
                                     <?php
-                                    show_customized_form_fields_table($formFields);
+                                    show_customized_form_fields_table($id, $formFields);
                                     ?>
                                 </div>
                             </div>

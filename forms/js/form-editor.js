@@ -103,7 +103,7 @@
                         properties['autocomplete'] = true;
                         properties['min'] = null;
                         properties['max'] = null;
-                        properties['step'] = 1;
+                        properties['step'] = null;
                         break;
                     case 'text':
                         properties['required'] = false;
@@ -120,14 +120,14 @@
                         properties['pattern'] = '';
                         properties['min'] = null;
                         properties['max'] = null;
-                        properties['step'] = 1;
+                        properties['step'] = null;
                         break;
                 }
                 dropElement = document.createElement('tr');
                 dropElement.setAttribute('id', formFieldId + '_tr');
                 dropElement.setAttribute('class', 'formField');
                 dropElement.setAttribute('draggable', 'true');
-                dropElement.dataset.name = field.bf_name;
+                dropElement.dataset.baseFieldName = field.bf_name;
                 dropElement.dataset.inputType = field.bf_inputType;
                 dropElement.dataset.properties = JSON.stringify(properties);
                 dropElement.innerHTML =

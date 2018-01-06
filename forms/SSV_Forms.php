@@ -66,8 +66,9 @@ abstract class SSV_Forms
             CREATE TABLE IF NOT EXISTS $tableName (
                 `cf_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 `cf_f_id` bigint(20),
-                `cf_bf_id` bigint(20),
-                `cf_json` TEXT NOT NULL
+                `cf_bf_name` VARCHAR(50),
+                `cf_json` TEXT NOT NULL,
+			    UNIQUE (`cf_f_id`, `cf_bf_name`)
             ) $charset_collate;";
             $wpdb->query($sql);
 
