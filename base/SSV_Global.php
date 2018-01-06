@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_global;
+namespace mp_ssv_global\base;
 
 use mp_ssv_users\SSV_Users;
 use wpdb;
@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class SSV_Global
+abstract class SSV_Global
 {
     const PATH = SSV_BASE_FUNCTIONS_PATH;
     const URL = SSV_BASE_FUNCTIONS_URL;

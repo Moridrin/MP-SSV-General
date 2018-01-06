@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 if (!class_exists(BaseFunctions::class)) {
     define('SSV_BASE_FUNCTIONS_PATH', plugin_dir_path(__FILE__));
     define('SSV_BASE_FUNCTIONS_URL', plugins_url() . '/' . plugin_basename(__DIR__));
-    require_once 'models/BaseFunctions.php';
+    require_once 'BaseFunctions.php';
 }
 
 if (!class_exists(User::class)) {

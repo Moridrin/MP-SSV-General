@@ -1,3 +1,11 @@
+#the-list .inline-edit-col .title {
+    width: 7em;
+}
+
+#the-list .inline-edit-col .input-text-wrap {
+    margin-left: 7em;
+}
+
 .postbox .inside {
     padding: 0;
     margin: 0;

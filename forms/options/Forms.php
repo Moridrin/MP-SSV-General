@@ -2,7 +2,7 @@
 
 namespace mp_ssv_forms\options;
 
-use mp_ssv_forms\models\SSV_Forms;
+use mp_ssv_general\forms\SSV_Forms;
 use mp_ssv_general\base\BaseFunctions;
 use stdClass;
 use wpdb;
@@ -89,42 +89,42 @@ abstract class Forms
             json_encode(
                 [
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_0',
                         'bf_name'      => 'username',
                         'bf_title'     => 'Username',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
                     ],
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_1',
                         'bf_name'      => 'first_name',
                         'bf_title'     => 'First Name',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
                     ],
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_2',
                         'bf_name'      => 'last_name',
                         'bf_title'     => 'Last Name',
                         'bf_inputType' => 'text',
                         'bf_value'     => null,
                     ],
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_3',
                         'bf_name'      => 'email',
                         'bf_title'     => 'Email',
                         'bf_inputType' => 'email',
                         'bf_value'     => null,
                     ],
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_4',
                         'bf_name'      => 'password',
                         'bf_title'     => 'Password',
                         'bf_inputType' => 'password',
                         'bf_value'     => null,
                     ],
                     [
-                        'bf_id'        => null,
+                        'bf_id'        => 'b_5',
                         'bf_name'      => 'password_confirm',
                         'bf_title'     => 'Confirm Password',
                         'bf_inputType' => 'password',

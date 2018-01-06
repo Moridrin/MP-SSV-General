@@ -1,6 +1,6 @@
 <?php
 
-use mp_ssv_forms\models\SSV_Forms;
+use mp_ssv_general\forms\SSV_Forms;
 use mp_ssv_forms\options\Forms;
 
 if (!class_exists(SSV_Forms::class)) {
@@ -16,7 +16,7 @@ if (!class_exists(SSV_Forms::class)) {
     define('SSV_FORMS_CUSTOMIZED_FIELDS', $wpdb->prefix . 'ssv_customized_fields');
     define('SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE', $wpdb->prefix . 'ssv_forms');
 
-    require_once 'models/SSV_Forms.php';
+    require_once 'SSV_Forms.php';
 }
 
 if (!class_exists(Forms::class)) {

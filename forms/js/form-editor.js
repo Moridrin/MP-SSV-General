@@ -1,4 +1,5 @@
 (function ($) {
+    let formFieldId = 0;
     $(document).ready(function () {
         let $label = $('#title-prompt-text');
         let $input = $('#title');
@@ -29,7 +30,7 @@
 
         let formFieldsListTop = document.getElementById('formFieldsListTop');
         let formFieldsListBottom = document.getElementById('formFieldsListBottom');
-        let formFieldsList = document.getElementById('formFieldsList');
+        let formFieldsList = document.getElementById('the-list');
         let wordPressBaseFieldsList = document.getElementById('wordPressBaseFieldsList');
         let sharedBaseFieldsList = document.getElementById('sharedBaseFieldsList');
         let siteSpecificBaseFieldsList = document.getElementById('siteSpecificBaseFieldsList');
@@ -71,7 +72,6 @@
             if (e.preventDefault) {
                 e.preventDefault();
             }
-            console.log(this);
             if (this === formFieldsListTop) {
                 formFieldsList.firstElementChild.classList.remove('topHeaderHover');
             } else if (this === formFieldsListBottom) {
@@ -86,20 +86,58 @@
                 e.stopPropagation();
             }
             let dropElement = null;
-            if (dragElement && (dragElement.parentNode === wordPressBaseFieldsList || dragElement.parentNode === sharedBaseFieldsList || dragElement.parentNode === siteSpecificBaseFieldsList)) {
+            if (dragElement && dragElement.parentNode !== formFieldsList) {
+                ++formFieldId;
                 let field = JSON.parse(dragElement.dataset.field);
-                let fieldType = dragElement.dataset.fieldType;
+                let value = field.bf_value !== null ? field.bf_value : '';
+                let properties = {
+                    'title': field.bf_title,
+                    'classes': {'div': '', 'label': '', 'input': ''},
+                    'styles': {'div': '', 'label': '', 'input': ''},
+                    'value': value,
+                };
+                switch (field.bf_inputType) {
+                    case 'number':
+                        properties['required'] = false;
+                        properties['placeholder'] = '';
+                        properties['autocomplete'] = true;
+                        properties['min'] = null;
+                        properties['max'] = null;
+                        properties['step'] = 1;
+                        break;
+                    case 'text':
+                        properties['required'] = false;
+                        properties['placeholder'] = '';
+                        properties['autocomplete'] = true;
+                        properties['list'] = '';
+                        properties['pattern'] = '';
+                        break;
+                    default:
+                        properties['required'] = false;
+                        properties['placeholder'] = '';
+                        properties['autocomplete'] = true;
+                        properties['list'] = '';
+                        properties['pattern'] = '';
+                        properties['min'] = null;
+                        properties['max'] = null;
+                        properties['step'] = 1;
+                        break;
+                }
                 dropElement = document.createElement('tr');
-                dropElement.setAttribute('draggable', 'true');
+                dropElement.setAttribute('id', formFieldId + '_tr');
                 dropElement.setAttribute('class', 'formField');
+                dropElement.setAttribute('draggable', 'true');
+                dropElement.dataset.name = field.bf_name;
+                dropElement.dataset.inputType = field.bf_inputType;
+                dropElement.dataset.properties = JSON.stringify(properties);
                 dropElement.innerHTML =
                     '<td>' +
                     '   <input type="hidden" name="form_fields[]" value="' + field.bf_name + '">' +
                     '   <strong>' + field.bf_title + '</strong>' +
+                    '<span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit(' + formFieldId + ')" class="editinline" aria-label="Quick edit “' + field.bf_title + '” inline">Quick Edit</a></span>' +
                     '</td>' +
-                    '<td>' + fieldType + '</td>' +
                     '<td>' + field.bf_inputType + '</td>' +
-                    '<td>' + field.bf_value + '</td>'
+                    '<td>' + value + '</td>'
                 ;
             } else {
                 dropElement = dragElement.cloneNode(true);
@@ -107,8 +145,10 @@
             }
             if (this === formFieldsListTop) {
                 formFieldsList.insertBefore(dropElement, formFieldsList.children.item(0));
+                removeField(document.getElementById('no-items'));
             } else if (this === formFieldsListBottom) {
                 formFieldsList.appendChild(dropElement);
+                removeField(document.getElementById('no-items'));
             } else if (this && this.parentNode === formFieldsList) {
                 formFieldsList.insertBefore(dropElement, this);
                 removeField(document.getElementById('no-items'));
@@ -132,7 +172,6 @@
             dragElement = null;
             if (!this.classList.contains('baseField')) {
                 removeField(this);
-                console.log(formFieldsList.children.length);
                 if (formFieldsList.children.length === 0) {
                     let emptyRow = document.createElement('tr');
                     emptyRow.setAttribute('id', 'no-items');
