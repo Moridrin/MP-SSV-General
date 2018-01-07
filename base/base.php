@@ -22,13 +22,15 @@ if (!class_exists(Message::class)) {
     require_once 'models/Message.php';
 }
 
-function mp_ssv_base_admin_enquire_scripts()
-{
-    wp_enqueue_script('select2', BaseFunctions::URL . '/lib/js/select2.js', ['jquery']);
-    wp_enqueue_script('select2-init', BaseFunctions::URL . '/js/select2-init.js', ['jquery']);
-    wp_enqueue_style('select2', BaseFunctions::URL . '/lib/css/select2.css');
+if (!function_exists('mp_ssv_base_admin_enqueue_scripts')) {
+    function mp_ssv_base_admin_enqueue_scripts()
+    {
+        wp_enqueue_script('select2', BaseFunctions::URL . '/lib/js/select2.js', ['jquery']);
+        wp_enqueue_script('select2-init', BaseFunctions::URL . '/js/select2-init.js', ['jquery']);
+        wp_enqueue_style('select2', BaseFunctions::URL . '/lib/css/select2.css');
 
-    wp_enqueue_script('mp-ssv-general-functions', BaseFunctions::URL . '/js/mp-ssv-general-functions.js', ['jquery']);
+        wp_enqueue_script('mp-ssv-general-functions', BaseFunctions::URL . '/js/mp-ssv-general-functions.js', ['jquery']);
+    }
+
+    add_action('admin_enqueue_scripts', 'mp_ssv_base_admin_enqueue_scripts');
 }
-
-add_action('admin_enqueue_scripts', 'mp_ssv_base_admin_enquire_scripts');

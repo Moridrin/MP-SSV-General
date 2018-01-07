@@ -45,8 +45,8 @@ abstract class SSV_Forms
             ) $charset_collate;";
         $wpdb->query($sql);
 
-        foreach ($blogIds as $blog_id) {
-            switch_to_blog($blog_id);
+        foreach ($blogIds as $blogId) {
+            switch_to_blog($blogId);
             $tableName = $wpdb->prefix . 'ssv_base_fields';
             $sql
                        = "
@@ -86,7 +86,7 @@ abstract class SSV_Forms
         }
     }
 
-    public static function enquireAdminScripts()
+    public static function enqueueAdminScripts()
     {
         $page      = isset($_GET['page']) ? $_GET['page'] : null;
         $action    = isset($_GET['action']) ? $_GET['action'] : null;
@@ -178,4 +178,4 @@ abstract class SSV_Forms
 }
 
 register_activation_hook(SSV_FORMS_ACTIVATOR_PLUGIN, [SSV_Forms::class, 'setup']);
-add_action('admin_enqueue_scripts', [SSV_Forms::class, 'enquireAdminScripts']);
+add_action('admin_enqueue_scripts', [SSV_Forms::class, 'enqueueAdminScripts']);

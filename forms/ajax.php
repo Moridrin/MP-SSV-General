@@ -37,8 +37,6 @@ if (!function_exists('mp_ssv_general_forms_save_customized_field')) {
             SSV_Forms::CUSTOMIZED_FIELDS_TABLE,
             $_POST['values']
         );
-        BaseFunctions::var_export($wpdb->last_query);
-        BaseFunctions::var_export($wpdb->last_error);
         // TODO update user meta if name is changed.
         if ($die) {
             wp_die();
@@ -72,7 +70,6 @@ if (!function_exists('mp_ssv_general_forms_save_site_specific_base_field')) {
         if (is_array($_POST['values']['bf_options'])) {
             $_POST['values']['bf_options'] = json_encode($_POST['values']['bf_options']);
         }
-        BaseFunctions::var_export($_POST['values'], 1);
         $wpdb->replace(
             SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE,
             $_POST['values']

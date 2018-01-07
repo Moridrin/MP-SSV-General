@@ -1,7 +1,9 @@
 <?php
 
+use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\Field;
+use mp_ssv_general\forms\options\Forms;
 use mp_ssv_general\forms\SSV_Forms;
-use mp_ssv_forms\options\Forms;
 
 if (!class_exists(SSV_Forms::class)) {
     $currentDir = getcwd();
@@ -23,5 +25,8 @@ if (!class_exists(Forms::class)) {
     require_once 'options/Forms.php';
 }
 
+if (!class_exists(Field::class)) {
+    require_once 'models/Field.php';
+}
+
 require_once 'ajax.php';
-require_once 'models/Field.php';
