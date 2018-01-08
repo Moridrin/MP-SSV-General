@@ -250,7 +250,7 @@ let fieldsManager = {
     deleteRow: function (fieldId) {
         let tr = document.getElementById(fieldId + '_tr');
         let container = tr.parentElement;
-        removeField(tr);
+        generalFunctions.removeElement(tr);
         jQuery.post(
             urls.ajax,
             {

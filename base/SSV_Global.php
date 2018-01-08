@@ -48,4 +48,12 @@ abstract class SSV_Global
         }
         return '';
     }
+
+    public static function enqueueAdminScripts()
+    {
+        wp_enqueue_script('ssv_global_datetimepicker', SSV_Global::URL . '/lib/js/jquery.datetimepicker.full.js', 'jquery-ui-datepicker');
+        wp_enqueue_script('ssv_global_datetimepicker_init', SSV_Global::URL . '/js/datetimepicker-init.js', 'ssv_events_datetimepicker');
+        wp_enqueue_style('ssv_global_datetimepicker_admin_css', SSV_Global::URL . '/lib/css/jquery.datetimepicker.css');
+    }
 }
+add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);

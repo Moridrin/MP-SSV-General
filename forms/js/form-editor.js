@@ -145,13 +145,13 @@
             }
             if (this === formFieldsListTop) {
                 formFieldsList.insertBefore(dropElement, formFieldsList.children.item(0));
-                removeField(document.getElementById('no-items'));
+                generalFunctions.removeElement(document.getElementById('no-items'));
             } else if (this === formFieldsListBottom) {
                 formFieldsList.appendChild(dropElement);
-                removeField(document.getElementById('no-items'));
+                generalFunctions.removeElement(document.getElementById('no-items'));
             } else if (this && this.parentNode === formFieldsList) {
                 formFieldsList.insertBefore(dropElement, this);
-                removeField(document.getElementById('no-items'));
+                generalFunctions.removeElement(document.getElementById('no-items'));
             }
             addDragEvents(dropElement);
             addDropEvents(dropElement);
@@ -171,7 +171,7 @@
             this.classList.remove('dragElem');
             dragElement = null;
             if (!this.classList.contains('baseField')) {
-                removeField(this);
+                generalFunctions.removeElement(this);
                 if (formFieldsList.children.length === 0) {
                     let emptyRow = document.createElement('tr');
                     emptyRow.setAttribute('id', 'no-items');

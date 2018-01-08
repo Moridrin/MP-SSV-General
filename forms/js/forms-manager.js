@@ -2,7 +2,7 @@ let formsManager = {
     deleteRow: function (formId) {
         let tr = document.getElementById(formId + '_tr');
         let container = tr.parentElement;
-        removeField(tr);
+        generalFunctions.removeElement(tr);
         jQuery.post(
             urls.ajax,
             {

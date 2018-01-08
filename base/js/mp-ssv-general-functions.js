@@ -1,45 +1,48 @@
 /**
  * Created by moridrin on 5-6-17.
  */
+let generalFunctions = {
+    getCurrentDate: function () {
+        var today = new Date();
+        var yyyy = today.getFullYear();
+        var mm = today.getMonth() + 1; //January is 0!
+        var dd = today.getDate();
+        if (dd < 10) {
+            dd = '0' + dd
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        return yyyy + '-' + mm + '-' + dd;
+    },
 
-function getSelectValues(select) {
-    var result = [];
-    var options = select && select.options;
-    var opt;
+    getCurrentTime: function () {
+        var today = new Date();
+        var hh = today.getHours();
+        var mm = today.getMinutes();
+        if (hh < 10) {
+            hh = '0' + hh
+        }
+        if (mm < 10) {
+            mm = '0' + mm
+        }
+        return hh + ':' + mm;
+    },
 
-    for (var i = 0, iLen = options.length; i < iLen; i++) {
-        opt = options[i];
+    removeFields: function (fields) {
+        if (fields !== null) {
+            while (fields.length > 0) {
+                generalFunctions.removeElement(fields[0]);
+            }
+        }
+    },
 
-        if (opt.selected) {
-            result.push(opt.value || opt.text);
+    removeElement: function (field) {
+        if (Array.isArray(field)) {
+            generalFunctions.removeFields(field);
+        }
+        if (field !== null) {
+            field.parentElement.removeChild(field);
         }
     }
-    return result;
-}
-
-//noinspection JSUnusedGlobalSymbols
-function getDraggable(fieldID) {
-    var draggableIcon = document.createElement("img");
-    draggableIcon.setAttribute("src", pluginBaseURL + '/general/images/icon-menu.svg');
-    draggableIcon.setAttribute("style", "padding-right: 15px; margin: 10px 0;");
-    var draggableIconTD = document.createElement("td");
-    draggableIconTD.setAttribute("style", "padding: 0;");
-    draggableIconTD.setAttribute("id", fieldID + "_draggable_td");
-    draggableIconTD.setAttribute("style", "vertical-align: middle; cursor: move;");
-    draggableIconTD.appendChild(draggableIcon);
-    return draggableIconTD;
-}
-
-function removeFields(fields) {
-    if (fields !== null) {
-        while (fields.length > 0) {
-            removeField(fields[0]);
-        }
-    }
-}
-
-function removeField(field) {
-    if (field !== null) {
-        field.parentElement.removeChild(field);
-    }
-}
+};
