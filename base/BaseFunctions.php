@@ -4,7 +4,6 @@ namespace mp_ssv_general\base;
 
 use DateTime;
 use Exception;
-use ReflectionClass;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -12,9 +11,6 @@ if (!defined('ABSPATH')) {
 
 abstract class BaseFunctions
 {
-    const PATH = SSV_BASE_FUNCTIONS_PATH;
-    const URL = SSV_BASE_FUNCTIONS_URL;
-
     /**
      * This function can be called from anywhere and will redirect the page to the given location.
      *
@@ -22,10 +18,11 @@ abstract class BaseFunctions
      */
     public static function redirect(string $location)
     {
-        $redirect_script = '<script type="text/javascript">';
-        $redirect_script .= 'window.location = "' . $location . '"';
-        $redirect_script .= '</script>';
-        echo $redirect_script;
+        ?>
+        <script type="text/javascript">
+            window.location = "<?= $location ?>";
+        </script>
+        <?php
     }
 
     /**
@@ -427,7 +424,7 @@ abstract class BaseFunctions
             ob_start();
             echo $variable . ';';
             $query = ob_get_clean();
-            require_once self::PATH.'lib/SqlFormatter.php';
+            require_once SSV_Global::PATH . 'lib/SqlFormatter.php';
             $print = SqlFormatter::highlight($query);
             $print = trim(preg_replace('/\s+/', ' ', $print));
         } else {

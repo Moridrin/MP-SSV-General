@@ -3,6 +3,7 @@
 namespace mp_ssv_general\forms\options;
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\SSV_Forms;
 use stdClass;
 use wpdb;
@@ -229,7 +230,7 @@ abstract class Forms
                 <a href="?page=<?= esc_html($_GET['page']) ?>&tab=siteSpecific" class="nav-tab <?= $activeTab === 'siteSpecific' ? 'nav-tab-active' : '' ?>">Site Specific</a>
                 <a href="http://bosso.nl/plugins/ssv-file-manager/" target="_blank" class="nav-tab">
                     Help <!--suppress HtmlUnknownTarget -->
-                    <img src="<?= esc_url(BaseFunctions::URL) ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle">
+                    <img src="<?= esc_url(SSV_Global::URL) ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle">
                 </a>
             </h2>
             <?php

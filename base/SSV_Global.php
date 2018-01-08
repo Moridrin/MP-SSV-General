@@ -1,9 +1,8 @@
 <?php
 
-namespace mp_ssv_global\base;
+namespace mp_ssv_general\base;
 
 use mp_ssv_users\SSV_Users;
-use wpdb;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -11,8 +10,8 @@ if (!defined('ABSPATH')) {
 
 abstract class SSV_Global
 {
-    const PATH = SSV_BASE_FUNCTIONS_PATH;
-    const URL = SSV_BASE_FUNCTIONS_URL;
+    const PATH = SSV_BASE_PATH;
+    const URL = SSV_BASE_URL;
 
     const HOOK_USER_PROFILE_URL = 'ssv_general__hook_profile_url';
     const HOOK_GENERAL_OPTIONS_PAGE_CONTENT = 'ssv_general__hook_general_options_page_content';
