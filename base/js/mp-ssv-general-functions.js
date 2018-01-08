@@ -29,7 +29,7 @@ let generalFunctions = {
         return hh + ':' + mm;
     },
 
-    removeFields: function (fields) {
+    removeElements: function (fields) {
         if (fields !== null) {
             while (fields.length > 0) {
                 generalFunctions.removeElement(fields[0]);
@@ -39,7 +39,7 @@ let generalFunctions = {
 
     removeElement: function (field) {
         if (Array.isArray(field)) {
-            generalFunctions.removeFields(field);
+            generalFunctions.removeElements(field);
         }
         if (field !== null) {
             field.parentElement.removeChild(field);
