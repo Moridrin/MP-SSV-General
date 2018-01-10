@@ -92,9 +92,10 @@
                 let value = field.bf_value !== null ? field.bf_value : '';
                 let properties = {
                     'title': field.bf_title,
-                    'classes': {'div': '', 'label': '', 'input': ''},
-                    'styles': {'div': '', 'label': '', 'input': ''},
+                    'classes': {'div': '', 'title': '', 'input': ''},
+                    'styles': {'div': '', 'title': '', 'input': ''},
                     'value': value,
+                    'defaultValue': '',
                 };
                 switch (field.bf_inputType) {
                     case 'number':

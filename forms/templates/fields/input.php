@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_checkbox_input_field(string $formId, array $field)
+function show_default_input_field(string $formId, array $field)
 {
     /** @var wpdb $wpdb */
     global $wpdb;
@@ -25,6 +25,7 @@ function show_checkbox_input_field(string $formId, array $field)
     if ($customizedField !== null) {
         $field                 = json_decode($customizedField, true) + $field;
         $field['required']     = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
+        $field['autocomplete'] = filter_var($field['autocomplete'], FILTER_VALIDATE_BOOLEAN);
     }
     $inputElementAttributes = [
         'type',
@@ -40,15 +41,15 @@ function show_checkbox_input_field(string $formId, array $field)
     if (current_theme_supports('materialize')) {
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>
-            <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <span><?= BaseFunctions::escape($field['defaultValue'], 'html') ?></span>
-            <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
+            <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/>
+            <label <?= Field::getElementAttributesString($field, 'title', ['for']) ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
         </div>
         <?php
     } else {
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>
-            <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
-            <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <span><?= BaseFunctions::escape($field['defaultValue'], 'html') ?></span>
+            <label <?= Field::getElementAttributesString($field, 'title', ['for']) ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label><br/>
+            <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/>
         </div>
         <?php
     }

@@ -6,7 +6,6 @@ use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\input_fields\CustomInputField;
 use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
-use mp_ssv_general\custom_fields\InputField;
 
 if (!defined('ABSPATH')) {
     exit;

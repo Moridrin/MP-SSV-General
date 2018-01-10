@@ -1,6 +1,5 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -25,23 +24,23 @@ function show_customized_form_fields_table(int $formId, array $fields)
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
                     <?php
-                    $table      = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
-                    $name       = $field->bf_name;
-                    $properties = [
-                            'title' => $field->bf_title,
-                            'classes' => ['div' => '', 'label' => '', 'input' => ''],
-                            'styles' => ['div' => '', 'label' => '', 'input' => ''],
-                            'defaultValue' => '',
-                            'required' => false,
-                            'placeholder' => '',
-                            'autocomplete' => true,
-                            'list' => '',
-                            'pattern' => '',
-                            'step' => null,
-                            'min' => null,
-                            'max' => null,
+                    $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
+                    $name            = $field->bf_name;
+                    $properties      = [
+                        'title'        => $field->bf_title,
+                        'classes'      => ['div' => '', 'label' => '', 'input' => ''],
+                        'styles'       => ['div' => '', 'label' => '', 'input' => ''],
+                        'defaultValue' => '',
+                        'required'     => false,
+                        'placeholder'  => '',
+                        'autocomplete' => true,
+                        'list'         => '',
+                        'pattern'      => '',
+                        'step'         => null,
+                        'min'          => null,
+                        'max'          => null,
                     ];
-                    $customizedField     = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+                    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
                     if ($customizedField !== null) {
                         $customizedField = json_decode($customizedField, true);
                         foreach ($customizedField as $key => $value) {
@@ -49,12 +48,14 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         }
                     }
                     ?>
-                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-options='<?= $field->bf_options ?>' data-properties='<?= json_encode($properties) ?>'>
+                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-options='<?= $field->bf_options ?>'
+                        data-properties='<?= json_encode($properties) ?>'>
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
-                            <strong id="<?= $field->bf_id ?>_title"><?= $field->bf_title ?></strong>
+                            <strong id="<?= $field->bf_id ?>_title"><?= $properties['title'] ?></strong>
                             <?php if ($field->bf_inputType !== 'hidden'): ?>
-                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
+                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline"
+                                                                   aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
                             <?php endif; ?>
                         </td>
                         <td id="<?= $field->bf_id ?>_inputType"><?= $field->bf_inputType ?></td>

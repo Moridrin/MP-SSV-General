@@ -25,7 +25,7 @@ abstract class SSV_Forms
     {
         /** @var wpdb $wpdb */
         global $wpdb;
-        require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $charset_collate = $wpdb->get_charset_collate();
         if (is_multisite() && $networkEnable) {
             $blogIds = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
@@ -155,7 +155,7 @@ abstract class SSV_Forms
             wp_localize_script(
                 'mp-ssv-fields-customizer',
                 'actions',
-                ['save'   => 'mp_ssv_general_forms_save_customized_field']
+                ['save' => 'mp_ssv_general_forms_save_customized_field']
             );
         }
     }
@@ -164,7 +164,7 @@ abstract class SSV_Forms
     {
         /** @var wpdb $wpdb */
         global $wpdb;
-        require_once(ABSPATH.'wp-admin/includes/upgrade.php');
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $tableName = self::SHARED_BASE_FIELDS_TABLE;
         $wpdb->query("DROP TABLE $tableName;");
         $tableName = self::SITE_SPECIFIC_BASE_FIELDS_TABLE;

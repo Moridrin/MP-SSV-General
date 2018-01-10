@@ -1,7 +1,6 @@
 <?php
 
 use mp_ssv_general\custom_fields\Field;
-use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\SSV_General;
 
 if (!defined('ABSPATH')) {
@@ -13,6 +12,7 @@ function mp_ssv_form_fields_creator_scripts($hook)
 {
     wp_enqueue_script('ssv_form_fields_creator', SSV_General::URL . '/js/mp-ssv-custom-field-creator.js');
 }
+
 add_action('admin_enqueue_scripts', 'mp_ssv_form_fields_creator_scripts');
 #endregion
 
@@ -46,20 +46,20 @@ function ssv_form_fields_creator_menu_page_network_admin()
     <h1>Form Fields</h1>
     <p>These fields will be available for all sites.</p>
     <?php if (!current_user_can('add_custom_fields')): ?>
-        <div class="notice">
-            <p>You are not allowed to add custom fields.</p>
-        </div>
-    <?php endif; ?>
+    <div class="notice">
+        <p>You are not allowed to add custom fields.</p>
+    </div>
+<?php endif; ?>
     <?php if (!current_user_can('edit_custom_fields')): ?>
-        <div class="notice">
-            <p>You are not allowed to edit existing custom fields.</p>
-        </div>
-    <?php endif; ?>
+    <div class="notice">
+        <p>You are not allowed to edit existing custom fields.</p>
+    </div>
+<?php endif; ?>
     <?php if (!current_user_can('remove_custom_fields')): ?>
-        <div class="notice">
-            <p>You are not allowed to remove custom fields.</p>
-        </div>
-    <?php endif; ?>
+    <div class="notice">
+        <p>You are not allowed to remove custom fields.</p>
+    </div>
+<?php endif; ?>
     <form method="post" action="#">
         <table class="form-table">
             <tr>
@@ -70,6 +70,7 @@ function ssv_form_fields_creator_menu_page_network_admin()
                     </div>
                     <script>
                         var i = <?= count($baseFields) > 0 ? max(array_keys($baseFields)) + 1 : 1 ?>;
+
                         function mp_ssv_add_new_custom_field() {
                             mp_ssv_add_custom_input_field('shared-custom-fields-placeholder', i, 'text', {"override_right": ""}, false);
                             i++;

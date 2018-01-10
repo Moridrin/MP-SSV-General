@@ -1,13 +1,12 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\Field;
 use mp_ssv_general\forms\options\Forms;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!class_exists(SSV_Forms::class)) {
     $currentDir = getcwd();
-    chdir(__DIR__.'/../..');
+    chdir(__DIR__ . '/../..');
     define('SSV_FORMS_ACTIVATOR_PLUGIN', getcwd() . DIRECTORY_SEPARATOR . glob('ss?-*.php')[0]);
     chdir($currentDir);
     define('SSV_FORMS_PATH', plugin_dir_path(__FILE__));
@@ -22,7 +21,7 @@ if (!class_exists(SSV_Forms::class)) {
 }
 
 if (!class_exists(Forms::class)) {
-    require_once 'options/Forms.php';
+    require_once 'models/Forms.php';
 }
 
 if (!class_exists(Field::class)) {

@@ -12,9 +12,12 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-require_once 'templates/base-form-fields-table.php';
-require_once 'templates/forms-table.php';
-require_once 'templates/form-editor.php';
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/base-form-fields-table.php';
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/forms-table.php';
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/form-editor.php';
 
 abstract class Forms
 {
@@ -343,7 +346,7 @@ abstract class Forms
         <?php
     }
 
-    private static function getFormHTML(stdClass $form): string
+    public static function getFormHTML(stdClass $form): string
     {
         $formFields = self::getFormFields(json_decode($form->f_fields));
         ob_start();
@@ -355,19 +358,28 @@ abstract class Forms
             }
             switch ($newField['inputType']) {
                 case 'hidden':
-                    require_once 'templates/fields/hidden.php';
+                    /** @noinspection PhpIncludeInspection */
+                    require_once SSV_Forms::PATH . 'templates/fields/hidden.php';
                     show_hidden_input_field($newField);
                     break;
                 case 'select':
-                    require_once 'templates/fields/select.php';
+                    /** @noinspection PhpIncludeInspection */
+                    require_once SSV_Forms::PATH . 'templates/fields/select.php';
                     show_select_input_field($form->f_id, $newField);
                     break;
                 case 'checkbox':
-                    require_once 'templates/fields/checkbox.php';
+                    /** @noinspection PhpIncludeInspection */
+                    require_once SSV_Forms::PATH . 'templates/fields/checkbox.php';
                     show_checkbox_input_field($form->f_id, $newField);
                     break;
+                case 'datetime':
+                    /** @noinspection PhpIncludeInspection */
+                    require_once SSV_Forms::PATH . 'templates/fields/datetime.php';
+                    show_datetime_input_field($form->f_id, $newField);
+                    break;
                 default:
-                    require_once 'templates/fields/input.php';
+                    /** @noinspection PhpIncludeInspection */
+                    require_once SSV_Forms::PATH . 'templates/fields/input.php';
                     show_default_input_field($form->f_id, $newField);
                     break;
             }

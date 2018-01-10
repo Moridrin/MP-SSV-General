@@ -18,7 +18,7 @@ function show_hidden_input_field(array $field)
     }
     $inputId                = BaseFunctions::escape('input_' . $field['name'], 'attr');
     $inputElementAttributes = [
-        'type' => true,
+        'type'  => true,
         'value' => true,
     ];
     ?><input <?= Field::getElementAttributesString($field, $inputId, $inputElementAttributes, '') ?>/><?php

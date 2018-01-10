@@ -1,47 +1,48 @@
 let fieldTypesObjects = {
     'text': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'email': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'password': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'checkbox': [
         'div',
+        'title',
         'label',
         'input',
     ],
-    'date': [
+    'datetime': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'file': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'select': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'number': [
         'div',
-        'label',
+        'title',
         'input',
     ],
     'custom': [
         'div',
-        'label',
+        'title',
         'input',
     ],
 };
@@ -85,15 +86,12 @@ let propertiesForField = {
         'styles',
         'required',
     ],
-    'date': [
+    'datetime': [
         'title',
         'classes',
         'defaultValue',
         'styles',
         'required',
-        'autocomplete',
-        'placeholder',
-        'pattern',
     ],
     'file': [
         'title',
@@ -262,7 +260,6 @@ let fieldsCustomizer = {
                     properties[propertyFields[i]][fieldTypeObjects[j]] = element.value;
                 }
             } else {
-                console.log(fieldId + '_' + propertyFields[i]);
                 let element = document.getElementById(fieldId + '_' + propertyFields[i]);
                 if (element.getAttribute('type') === 'checkbox') {
                     properties[propertyFields[i]] = element.checked;
@@ -289,7 +286,7 @@ let fieldsCustomizer = {
 
     updateTrForDisplay: function (fieldId) {
         let tr = document.getElementById(fieldId + '_tr');
-        let name = tr.dataset.name;
+        let name = tr.dataset.baseFieldName;
         let inputType = tr.dataset.inputType;
         let properties = JSON.parse(tr.dataset.properties);
         let title = properties['title'];

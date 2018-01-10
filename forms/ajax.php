@@ -1,7 +1,6 @@
 <?php
 
 use mp_ssv_general\forms\SSV_Forms;
-use mp_ssv_general\base\BaseFunctions;
 
 if (!function_exists('mp_ssv_general_forms_save_shared_base_field')) {
     function mp_ssv_general_forms_save_shared_base_field(bool $die = true)
@@ -10,7 +9,7 @@ if (!function_exists('mp_ssv_general_forms_save_shared_base_field')) {
         global $wpdb;
         if (!empty($_POST['values']['bf_options'])) {
             $_POST['values']['bf_options'] = json_encode($_POST['values']['bf_options']);
-            $_POST['values']['bf_value'] = null;
+            $_POST['values']['bf_value']   = null;
         } else {
             $_POST['values']['bf_options'] = null;
         }

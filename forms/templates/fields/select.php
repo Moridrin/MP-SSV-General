@@ -26,9 +26,9 @@ function show_select_input_field(string $formId, array $field)
     $name            = $field['name'];
     $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
     if ($customizedField !== null) {
-        $field                 = json_decode($customizedField, true) + $field;
-        $field['required']     = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
-        $field['multiple']     = filter_var($field['multiple'], FILTER_VALIDATE_BOOLEAN);
+        $field             = json_decode($customizedField, true) + $field;
+        $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
+        $field['multiple'] = filter_var($field['multiple'], FILTER_VALIDATE_BOOLEAN);
     }
     $field['options'] = json_decode($field['options']);
     if (empty($field['value']) && !empty($field['defaultValue'])) {

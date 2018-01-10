@@ -1,7 +1,5 @@
 <?php
 
-use mp_ssv_general\custom_fields\Field;
-use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
@@ -10,9 +8,9 @@ if (!defined('ABSPATH')) {
 
 /** @var wpdb $wpdb */
 global $wpdb;
-$sharedBaseTable = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
+$sharedBaseTable       = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
 $siteSpecificBaseTable = BaseFunctions::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-$customizedTable = BaseFunctions::CUSTOMIZED_FIELDS_TABLE;
+$customizedTable       = BaseFunctions::CUSTOMIZED_FIELDS_TABLE;
 if (BaseFunctions::isValidPOST(BaseFunctions::OPTIONS_ADMIN_REFERER)) {
     if (isset($_POST['reset'])) {
         BaseFunctions::resetOptions();
@@ -71,15 +69,15 @@ $sharedBaseFields = $wpdb->get_results("SELECT * FROM $sharedBaseTable");
         <tr id="3_tr">
             <td style="padding: 0;">
                 <label style="white-space: nowrap;">Field Title</label><br>
-                <input style="width: 100%;" value="<?=$baseField->bf_title?>" readonly>
+                <input style="width: 100%;" value="<?= $baseField->bf_title ?>" readonly>
             </td>
             <td style="padding: 0;">
                 <label style="white-space: nowrap;">Name</label><br>
-                <input style="width: 100%;" pattern="[a-z0-9_]+" value="<?=$baseField->bf_name?>" readonly>
+                <input style="width: 100%;" pattern="[a-z0-9_]+" value="<?= $baseField->bf_name ?>" readonly>
             </td>
             <td style="padding: 0;">
                 <label style="white-space: nowrap;">Input Type</label><br>
-                <input style="width: 100%;" list="inputType" value="<?=$baseField->bf_inputType?>" readonly>
+                <input style="width: 100%;" list="inputType" value="<?= $baseField->bf_inputType ?>" readonly>
             </td>
             <?php
             switch ($baseField->bf_inputType) {
@@ -102,7 +100,7 @@ $sharedBaseFields = $wpdb->get_results("SELECT * FROM $sharedBaseTable");
                 default:
                     ?>
                     <td style="padding: 0;" id="3_empty_td"></td>
-                    <?php
+                <?php
             }
             ?>
             <td style="padding: 0;" id="3_empty_td"></td>

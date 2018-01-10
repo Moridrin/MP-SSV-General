@@ -2,9 +2,7 @@
 
 namespace mp_ssv_general\custom_fields;
 
-use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\custom_fields\input_fields\CheckboxInputField;
-use mp_ssv_general\custom_fields\input_fields\HiddenInputField;
 use mp_ssv_general\custom_fields\input_fields\TextInputField;
 
 if (!defined('ABSPATH')) {

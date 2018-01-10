@@ -67,7 +67,7 @@ class TextInputField extends InputField
         if (strtolower($this->defaultValue) == 'now') {
             $this->defaultValue = (new DateTime('NOW'))->format('Y-m-d');
         }
-        $divId      = BaseFunctions::escape('div_' . $this->name, 'attr');
+        $divId = BaseFunctions::escape('div_' . $this->name, 'attr');
         $input = BaseFunctions::escape('input_' . $this->name, 'attr');
         $label = BaseFunctions::escape('label_' . $this->name, 'attr');
         ob_start();

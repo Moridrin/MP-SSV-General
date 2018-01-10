@@ -2,7 +2,6 @@
 
 use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
-use mp_ssv_general\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
