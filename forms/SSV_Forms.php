@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general\forms;
 
+use mp_ssv_general\base\SSV_Global;
 use wpdb;
 
 if (!defined('ABSPATH')) {
@@ -21,17 +22,54 @@ abstract class SSV_Forms
     const CUSTOMIZED_FIELDS_TABLE = SSV_FORMS_CUSTOMIZED_FIELDS;
     const SITE_SPECIFIC_FORMS_TABLE = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
 
+    public static function setupForBlog() {
+        /** @var wpdb $wpdb */
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $charset_collate = $wpdb->get_charset_collate();
+        $tableName = $wpdb->prefix . 'ssv_base_fields';
+        $sql
+                   = "
+        CREATE TABLE IF NOT EXISTS $tableName (
+            `bf_id` bigint(20) NOT NULL PRIMARY KEY,
+            `bf_name` VARCHAR(50) UNIQUE,
+            `bf_title` VARCHAR(50) NOT NULL,
+            `bf_inputType` VARCHAR(50),
+            `bf_options` TEXT,
+            `bf_value` VARCHAR(255)
+        ) $charset_collate;";
+        $wpdb->query($sql);
+
+        $tableName = $wpdb->prefix . 'ssv_customized_fields';
+        $sql
+                   = "
+        CREATE TABLE IF NOT EXISTS $tableName (
+            `cf_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `cf_f_id` bigint(20),
+            `cf_bf_name` VARCHAR(50),
+            `cf_json` TEXT NOT NULL,
+            UNIQUE (`cf_f_id`, `cf_bf_name`)
+        ) $charset_collate;";
+        $wpdb->query($sql);
+
+        $tableName = $wpdb->prefix . 'ssv_forms';
+        $sql
+                   = "
+        CREATE TABLE IF NOT EXISTS $tableName (
+            `f_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `f_tag` VARCHAR(50) UNIQUE,
+            `f_title` VARCHAR(50) NOT NULL,
+            `f_fields` TEXT
+        ) $charset_collate;";
+        $wpdb->query($sql);
+    }
+
     public static function setup($networkEnable)
     {
         /** @var wpdb $wpdb */
         global $wpdb;
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         $charset_collate = $wpdb->get_charset_collate();
-        if (is_multisite() && $networkEnable) {
-            $blogIds = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
-        } else {
-            $blogIds = [get_current_blog_id()];
-        }
         $tableName = self::SHARED_BASE_FIELDS_TABLE;
         $sql
                    = "
@@ -44,45 +82,10 @@ abstract class SSV_Forms
                 `bf_value` VARCHAR(255)
             ) $charset_collate;";
         $wpdb->query($sql);
-
-        foreach ($blogIds as $blogId) {
-            switch_to_blog($blogId);
-            $tableName = $wpdb->prefix . 'ssv_base_fields';
-            $sql
-                       = "
-            CREATE TABLE IF NOT EXISTS $tableName (
-                `bf_id` bigint(20) NOT NULL PRIMARY KEY,
-                `bf_name` VARCHAR(50) UNIQUE,
-                `bf_title` VARCHAR(50) NOT NULL,
-                `bf_inputType` VARCHAR(50),
-                `bf_options` TEXT,
-                `bf_value` VARCHAR(255)
-            ) $charset_collate;";
-            $wpdb->query($sql);
-
-            $tableName = $wpdb->prefix . 'ssv_customized_fields';
-            $sql
-                       = "
-            CREATE TABLE IF NOT EXISTS $tableName (
-                `cf_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                `cf_f_id` bigint(20),
-                `cf_bf_name` VARCHAR(50),
-                `cf_json` TEXT NOT NULL,
-			    UNIQUE (`cf_f_id`, `cf_bf_name`)
-            ) $charset_collate;";
-            $wpdb->query($sql);
-
-            $tableName = $wpdb->prefix . 'ssv_forms';
-            $sql
-                       = "
-            CREATE TABLE IF NOT EXISTS $tableName (
-                `f_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-                `f_tag` VARCHAR(50) UNIQUE,
-                `f_title` VARCHAR(50) NOT NULL,
-                `f_fields` TEXT
-            ) $charset_collate;";
-            $wpdb->query($sql);
-            restore_current_blog();
+        if ($networkEnable) {
+            SSV_Global::runFunctionOnAllSites([self::class, 'setupForBlog']);
+        } else {
+            self::setupForBlog();
         }
     }
 

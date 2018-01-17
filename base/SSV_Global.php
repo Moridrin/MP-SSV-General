@@ -62,6 +62,21 @@ abstract class SSV_Global
         wp_enqueue_script('ssv_global_datetimepicker_init', SSV_Global::URL . '/js/datetimepicker-init.js', ['ssv_global_datetimepicker', 'jquery']);
         wp_enqueue_style('ssv_global_datetimepicker_css', SSV_Global::URL . '/lib/css/jquery.datetimepicker.css');
     }
+
+    public static function runFunctionOnAllSites(callable $callable, ...$args)
+    {
+        global $wpdb;
+        if (is_multisite()) {
+            $blogIds = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+        } else {
+            $blogIds = [get_current_blog_id()];
+        }
+        foreach ($blogIds as $blogId) {
+            switch_to_blog($blogId);
+            call_user_func($callable, ...$args);
+            restore_current_blog();
+        }
+    }
 }
 
 add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);
