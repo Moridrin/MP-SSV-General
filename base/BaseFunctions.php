@@ -34,16 +34,7 @@ abstract class BaseFunctions
      */
     public static function isValidPOST(string $adminReferer): bool
     {
-        if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            return false;
-        }
-        if (!isset($_POST['admin_referer']) || $_POST['admin_referer'] != $adminReferer) {
-            return false;
-        }
-        if (!check_admin_referer($adminReferer)) {
-            return false;
-        }
-        return true;
+        return $_SERVER['REQUEST_METHOD'] === 'POST' && check_admin_referer($adminReferer);
     }
 
     /**
@@ -189,10 +180,9 @@ abstract class BaseFunctions
      *
      * @return string HTML
      */
-    public static function getFormSecurityFields(string $adminReferer, $saveButton = true, $resetButton = true): string
+    public static function getAdminFormSecurityFields(string $adminReferer, $saveButton = true, $resetButton = false): string
     {
         ob_start();
-        ?><input type="hidden" name="admin_referer" value="<?= $adminReferer ?>"><?php
         wp_nonce_field($adminReferer);
         if (is_string($saveButton)) {
             submit_button($saveButton);
@@ -201,6 +191,22 @@ abstract class BaseFunctions
         }
         if ($resetButton) {
             ?><input type="submit" name="reset" id="reset" class="button button-primary" value="<?= is_string($resetButton) ? $resetButton : 'Reset to Default' ?>"><?php
+        }
+        return ob_get_clean();
+    }
+
+    /**
+     * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
+     * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
+     *
+     * @return string HTML
+     */
+    public static function getFrontendFormSecurityFields(string $adminReferer, $saveButton = 'Submit'): string
+    {
+        ob_start();
+        wp_nonce_field($adminReferer);
+        if (is_string($saveButton)) {
+            ?><button type="submit"><?= $saveButton ?></button><?php
         }
         return ob_get_clean();
     }

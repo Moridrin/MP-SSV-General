@@ -1,4 +1,3 @@
-console.log('test');
 jQuery(function ($) {
     $(document).ready(function () {
         var dateTimePickers = $('.datetimepicker');

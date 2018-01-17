@@ -30,7 +30,7 @@ abstract class Forms
         $forms = $wpdb->get_results("SELECT * FROM $table");
         foreach ($forms as $form) {
             if (strpos($content, $form->f_tag) !== false) {
-                $content = str_replace($form->f_tag, self::getFormHTML($form), $content);
+                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form), $content);
             }
         }
         return $content;
@@ -186,7 +186,7 @@ abstract class Forms
                     <?php
                     show_forms_table($forms, $order, $orderBy, current_user_can('manage_site_specific_forms'));
                     if (current_user_can('manage_site_specific_forms')) {
-                        echo BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
+                        echo BaseFunctions::getAdminFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
                     }
                     ?>
                 </form>
@@ -338,7 +338,7 @@ abstract class Forms
                         i++;
                     }
                 </script>
-                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false) ?>
+                <?= BaseFunctions::getAdminFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false) ?>
                 <?php
             }
             ?>
@@ -346,7 +346,7 @@ abstract class Forms
         <?php
     }
 
-    public static function getFormHTML(stdClass $form): string
+    public static function getFormFieldsHTML(stdClass $form): string
     {
         $formFields = self::getFormFields(json_decode($form->f_fields));
         ob_start();
@@ -401,7 +401,8 @@ abstract class Forms
         $fieldNames                  = '"' . implode('", "', $fieldNames) . '"';
         $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-        return array_merge($formFields, $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($fieldNames)"));
+        $databaseFields = $wpdb->get_results("SELECT * FROM (SELECT * FROM $sharedBaseFieldsTable UNION SELECT * FROM $siteSpecificBaseFieldsTable) combined WHERE bf_name IN ($fieldNames) ORDER BY FIELD(`bf_name`,$fieldNames)");
+        return array_merge($formFields, $databaseFields);
     }
 }
 

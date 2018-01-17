@@ -26,6 +26,7 @@ function show_checkbox_input_field(string $formId, array $field)
         $field             = json_decode($customizedField, true) + $field;
         $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
     }
+    $field['value'] = 'true';
     $inputElementAttributes = [
         'type',
         'value',

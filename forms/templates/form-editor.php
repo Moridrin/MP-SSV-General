@@ -41,7 +41,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                                 <a class="submitdelete deletion" href="#">Move to Trash</a>
                                             </div>
                                             <div id="publishing-action">
-                                                <?= BaseFunctions::getFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
+                                                <?= BaseFunctions::getAdminFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
                                                 <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="<?= empty($title) ? 'Publish' : 'Update' ?>">
                                             </div>
                                             <div class="clear"></div>
