@@ -11,6 +11,8 @@ if (!defined('ABSPATH')) {
 
 abstract class BaseFunctions
 {
+    private static $options = [];
+
     /**
      * This function can be called from anywhere and will redirect the page to the given location.
      *
@@ -595,5 +597,21 @@ abstract class BaseFunctions
     public static function endsWith(string $haystack, string $needle): bool
     {
         return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+    }
+
+    public static function registerOption(string $group, string $name, string $type)
+    {
+        if (!isset(self::$options[$group])) {
+            self::$options[$group] = [];
+        }
+        self::$options[$group][] = [
+                'name' => $name,
+                'type' => $type,
+        ];
+        register_setting($group, $name, ['type' => $type]);
+    }
+
+    public static function getOption($string)
+    {
     }
 }

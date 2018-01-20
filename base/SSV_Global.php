@@ -77,6 +77,21 @@ abstract class SSV_Global
             restore_current_blog();
         }
     }
+    public static function addSettingsPage(string $mainTitle, string $subTitle, string $capability = 'edit_posts', array $function)
+    {
+        if (empty($GLOBALS['admin_page_hooks']['ssv_settings'])) {
+            add_menu_page($mainTitle, $mainTitle, $capability, 'ssv_settings');
+            add_submenu_page('ssv_settings', $subTitle, $subTitle, $capability, 'ssv_settings', $function);
+        } else {
+            global $menu;
+            foreach ($menu as &$menuItem) {
+                if ($menuItem[2] === 'ssv_settings' && $menuItem[0] !== 'SSV Settings') {
+                    $menuItem[0] = 'SSV Settings';
+                }
+            }
+            add_submenu_page('ssv_settings', $subTitle, $subTitle, $capability, 'ssv_'.BaseFunctions::toSnakeCase($subTitle), $function);
+        }
+    }
 }
 
 add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);

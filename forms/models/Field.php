@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_general;
+namespace mp_ssv_general\forms\models;
 
 use mp_ssv_general\base\BaseFunctions;
 
