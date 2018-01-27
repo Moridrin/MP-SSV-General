@@ -3,6 +3,7 @@
 namespace mp_ssv_general\forms\models;
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\User;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -27,10 +28,11 @@ abstract class Field
             'pattern'        => null,
             'multiple'       => false,
             'selected'       => false,
+            'profileField'   => true,
             'size'           => 1,
         ];
         $currentUserCanOverride = self::currentUserCanOverride($field['overrideRights']);
-        $attributesString       = 'id="' . BaseFunctions::escape($element . '_' . $field['name'], 'attr') . '"';
+        $attributesString       = 'id="' . BaseFunctions::escape($field['formId'] . '_' . $element . '_' . $field['name'], 'attr') . '"';
         if (in_array('type', $options)) {
             $attributesString .= ' type="' . $field['inputType'] . '"';
         }
@@ -53,10 +55,13 @@ abstract class Field
             $attributesString .= checked($field['checked'], true, false);
         }
         if (in_array('value', $options)) {
-            if (empty($field['value']) && !empty($field['defaultValue'])) {
-                $attributesString .= ' value="' . BaseFunctions::escape($field['defaultValue'], 'attr') . '"';
-            } elseif (!empty($field['value'])) {
+            $profileValue = User::getCurrent()->getMeta($field['name']);
+            if (!empty($field['value'])) {
                 $attributesString .= ' value="' . BaseFunctions::escape($field['value'], 'attr') . '"';
+            } elseif ($field['profileField'] && !empty($profileValue)) {
+                $attributesString .= ' value="' . BaseFunctions::escape($profileValue, 'attr') . '"';
+            } elseif (!empty($field['defaultValue'])) {
+                $attributesString .= ' value="' . BaseFunctions::escape($field['defaultValue'], 'attr') . '"';
             }
         }
         if (in_array('multiple', $options) && $field['multiple']) {
@@ -66,18 +71,18 @@ abstract class Field
             $attributesString .= ' size="' . BaseFunctions::escape($field['size'], 'attr') . '"';
         }
         if (in_array('for', $options)) {
-            $attributesString .= ' for="' . BaseFunctions::escape('input_' . $field['name'], 'attr') . '"';
+            $attributesString .= ' for="' . BaseFunctions::escape($field['formId'] . '_' . 'input_' . $field['name'], 'attr') . '"';
         }
-        if (in_array('autocomplete', $options)) {
+        if (in_array('autocomplete', $options) && !empty($field['autocomplete'])) {
             $attributesString .= ' autocomplete="' . $field['autocomplete'] . '"';
         }
-        if (in_array('placeholder', $options)) {
+        if (in_array('placeholder', $options) && !empty($field['placeholder'])) {
             $attributesString .= ' placeholder="' . $field['placeholder'] . '"';
         }
-        if (in_array('list', $options)) {
+        if (in_array('list', $options) && !empty($field['list'])) {
             $attributesString .= ' list="' . $field['list'] . '"';
         }
-        if (in_array('pattern', $options)) {
+        if (in_array('pattern', $options) && !empty($field['pattern'])) {
             $attributesString .= ' pattern="' . $field['pattern'] . '"';
         }
         return $attributesString;

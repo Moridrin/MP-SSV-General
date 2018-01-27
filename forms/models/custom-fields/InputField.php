@@ -122,7 +122,7 @@ abstract class InputField extends Field
 
     public function updateName($id, $postID)
     {
-        global $wpdb;
+                $wpdb = SSV_Global::getDatabase();
         $table = BaseFunctions::CUSTOMIZED_FIELDS_TABLE;
         $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
         $json  = $wpdb->get_var($sql);

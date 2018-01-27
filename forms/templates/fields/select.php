@@ -1,6 +1,7 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\SSV_Forms;
 
@@ -10,8 +11,7 @@ if (!defined('ABSPATH')) {
 
 function show_select_input_field(string $formId, array $field)
 {
-    /** @var wpdb $wpdb */
-    global $wpdb;
+    $wpdb = SSV_Global::getDatabase();
     $field += [
         'defaultValue' => null,
         'required'     => false,
@@ -24,7 +24,7 @@ function show_select_input_field(string $formId, array $field)
     $labelId         = BaseFunctions::escape('label_' . $field['name'], 'attr');
     $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
     $name            = $field['name'];
-    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
     if ($customizedField !== null) {
         $field             = json_decode($customizedField, true) + $field;
         $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);

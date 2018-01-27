@@ -1,6 +1,7 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\SSV_Forms;
 
@@ -10,8 +11,7 @@ if (!defined('ABSPATH')) {
 
 function show_default_input_field(string $formId, array $field)
 {
-    /** @var wpdb $wpdb */
-    global $wpdb;
+    $wpdb = SSV_Global::getDatabase();
     $field += [
         'defaultValue' => null,
         'required'     => false,
@@ -21,7 +21,7 @@ function show_default_input_field(string $formId, array $field)
     }
     $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
     $name            = $field['name'];
-    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
     if ($customizedField !== null) {
         $field                 = json_decode($customizedField, true) + $field;
         $field['required']     = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
@@ -39,6 +39,8 @@ function show_default_input_field(string $formId, array $field)
         'pattern',
     ];
     if (current_theme_supports('materialize')) {
+        $field['classes']['div'][] = 'input-field';
+        $field['classes']['input'][] = 'validate';
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>
             <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/>

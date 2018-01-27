@@ -56,7 +56,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <div class="inside">
                                     <ul id="wordPressBaseFieldsList">
                                         <?php foreach (Forms::getWordPressBaseFields() as $wordPressBaseField): ?>
-                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField) ?>' data-field-type="Input">
+                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField) ?>' data-type="Input" data-list="wordpress">
                                                 <span><strong><?= $wordPressBaseField->bf_title ?></strong></span>
                                                 <span style="float: right"><?= $wordPressBaseField->bf_inputType ?></span>
                                             </li>
@@ -71,13 +71,13 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                     <ul id="sharedBaseFieldsList">
                                         <?php if (!empty($sharedBaseFields)): ?>
                                             <?php foreach ($sharedBaseFields as $sharedBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField) ?>' data-field-type="Input">
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField) ?>' data-type="Input" data-list="shared">
                                                     <span><strong><?= $sharedBaseField->bf_title ?></strong></span>
                                                     <span style="float: right"><?= $sharedBaseField->bf_inputType ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>
-                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_base_fields_manager">Click Here</a> to create one.</li>
+                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_fields_manager">Click Here</a> to create one.</li>
                                         <?php endif; ?>
                                     </ul>
                                 </div>
@@ -89,13 +89,13 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                     <ul id="siteSpecificBaseFieldsList">
                                         <?php if (!empty($siteSpecificBaseFields)): ?>
                                             <?php foreach ($siteSpecificBaseFields as $siteSpecificBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField) ?>' data-field-type="Input">
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField) ?>' data-type="Input" data-list="siteSpecific">
                                                     <span><strong><?= $siteSpecificBaseField->bf_title ?></strong></span>
                                                     <span style="float: right"><?= $siteSpecificBaseField->bf_inputType ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>
-                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_base_fields_manager">Click Here</a> to create one.</li>
+                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_fields_manager">Click Here</a> to create one.</li>
                                         <?php endif; ?>
                                     </ul>
                                 </div>

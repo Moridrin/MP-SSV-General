@@ -4,6 +4,7 @@ namespace mp_ssv_general\custom_fields;
 
 use Exception;
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -42,8 +43,7 @@ abstract class Field
 
     public static function titleFromDatabase(string $name): string
     {
-        /** @var \wpdb $wpdb */
-        global $wpdb;
+        $wpdb = SSV_Global::getDatabase();
         $table = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
         return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }

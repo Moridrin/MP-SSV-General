@@ -1,5 +1,7 @@
 <?php
 
+use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -8,8 +10,7 @@ if (!defined('ABSPATH')) {
 
 function show_customized_form_fields_table(int $formId, array $fields)
 {
-    /** @var wpdb $wpdb */
-    global $wpdb;
+    $wpdb = SSV_Global::getDatabase();
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
@@ -28,8 +29,8 @@ function show_customized_form_fields_table(int $formId, array $fields)
                     $name            = $field->bf_name;
                     $properties      = [
                         'title'        => $field->bf_title,
-                        'classes'      => ['div' => '', 'label' => '', 'input' => ''],
-                        'styles'       => ['div' => '', 'label' => '', 'input' => ''],
+                        'classes'      => ['div' => '', 'title' => '', 'input' => ''],
+                        'styles'       => ['div' => '', 'title' => '', 'input' => ''],
                         'defaultValue' => '',
                         'required'     => false,
                         'placeholder'  => '',
@@ -39,8 +40,9 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         'step'         => null,
                         'min'          => null,
                         'max'          => null,
+                        'profileField' => true,
                     ];
-                    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+                    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
                     if ($customizedField !== null) {
                         $customizedField = json_decode($customizedField, true);
                         foreach ($customizedField as $key => $value) {
@@ -48,13 +50,22 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         }
                     }
                     ?>
-                    <tr id="<?= $field->bf_id ?>_tr" draggable="true" class="formField" data-base-field-name="<?= $field->bf_name ?>" data-input-type="<?= $field->bf_inputType ?>" data-options='<?= $field->bf_options ?>'
-                        data-properties='<?= json_encode($properties) ?>'>
+                    <tr
+                            id="<?= $field->bf_list . '_' . $field->bf_id ?>_tr"
+                            draggable="true"
+                            class="formField"
+                            data-base-field-name="<?= $field->bf_name ?>"
+                            data-list="<?= $field->bf_list ?>"
+                            data-type="<?= $field->bf_type ?>"
+                            data-input-type="<?= $field->bf_inputType ?>"
+                            data-options='<?= $field->bf_options ?>'
+                            data-properties='<?= json_encode($properties) ?>'
+                    >
                         <td>
                             <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
                             <strong id="<?= $field->bf_id ?>_title"><?= $properties['title'] ?></strong>
                             <?php if ($field->bf_inputType !== 'hidden'): ?>
-                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_id ?>')" class="editinline"
+                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_list ?>', '<?= $field->bf_id ?>')" class="editinline"
                                                                    aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
                             <?php endif; ?>
                         </td>

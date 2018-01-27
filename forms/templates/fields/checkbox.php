@@ -1,6 +1,7 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\SSV_Forms;
 
@@ -8,10 +9,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_checkbox_input_field(string $formId, array $field)
+function show_checkbox_input_field(array $field)
 {
-    /** @var wpdb $wpdb */
-    global $wpdb;
+    $wpdb = SSV_Global::getDatabase();
     $field += [
         'defaultValue' => null,
         'required'     => false,
@@ -21,30 +21,42 @@ function show_checkbox_input_field(string $formId, array $field)
     }
     $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
     $name            = $field['name'];
-    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_f_id = $formId AND cf_bf_name = '$name'");
+    $formId          = $field['formId'];
+    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
     if ($customizedField !== null) {
         $field             = json_decode($customizedField, true) + $field;
         $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
     }
-    $field['value'] = 'true';
+    $field['value']         = 'true';
+    $field['classes']       = [
+        'div'   => [],
+        'input' => ['filled-in'],
+        'label' => [],
+    ];
     $inputElementAttributes = [
         'type',
-        'value',
         'disabled',
         'checked',
         'required',
-        'autocomplete',
-        'placeholder',
-        'list',
-        'pattern',
     ];
     if (current_theme_supports('materialize')) {
-        ?>
-        <div <?= Field::getElementAttributesString($field, 'div') ?>>
-            <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape($field['defaultValue'], 'html') ?></label>
-            <label <?= Field::getElementAttributesString($field, 'title') ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
-        </div>
-        <?php
+        if (!empty($field['defaultValue'])) {
+            ?>
+            <div <?= Field::getElementAttributesString($field, 'div') ?>>
+                <label <?= Field::getElementAttributesString($field, 'title') ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
+                <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape(
+                        $field['defaultValue'],
+                        'html'
+                    ) ?></label>
+            </div>
+            <?php
+        } else {
+            ?>
+            <div <?= Field::getElementAttributesString($field, 'div') ?>>
+                <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <label <?= Field::getElementAttributesString($field, 'title', ['for']) ?>><?= BaseFunctions::escape($field['title'], 'html') ?></label>
+            </div>
+            <?php
+        }
     } else {
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>

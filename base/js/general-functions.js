@@ -44,5 +44,13 @@ let generalFunctions = {
         if (field !== null) {
             field.parentElement.removeChild(field);
         }
+    },
+
+    showError: function (message) {
+        document.getElementById('messagesContainer').innerHTML =
+            '<div class="notice notice-error">' +
+            '   <p>' + message + '</p>' +
+            '</div>'
+        ;
     }
 };

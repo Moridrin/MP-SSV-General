@@ -288,10 +288,25 @@ abstract class BaseFunctions
         return ob_get_clean();
     }
 
+    public static function getInputTypes(array $exclude = []): array
+    {
+        $inputTypes = [
+            'text',
+            'select',
+            'checkbox',
+            'role_checkbox',
+            'role_select',
+            'datetime',
+            'file',
+            'hidden',
+        ];
+        return array_diff($inputTypes, $exclude);
+    }
+
     public static function getInputTypeDataList(array $exclude = []): string
     {
         ob_start();
-        $inputTypes = array_diff(['Text', 'Select', 'Checkbox', 'Role Checkbox', 'Role Select', 'Datetime', 'File', 'Hidden'], $exclude);
+        $inputTypes = self::getInputTypes($exclude);
         ?>
         <datalist id="inputType">
             <?php foreach ($inputTypes as $inputType): ?>
@@ -352,7 +367,11 @@ abstract class BaseFunctions
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
                 break;
             case 'int':
-                $value = intval($value);
+                if (strval($value) === '') {
+                    $value = null;
+                } else {
+                    $value = intval($value);
+                }
                 break;
             case 'role':
             case 'role_select':

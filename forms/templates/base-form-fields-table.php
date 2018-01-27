@@ -9,14 +9,12 @@ if (!defined('ABSPATH')) {
 function show_base_form_fields_table(array $fields, string $order = 'asc', string $orderBy = 'bf_title', bool $canManage = false)
 {
     $newOrder         = $order === 'asc' ? 'desc' : 'asc';
-    $orderByTitle     = ($orderBy === 'bf_title' ? 'sorted' : '');
-    $orderByName      = ($orderBy === 'bf_name' ? 'sorted' : '');
-    $orderByInputType = ($orderBy === 'bf_inputType' ? 'sorted' : '');
-    $orderByValue     = ($orderBy === 'bf_value' ? 'sorted' : '');
-    $orderTitle       = ($orderBy === 'bf_title' ? $newOrder : $order);
-    $orderName        = ($orderBy === 'bf_name' ? $newOrder : $order);
-    $orderInputType   = ($orderBy === 'bf_inputType' ? $newOrder : $order);
-    $orderValue       = ($orderBy === 'bf_value' ? $newOrder : $order);
+    $orderByName      = ($orderBy === 'name' ? 'sorted' : '');
+    $orderByInputType = ($orderBy === 'inputType' ? 'sorted' : '');
+    $orderByValue     = ($orderBy === 'value' ? 'sorted' : '');
+    $orderName        = ($orderBy === 'name' ? $newOrder : $order);
+    $orderInputType   = ($orderBy === 'inputType' ? $newOrder : $order);
+    $orderValue       = ($orderBy === 'value' ? $newOrder : $order);
     ?>
     <div style="overflow-x: auto;">
         <?php if ($canManage): ?>
@@ -40,65 +38,63 @@ function show_base_form_fields_table(array $fields, string $order = 'asc', strin
                         <input id="cb-select-all-1" type="checkbox">
                     <?php endif; ?>
                 </td>
-                <th scope="col" id="title" class="manage-column column-name column-primary sortable <?= BaseFunctions::escape($orderTitle, 'attr') ?> <?= $orderByTitle ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
-                </th>
                 <th scope="col" id="name" class="manage-column column-name sortable <?= BaseFunctions::escape($orderName, 'attr') ?> <?= $orderByName ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_name&order=<?= BaseFunctions::escape($orderName, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=name&order=<?= BaseFunctions::escape($orderName, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="input_type" class="manage-column column-name sortable <?= BaseFunctions::escape($orderInputType, 'attr') ?> <?= $orderByInputType ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_inputType&order=<?= BaseFunctions::escape($orderInputType, 'attr') ?>"><span>Input Type</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=inputType&order=<?= BaseFunctions::escape($orderInputType, 'attr') ?>"><span>Input Type</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="value" class="manage-column column-name sortable <?= BaseFunctions::escape($orderValue, 'attr') ?> <?= $orderByValue ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_value&order=<?= BaseFunctions::escape($orderValue, 'attr') ?>"><span>Value</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=value&order=<?= BaseFunctions::escape($orderValue, 'attr') ?>"><span>Value</span><span class="sorting-indicator"></span></a>
                 </th>
             </tr>
             </thead>
             <tbody id="the-list">
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
-                    <?php if ($field->bf_id !== null): ?>
-                        <tr id="<?= $field->bf_id ?>_tr" class="inactive">
-                            <th id="<?= $field->bf_id ?>_id_td" class="check-column">
+                    <?php $properties = json_decode($field->bf_properties); ?>
+                    <?php $properties->value = isset($properties->value) ? $properties->value : '' ?>
+                    <?php if ($field->bf_name !== null): ?>
+                        <tr id="field_<?= $field->bf_name ?>" class="inactive" data-properties='<?= json_encode($properties) ?>'>
+                            <th class="check-column">
                                 <?php if ($canManage): ?>
-                                    <input type="checkbox" id="<?= $field->bf_id ?>_id" name="fieldIds[]" value="<?= $field->bf_id ?>">
+                                    <input type="checkbox" name="fieldNames[]" value="<?= $field->bf_name ?>">
                                 <?php endif; ?>
                             </th>
-                            <td id="<?= $field->bf_id ?>_field_title_td">
-                                <strong><?= $field->bf_title ?></strong>
+                            <td>
+                                <strong><?= $field->bf_name ?></strong>
                                 <div class="row-actions">
                                     <?php if ($canManage): ?>
-                                        <span class="inline hide-if-no-js"><a href="javascript:void(0)" onclick="fieldsManager.inlineEdit('<?= $field->bf_id ?>')" class="editinline" aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick&nbsp;Edit</a> | </span>
-                                        <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_id ?>')" class="submitdelete" aria-label="Delete “<?= $field->bf_title ?>”">Trash</a></span>
+                                        <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.edit('<?= $field->bf_name ?>')" class="editinline">Edit</a> | </span>
+                                        <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.customize('<?= $field->bf_name ?>')" class="editinline">Customize</a> | </span>
+                                        <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_name ?>')" class="submitdelete">Trash</a></span>
                                     <?php endif; ?>
                                 </div>
                             </td>
-                            <td id="<?= $field->bf_id ?>_name_td">
-                                <?= $field->bf_name ?>
+                            <td>
+                                <?= $properties->type ?>
                             </td>
-                            <td id="<?= $field->bf_id ?>_inputType_td">
-                                <?= $field->bf_inputType ?>
-                            </td>
-                            <?php if ($field->bf_inputType === 'select' || $field->bf_inputType === 'role_select'): ?>
-                                <td class="value_td" id="<?= $field->bf_id ?>_value_td">
-                                    <?= $field->bf_options ?>
-                                </td>
-                            <?php elseif ($field->bf_inputType === 'hidden'): ?>
-                                <td class="value_td" id="<?= $field->bf_id ?>_value_td">
-                                    <?= $field->bf_value ?>
+                            <?php if ($properties->type === 'select' || $properties->type === 'role_select' || $properties->type === 'hidden'): ?>
+                                <td class="value_td">
+                                    <?php
+                                    if (is_array($properties->value)) {
+                                        $properties->value = implode(',', $properties->value);
+                                    }
+                                    echo $properties->value;
+                                    ?>
                                 </td>
                             <?php else: ?>
-                                <td id="<?= $field->bf_id ?>_empty_td"></td>
+                                <td></td>
                             <?php endif; ?>
                         </tr>
                     <?php else: ?>
                         <tr>
                             <th class="check-column">
                             </th>
-                            <td><strong><?= $field->bf_title ?></strong></td>
-                            <td><?= $field->bf_name ?></td>
-                            <td><?= $field->bf_inputType ?></td>
-                            <td id="<?= $field->bf_id ?>_empty_td"></td>
+                            <td><strong><?= $properties->title ?></strong></td>
+                            <td><?= $properties->name ?></td>
+                            <td><?= $properties->inputType ?></td>
+                            <td></td>
                         </tr>
                     <?php endif; ?>
                 <?php endforeach; ?>
@@ -116,17 +112,14 @@ function show_base_form_fields_table(array $fields, string $order = 'asc', strin
                         <input id="cb-select-all-1" type="checkbox">
                     <?php endif; ?>
                 </td>
-                <th scope="col" id="title" class="manage-column column-name column-primary sortable <?= BaseFunctions::escape($orderTitle, 'attr') ?> <?= $orderByTitle ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_title&order=<?= BaseFunctions::escape($orderTitle, 'attr') ?>"><span>Title</span><span class="sorting-indicator"></span></a>
-                </th>
                 <th scope="col" id="name" class="manage-column column-name sortable <?= BaseFunctions::escape($orderName, 'attr') ?> <?= $orderByName ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_name&order=<?= BaseFunctions::escape($orderName, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=name&order=<?= BaseFunctions::escape($orderName, 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="input_type" class="manage-column column-name sortable <?= BaseFunctions::escape($orderInputType, 'attr') ?> <?= $orderByInputType ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_inputType&order=<?= BaseFunctions::escape($orderInputType, 'attr') ?>"><span>Input Type</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=inputType&order=<?= BaseFunctions::escape($orderInputType, 'attr') ?>"><span>Input Type</span><span class="sorting-indicator"></span></a>
                 </th>
                 <th scope="col" id="value" class="manage-column column-name sortable <?= BaseFunctions::escape($orderValue, 'attr') ?> <?= $orderByValue ?>">
-                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=bf_value&order=<?= BaseFunctions::escape($orderValue, 'attr') ?>"><span>Value</span><span class="sorting-indicator"></span></a>
+                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=value&order=<?= BaseFunctions::escape($orderValue, 'attr') ?>"><span>Value</span><span class="sorting-indicator"></span></a>
                 </th>
             </tr>
             </tfoot>

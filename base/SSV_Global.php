@@ -25,6 +25,8 @@ abstract class SSV_Global
     const OPTIONS_ADMIN_REFERER = 'ssv_general__options_admin_referer';
     const BASE_FORM_FIELDS_BULK_ACTIONS = 'ssv_general__base_form_fields_bulk_actions';
 
+    private static $database = null;
+
     public static function getLoginURL()
     {
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
@@ -65,7 +67,7 @@ abstract class SSV_Global
 
     public static function runFunctionOnAllSites(callable $callable, ...$args)
     {
-        global $wpdb;
+        $wpdb = SSV_Global::getDatabase();
         if (is_multisite()) {
             $blogIds = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
         } else {
@@ -77,7 +79,8 @@ abstract class SSV_Global
             restore_current_blog();
         }
     }
-    public static function addSettingsPage(string $mainTitle, string $subTitle, string $capability = 'edit_posts', array $function)
+
+    public static function addSettingsPage(string $mainTitle, string $subTitle, string $capability = 'edit_posts', callable $function)
     {
         if (empty($GLOBALS['admin_page_hooks']['ssv_settings'])) {
             add_menu_page($mainTitle, $mainTitle, $capability, 'ssv_settings');
@@ -89,10 +92,47 @@ abstract class SSV_Global
                     $menuItem[0] = 'SSV Settings';
                 }
             }
-            add_submenu_page('ssv_settings', $subTitle, $subTitle, $capability, 'ssv_'.BaseFunctions::toSnakeCase($subTitle), $function);
+            add_submenu_page('ssv_settings', $subTitle, $subTitle, $capability, 'ssv_' . BaseFunctions::toSnakeCase($subTitle), $function);
         }
+    }
+
+    public static function getErrors()
+    {
+        ob_start();
+        foreach ($_SESSION['SSV']['errors'] as $error) {
+            ?>
+            <div class="notice notice-error">
+                <p><?= $error ?></p>
+            </div>
+            <?php
+        }
+        $_SESSION['SSV']['errors'] = [];
+        return ob_get_clean();
+    }
+
+    public static function showErrors()
+    {
+        ?>
+        <div id="messagesContainer" class="notice">
+            <?= self::getErrors() ?>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                document.getElementById('messagesContainer').setAttribute('class', '');
+            });
+        </script>
+        <?php
+    }
+
+    public static function getDatabase(): Database
+    {
+        if (!(self::$database instanceof Database)) {
+            self::$database = new Database();
+        }
+        return self::$database;
     }
 }
 
 add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);
 add_action('wp_enqueue_scripts', [SSV_Global::class, 'enqueueScripts']);
+add_action('admin_notices', [SSV_Global::class, 'showErrors']);
