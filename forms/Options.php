@@ -179,19 +179,9 @@ abstract class Options
     {
         if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                mp_ssv_general_forms_delete_shared_base_fields(false);
-            } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
-                $_POST['values'] = [
-                    'bf_id'        => $_POST['_inline_edit'],
-                    'bf_name'      => $_POST['name'],
-                    'bf_title'     => $_POST['title'],
-                    'bf_inputType' => $_POST['inputType'],
-                    'bf_value'     => isset($_POST['value']) ? $_POST['value'] : null,
-                    'bf_options'   => isset($_POST['options']) ? $_POST['options'] : null,
-                ];
-                mp_ssv_general_forms_save_shared_base_field(false);
+                mp_ssv_general_forms_delete_fields(true);
             } else {
-                echo '<div class="notice error">Something unexpected happened. Please try again.</div>';
+                $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
         }
         $wpdb = SSV_Global::getDatabase();
@@ -215,27 +205,14 @@ abstract class Options
     {
         if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                mp_ssv_general_forms_delete_site_specific_base_fields(false);
-            } elseif ($_POST['action'] === '-1' && isset($_POST['_inline_edit'])) {
-                $value = isset($_POST['value']) ? $_POST['value'] : null;
-                if (is_array($value)) {
-                    $value = implode(';', $value);
-                }
-                $_POST['values'] = [
-                    'bf_id'        => $_POST['_inline_edit'],
-                    'bf_name'      => $_POST['name'],
-                    'bf_title'     => $_POST['title'],
-                    'bf_inputType' => $_POST['inputType'],
-                    'bf_value'     => $value,
-                ];
-                mp_ssv_general_forms_save_site_specific_base_field(false);
+                mp_ssv_general_forms_delete_fields(false);
             } else {
-                echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
+                $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
         }
         $wpdb = SSV_Global::getDatabase();
         $order      = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
-        $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_title', 'text');
+        $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_name', 'text');
         $baseTable  = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
         $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="fieldsManager.addNew(\'the-list\', \'\')">Add New</a>';

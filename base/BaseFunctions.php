@@ -317,6 +317,13 @@ abstract class BaseFunctions
         return ob_get_clean();
     }
 
+    /**
+     * @param             $value
+     * @param             $sanitationType
+     * @param string|null $implode
+     *
+     * @return mixed
+     */
     public static function sanitize($value, $sanitationType, string $implode = null)
     {
         if (is_array($value)) {

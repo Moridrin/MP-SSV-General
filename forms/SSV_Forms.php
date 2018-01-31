@@ -95,6 +95,19 @@ abstract class SSV_Forms
         $page      = isset($_GET['page']) ? $_GET['page'] : null;
         $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'shared';
         if ($page === 'ssv_forms_fields_manager') {
+
+            $wpdb = SSV_Global::getDatabase();
+            $sharedBaseFieldsTable = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
+            $usedFieldNames = $wpdb->get_col("SELECT bf_name FROM $sharedBaseFieldsTable");
+            if ($activeTab !== 'shared') {
+                $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
+                $usedFieldNames = array_merge($usedFieldNames, $wpdb->get_col("SELECT bf_name FROM $siteSpecificBaseFieldsTable"));
+            }
+            $duplicateNames = array_diff_assoc($usedFieldNames, array_unique($usedFieldNames));
+            foreach ($duplicateNames as $duplicateName) {
+                $_SESSION['SSV']['errors'][] = 'The field with the name \'' . $duplicateName . '\' is not unique. Fields with the same name can cause loss of data!';
+            }
+
             wp_enqueue_script('mp-ssv-fields-manager', SSV_Forms::URL . '/js/fields-manager.js', ['jquery']);
             wp_localize_script(
                 'mp-ssv-fields-manager',
@@ -112,7 +125,7 @@ abstract class SSV_Forms
                     ],
                     'isShared' => $activeTab === 'shared',
                     'roles' => array_keys(get_editable_roles()),
-                    'usedNames' => [],
+                    'usedFieldNames' => $usedFieldNames,
                     'inputTypes' => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
                     'formId' => isset($_GET['id']) ? $_GET['id'] : null,
                 ]

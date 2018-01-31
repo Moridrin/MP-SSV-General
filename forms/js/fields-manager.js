@@ -243,15 +243,23 @@ let fieldsManager = {
         },
 
         onKeyDown: function () {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                let editType = document.getElementById('edit-type').dataset.editType;
-                if (editType === 'edit') {
+            let $nameInput = event.path[0];
+            let editType = document.getElementById('edit-type').dataset.editType;
+            if (editType === 'edit') {
+                if (event.keyCode === 13) {
                     fieldsManager.saveEdit();
-                } else if (editType === 'customize') {
-                    fieldsManager.saveCustomization();
+                    event.preventDefault();
+                    return false;
+                } else {
+                    $nameInput.setCustomValidity('');
+                    $nameInput.reportValidity();
                 }
-                return false;
+            } else if (editType === 'customize') {
+                if (event.keyCode === 13) {
+                    fieldsManager.saveCustomization();
+                    event.preventDefault();
+                    return false;
+                }
             }
         },
 
@@ -518,6 +526,8 @@ let fieldsManager = {
                 params.urls.ajax,
                 {
                     action: params.actions.delete,
+                    shared: params.isShared,
+                    formId: params.formId,
                     fieldNames: [fieldName],
                 },
                 function (data) {
@@ -549,19 +559,20 @@ let fieldsManager = {
     },
 
     cancel: function () {
-        let tr = document.getElementById('field_' + this.editor.current);
-        let properties = JSON.parse(tr.dataset.properties);
-        if (properties.name !== '') {
-            this.closeEditor();
-        } else {
-            this.deleteRow(properties.name);
-        }
+        this.closeEditor();
     },
 
     saveEdit: function () {
         let tr = document.getElementById('field_' + this.editor.current);
         let properties = JSON.parse(tr.dataset.properties);
-        properties.name = tr.querySelector('input[name="name"]').value;
+        let $nameInput = tr.querySelector('input[name="name"]');
+        if (params.usedFieldNames.indexOf($nameInput.value) !== -1) {
+            $nameInput.setCustomValidity('This field name is already used.');
+            $nameInput.reportValidity();
+            return;
+        } else {
+            properties.name = $nameInput.value;
+        }
         properties.type = tr.querySelector('select[name="type"]').value;
         if (properties.type === 'hidden') {
             properties.value = tr.querySelector('input[name="value"]').value;
@@ -646,6 +657,9 @@ let fieldsManager = {
         let fieldName = this.editor.current;
         let tr = document.getElementById('field_' + fieldName);
         let properties = JSON.parse(tr.dataset.properties);
+        if (properties.name === '') {
+            this.deleteRow(properties.name);
+        }
         tr.innerHTML =
             '<th class="check-column">' +
             '   <input type="checkbox" name="fieldNames[]" value="\'' + fieldName + '\'">' +

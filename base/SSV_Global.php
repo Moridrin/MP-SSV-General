@@ -96,7 +96,7 @@ abstract class SSV_Global
         }
     }
 
-    public static function getErrors()
+    public static function getErrors($clear = true)
     {
         ob_start();
         foreach ($_SESSION['SSV']['errors'] as $error) {
@@ -106,22 +106,26 @@ abstract class SSV_Global
             </div>
             <?php
         }
-        $_SESSION['SSV']['errors'] = [];
+        if ($clear) {
+            $_SESSION['SSV']['errors'] = [];
+        }
         return ob_get_clean();
     }
 
     public static function showErrors()
     {
-        ?>
-        <div id="messagesContainer" class="notice">
-            <?= self::getErrors() ?>
-        </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", function (event) {
-                document.getElementById('messagesContainer').setAttribute('class', '');
-            });
-        </script>
-        <?php
+        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+            ?>
+            <div id="messagesContainer" class="notice">
+                <?= self::getErrors() ?>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function (event) {
+                    document.getElementById('messagesContainer').setAttribute('class', '');
+                });
+            </script>
+            <?php
+        }
     }
 
     public static function getDatabase(): Database
@@ -135,4 +139,4 @@ abstract class SSV_Global
 
 add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);
 add_action('wp_enqueue_scripts', [SSV_Global::class, 'enqueueScripts']);
-add_action('admin_notices', [SSV_Global::class, 'showErrors']);
+add_action('shutdown', [SSV_Global::class, 'showErrors']);
