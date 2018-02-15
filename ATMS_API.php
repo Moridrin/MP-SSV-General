@@ -22,8 +22,8 @@ class ATMS_API
         'phone' => 'phone_number',
         'street' => 'address'
     ];
-    
-    public static function get($url, $token=null)
+
+    public static function get($url)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, get_option('atms_url') . '/api/v1/' . $url);
@@ -35,12 +35,14 @@ class ATMS_API
         $headers = curl_getinfo($ch);
         curl_close($ch);
 
-        if($headers['http_code']==200)
-        {
+        if (stristr($headers['content_type'], 'text/html')) {
+            return $bodyStr;
+        }
+
+        if ($headers['http_code'] == 200) {
             // Request succeeded
             return json_decode($bodyStr, true);
-        }else
-        {
+        } else {
             throw new \Exception('ATMS API responded with ' . $headers['http_code']);
         }
     }
@@ -63,44 +65,67 @@ class ATMS_API
         $headers = curl_getinfo($ch);
         curl_close($ch);
 
-        if($headers['http_code']==200)
-        {
+        if ($headers['http_code'] == 200) {
             // Request succeeded
             return json_decode($bodyStr, true);
-        }else
-        {
+        } else {
+            throw new \Exception('ATMS API responded with ' . $headers['http_code']);
+        }
+    }
+
+    public static function post($url, $data)
+    {
+        $data_json = json_encode($data);
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, get_option('atms_url') . '/api/v1/' . $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: ' . get_option('atms_key'),
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($data_json)
+        ]);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $bodyStr = curl_exec($ch);
+
+        $headers = curl_getinfo($ch);
+        curl_close($ch);
+
+        if (stristr($headers['content_type'], 'text/html')) {
+            return $bodyStr;
+        }
+        if ($headers['http_code'] == 200) {
+            // Request succeeded
+            return json_decode($bodyStr, true);
+        } else {
             throw new \Exception('ATMS API responded with ' . $headers['http_code']);
         }
     }
 
     public static function deleteCache($url)
     {
-        $key = "atms-api-".$url;
+        $key = "atms-api-" . $url;
         $group = "atms";
 
         delete_transient($key);
         wp_cache_delete($key, $group);
     }
 
-    public static function cache($url, $expiration = 120, $persistent=true)
+    public static function cache($url, $expiration = 120, $persistent = true)
     {
-        $key = "atms-api-".$url;
+        $key = "atms-api-" . $url;
         $group = "atms";
 
-        if($persistent)
-        {
+        if ($persistent) {
             $data = get_transient($key);
-            if($data===false)
-            {
+            if ($data === false) {
                 $data = self::get($url);
                 set_transient($key, $data, $expiration);
                 return $data;
             }
-        }else
-        {
+        } else {
             $data = wp_cache_get($key, $group);
-            if($data===false)
-            {
+            if ($data === false) {
                 $data = self::get($url);
                 wp_cache_set($key, $data, $group, $expiration);
             }
