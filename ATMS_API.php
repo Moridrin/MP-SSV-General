@@ -73,7 +73,7 @@ class ATMS_API
         }
     }
 
-    public static function post($url, $data)
+    public static function post($url, $data, $full = false)
     {
         $data_json = json_encode($data);
         $ch = curl_init();
@@ -91,6 +91,12 @@ class ATMS_API
         $headers = curl_getinfo($ch);
         curl_close($ch);
 
+        if ($full) {
+            return [
+                'status' => $headers['http_code'],
+                'body' => $bodyStr
+            ];
+        }
         if (stristr($headers['content_type'], 'text/html')) {
             return $bodyStr;
         }
