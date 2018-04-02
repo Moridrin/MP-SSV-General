@@ -3,6 +3,7 @@
 namespace mp_ssv_general\custom_fields\input_fields;
 
 use Exception;
+use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 use mp_ssv_general\User;
@@ -42,7 +43,7 @@ class RoleCheckboxInputField extends InputField
      * @return RoleCheckboxInputField
      * @throws Exception
      */
-    public static function fromJSON($json)
+    public static function fromJSON($json): Field
     {
         $values = json_decode($json);
         if ($values->input_type != self::INPUT_TYPE) {
@@ -59,10 +60,7 @@ class RoleCheckboxInputField extends InputField
         );
     }
 
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
+    public function toJSON(): string
     {
         $values = array(
             'container_id'   => $this->containerID,
@@ -82,7 +80,7 @@ class RoleCheckboxInputField extends InputField
     /**
      * @return string the field as HTML object.
      */
-    public function getHTML()
+    public function getHTML(): string
     {
         $name     = 'name="' . esc_html($this->name) . '"';
         $class    = !empty($this->classes) ? 'class="' . esc_html($this->classes) . '"' : 'class="validate filled-in"';

@@ -2,8 +2,6 @@
 
 namespace mp_ssv_general\base;
 
-use mp_ssv_users\SSV_Users;
-
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -67,9 +65,15 @@ abstract class SSV_Global
 
     public static function runFunctionOnAllSites(callable $callable, ...$args)
     {
-        $wpdb = SSV_Global::getDatabase();
+        if (is_array($args) && array_key_exists('callables', $args)) {
+            foreach ($args['callables'] as $callable) {
+                $args[] = call_user_func($callable);
+            }
+            unset($args['callables']);
+        }
+        $database = SSV_Global::getDatabase();
         if (is_multisite()) {
-            $blogIds = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+            $blogIds = $database->get_col("SELECT blog_id FROM ".$database->getBlogsTable());
         } else {
             $blogIds = [get_current_blog_id()];
         }
@@ -130,9 +134,7 @@ abstract class SSV_Global
 
     public static function getDatabase(): Database
     {
-        if (!(self::$database instanceof Database)) {
-            self::$database = new Database();
-        }
+        self::$database = new Database();
         return self::$database;
     }
 }

@@ -7,7 +7,7 @@ let formsManager = {
             urls.ajax,
             {
                 action: actions.delete,
-                formIds: [formId],
+                formIds: [formId]
             }
         );
         event.preventDefault();

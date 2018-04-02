@@ -11,7 +11,7 @@ if (!function_exists('mp_ssv_general_forms_save_field')) {
         $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
         $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
         $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         if ($formId !== null) {
             $table = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
             $values = [
@@ -34,9 +34,9 @@ if (!function_exists('mp_ssv_general_forms_save_field')) {
         }
         $oldName = BaseFunctions::sanitize($_POST['oldName'], 'text');
         if (empty($oldName)) {
-            $wpdb->insert($table, $values);
+            $database->insert($table, $values);
         } elseif ($oldName !== $values['bf_name']) {
-            $userIds = $wpdb->get_col('SELECT ID FROM ' . $wpdb->users);
+            $userIds = $database->get_col('SELECT ID FROM ' . $database->getUsersTable());
             foreach ($userIds as $userId) {
                 $user = User::getByID($userId);
                 $value = $user->getMeta($oldName);
@@ -45,9 +45,9 @@ if (!function_exists('mp_ssv_general_forms_save_field')) {
                     $user->removeMeta($values['bf_name']);
                 }
             }
-            $wpdb->update($table, $values, ['bf_name' => BaseFunctions::sanitize($_POST['oldName'], 'text')]);
+            $database->update($table, $values, ['bf_name' => BaseFunctions::sanitize($_POST['oldName'], 'text')]);
         } else {
-            $wpdb->replace($table, $values);
+            $database->replace($table, $values);
         }
         if (defined('DOING_AJAX') && DOING_AJAX) {
             wp_die(SSV_Global::getErrors());
@@ -67,12 +67,12 @@ if (!function_exists('mp_ssv_general_forms_delete_fields')) {
             $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
         }
         $fieldNames = BaseFunctions::sanitize($_POST['fieldNames'], 'text');
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         if ($formId !== null) {
             $table = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-            $formFields = json_decode($wpdb->get_var("SELECT f_fields FROM $table WHERE f_id = $formId"), true);
+            $formFields = json_decode($database->get_var("SELECT f_fields FROM $table WHERE f_id = $formId"), true);
             $formFields = array_diff($formFields, $fieldNames);
-            $wpdb->update($table, ['f_fields' => $formFields], ['f_id' => $formId]);
+            $database->update($table, ['f_fields' => $formFields], ['f_id' => $formId]);
         } else {
             if ($shared) {
                 $table = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
@@ -80,7 +80,7 @@ if (!function_exists('mp_ssv_general_forms_delete_fields')) {
                 $table = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
             }
             $fieldNames   = '\'' . implode('\', \'', $fieldNames) . '\'';
-            $wpdb->query("DELETE FROM $table WHERE bf_name IN ($fieldNames)");
+            $database->query("DELETE FROM $table WHERE bf_name IN ($fieldNames)");
         }
         if (defined('DOING_AJAX') && DOING_AJAX) {
             wp_die(SSV_Global::getErrors());
@@ -93,10 +93,10 @@ if (!function_exists('mp_ssv_general_forms_delete_fields')) {
 if (!function_exists('mp_ssv_general_forms_delete_shared_forms')) {
     function mp_ssv_general_forms_delete_shared_forms(bool $ajaxRequest = true)
     {
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $table = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
         $ids   = implode(', ', $_POST['formIds']);
-        $wpdb->query("DELETE FROM $table WHERE f_id IN ($ids)");
+        $database->query("DELETE FROM $table WHERE f_id IN ($ids)");
         if ($ajaxRequest) {
             wp_die(SSV_Global::getErrors());
         }

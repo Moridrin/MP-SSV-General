@@ -122,10 +122,10 @@ abstract class InputField extends Field
 
     public function updateName($id, $postID)
     {
-                $wpdb = SSV_Global::getDatabase();
+                $database = SSV_Global::getDatabase();
         $table = BaseFunctions::CUSTOMIZED_FIELDS_TABLE;
         $sql   = "SELECT customField FROM $table WHERE ID = $id AND postID = $postID";
-        $json  = $wpdb->get_var($sql);
+        $json  = $database->get_var($sql);
         if (empty($json)) {
             return;
         }
@@ -133,8 +133,8 @@ abstract class InputField extends Field
         if (!$field instanceof InputField) {
             return;
         }
-        $wpdb->update(
-            $wpdb->usermeta,
+        $database->update(
+            $database->usermeta,
             array(
                 'meta_key' => $this->name,
             ),

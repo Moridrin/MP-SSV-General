@@ -5,7 +5,6 @@ namespace mp_ssv_general\forms;
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Forms;
-use wpdb;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -54,11 +53,11 @@ abstract class Options
                     echo '<div class="notice error">Something unexpected happened. Please try again.</div>';
                 }
             }
-            $wpdb = SSV_Global::getDatabase();
+            $database = SSV_Global::getDatabase();
             $order      = isset($_GET['order']) ? BaseFunctions::sanitize($_GET['order'], 'text') : 'asc';
             $orderBy    = isset($_GET['orderby']) ? BaseFunctions::sanitize($_GET['orderby'], 'text') : 'bf_title';
             $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-            $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
+            $baseFields = $database->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
             $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="fieldsManager.addNew(\'the-list\', \'\')">Add New</a>';
             ?>
             <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
@@ -79,8 +78,8 @@ abstract class Options
             <div class="wrap">
                 <?php
                 if (BaseFunctions::isValidPOST(SSV_Forms::EDIT_FORM_ADMIN_REFERER)) {
-                    $wpdb = SSV_Global::getDatabase();
-                    $wpdb->replace(
+                    $database = SSV_Global::getDatabase();
+                    $database->replace(
                         SSV_Forms::SITE_SPECIFIC_FORMS_TABLE,
                         [
                             'f_id'     => $_POST['form_id'],
@@ -89,10 +88,6 @@ abstract class Options
                             'f_fields' => json_encode(isset($_POST['form_fields']) ? $_POST['form_fields'] : []),
                         ]
                     );
-                    if ($wpdb->last_error) {
-                        $_SESSION['SSV']['errors'][] = $wpdb->last_error;
-                        SSV_Global::showErrors();
-                    }
                 } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
                     if ($_POST['action'] === 'delete-selected') {
                         mp_ssv_general_forms_delete_shared_forms(false);
@@ -100,11 +95,11 @@ abstract class Options
                         echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
                     }
                 }
-                $wpdb = SSV_Global::getDatabase();
+                $database = SSV_Global::getDatabase();
                 $order   = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
                 $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');
                 $table   = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-                $forms   = $wpdb->get_results("SELECT * FROM $table ORDER BY $orderBy $order");
+                $forms   = $database->get_results("SELECT * FROM $table ORDER BY $orderBy $order");
                 $addNew  = '<a href="?page=ssv_forms_add_new_form" class="page-title-action">Add New</a>';
                 ?>
                 <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
@@ -126,19 +121,19 @@ abstract class Options
 
     public static function showEditFormPage()
     {
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $sharedBaseFieldsTable       = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $formsTable                  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $baseSharedFields            = $wpdb->get_results("SELECT * FROM $sharedBaseFieldsTable ORDER BY bf_title");
-        $baseSiteSpecificFields      = $wpdb->get_results("SELECT * FROM $siteSpecificBaseFieldsTable ORDER BY bf_title");
+        $baseSharedFields            = $database->get_results("SELECT * FROM $sharedBaseFieldsTable ORDER BY bf_title");
+        $baseSiteSpecificFields      = $database->get_results("SELECT * FROM $siteSpecificBaseFieldsTable ORDER BY bf_title");
         if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
             $id         = $_GET['id'];
-            $formName   = $wpdb->get_var("SELECT f_title FROM $formsTable WHERE f_id = $id");
-            $fieldNames = json_decode($wpdb->get_var("SELECT f_fields FROM $formsTable WHERE f_id = $id"));
+            $formName   = $database->get_var("SELECT f_title FROM $formsTable WHERE f_id = $id");
+            $fieldNames = json_decode($database->get_var("SELECT f_fields FROM $formsTable WHERE f_id = $id"));
             $formFields = Forms::getFormFields($fieldNames);
         } else {
-            $id         = $wpdb->get_var("SELECT MAX(f_id) AS maxId FROM $formsTable") + 1;
+            $id         = $database->get_var("SELECT MAX(f_id) AS maxId FROM $formsTable") + 1;
             $formName   = '';
             $formFields = [];
         }
@@ -184,14 +179,11 @@ abstract class Options
                 $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
         }
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $order      = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'name', 'text');
         $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-        $baseFields = $wpdb->get_results("SELECT *, JSON_EXTRACT(bf_properties, '$.$orderBy') AS $orderBy FROM $baseTable ORDER BY $orderBy $order");
-        if ($wpdb->last_error) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
-        }
+        $baseFields = $database->get_results("SELECT *, JSON_EXTRACT(bf_properties, '$.$orderBy') AS $orderBy FROM $baseTable ORDER BY $orderBy $order");
         $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="fieldsManager.addNew(\'the-list\', \'\')">Add New</a>';
         ?>
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
@@ -210,11 +202,11 @@ abstract class Options
                 $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
         }
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $order      = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'bf_name', 'text');
         $baseTable  = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-        $baseFields = $wpdb->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
+        $baseFields = $database->get_results("SELECT * FROM $baseTable ORDER BY $orderBy $order");
         $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="fieldsManager.addNew(\'the-list\', \'\')">Add New</a>';
         ?>
         <h1 class="wp-heading-inline"><span>Site Specific Form Fields</span><?= current_user_can('manage_site_specific_base_fields') ? $addNew : '' ?></h1>

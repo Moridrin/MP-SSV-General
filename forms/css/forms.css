@@ -19,8 +19,7 @@
     /*display: inline-block;*/
 /*}*/
 
-#wordPressBaseFieldsList,
-#baseFieldsList {
+#wordPressBaseFieldsList {
     margin-bottom: 0;
 }
 

@@ -4,6 +4,7 @@ namespace mp_ssv_general\custom_fields\input_fields;
 
 use DateTime;
 use Exception;
+use mp_ssv_general\custom_fields\Field;
 use mp_ssv_general\custom_fields\InputField;
 use mp_ssv_general\Message;
 
@@ -63,7 +64,7 @@ class DateInputField extends InputField
      * @return DateInputField
      * @throws Exception
      */
-    public static function fromJSON($json)
+    public static function fromJSON($json): Field
     {
         $values = json_decode($json);
         if ($values->input_type != self::INPUT_TYPE) {
@@ -85,10 +86,7 @@ class DateInputField extends InputField
         );
     }
 
-    /**
-     * @return string the class as JSON object.
-     */
-    public function toJSON()
+    public function toJSON(): string
     {
         $values = array(
             'container_id'      => $this->containerID,

@@ -1,6 +1,5 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\SSV_Forms;
 
@@ -10,7 +9,7 @@ if (!defined('ABSPATH')) {
 
 function show_customized_form_fields_table(int $formId, array $fields)
 {
-    $wpdb = SSV_Global::getDatabase();
+    $database = SSV_Global::getDatabase();
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
@@ -42,7 +41,7 @@ function show_customized_form_fields_table(int $formId, array $fields)
                         'max'          => null,
                         'profileField' => true,
                     ];
-                    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
+                    $customizedField = $database->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
                     if ($customizedField !== null) {
                         $customizedField = json_decode($customizedField, true);
                         foreach ($customizedField as $key => $value) {

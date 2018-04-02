@@ -5,7 +5,6 @@ namespace mp_ssv_general\forms\models;
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\SSV_Forms;
-use wpdb;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -22,9 +21,9 @@ abstract class Forms
 {
     public static function filterContent($content)
     {
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $table = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $forms = $wpdb->get_results("SELECT * FROM $table");
+        $forms = $database->get_results("SELECT * FROM $table");
         foreach ($forms as $form) {
             if (strpos($content, $form->f_tag) !== false) {
                 $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
@@ -35,9 +34,9 @@ abstract class Forms
 
     public static function getFormFieldsHTML(int $formId): string
     {
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $tableName  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $form       = $wpdb->get_row("SELECT * FROM $tableName WHERE f_id = '$formId'");
+        $form       = $database->get_row("SELECT * FROM $tableName WHERE f_id = '$formId'");
         $formFields = self::getFormFields(json_decode($form->f_fields));
         ob_start();
         foreach ($formFields as $field) {
@@ -95,14 +94,14 @@ abstract class Forms
                 return in_array($field->bf_name, $fieldNames);
             }
         );
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $fieldNames                   = '"' . implode('", "', $fieldNames) . '"';
         $sharedBaseFieldsTable        = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable  = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
         $sharedFieldieldsSelect       = "SELECT *, 'shared' AS bf_list, 'input' AS bf_type FROM $sharedBaseFieldsTable";
         $siteSpecificBaseFieldsSelect = "SELECT *, 'siteSpecific' AS bf_list, 'input' AS bf_type FROM $siteSpecificBaseFieldsTable)";
         $select                       = "SELECT * FROM ($sharedFieldieldsSelect UNION $siteSpecificBaseFieldsSelect combined WHERE bf_name IN ($fieldNames) ORDER BY FIELD(`bf_name`,$fieldNames)";
-        $databaseFields               = $wpdb->get_results($select);
+        $databaseFields               = $database->get_results($select);
         return array_merge($wordPressFormFields, $decorationFormFields, $databaseFields);
     }
 

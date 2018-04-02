@@ -43,11 +43,16 @@ abstract class Field
 
     public static function titleFromDatabase(string $name): string
     {
-        $wpdb = SSV_Global::getDatabase();
+        $database = SSV_Global::getDatabase();
         $table = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
-        return $wpdb->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
+        return $database->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
+    /**
+     * @param string $json
+     * @return Field
+     * @throws Exception
+     */
     public static function fromJSON(string $json): Field
     {
         $values = json_decode($json);

@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 
 function show_default_input_field(string $formId, array $field)
 {
-    $wpdb = SSV_Global::getDatabase();
+    $database = SSV_Global::getDatabase();
     $field += [
         'defaultValue' => null,
         'required'     => false,
@@ -21,7 +21,7 @@ function show_default_input_field(string $formId, array $field)
     }
     $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
     $name            = $field['name'];
-    $customizedField = $wpdb->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
+    $customizedField = $database->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
     if ($customizedField !== null) {
         $field                 = json_decode($customizedField, true) + $field;
         $field['required']     = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
