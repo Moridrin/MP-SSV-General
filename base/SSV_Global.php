@@ -73,7 +73,7 @@ abstract class SSV_Global
         }
         $database = SSV_Global::getDatabase();
         if (is_multisite()) {
-            $blogIds = $database->get_col("SELECT blog_id FROM ".$database->getBlogsTable());
+            $blogIds = $database->get_col("SELECT blog_id FROM " . $database->getBlogsTable());
         } else {
             $blogIds = [get_current_blog_id()];
         }

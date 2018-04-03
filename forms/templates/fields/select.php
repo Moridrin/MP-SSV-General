@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 function show_select_input_field(string $formId, array $field)
 {
     $database = SSV_Global::getDatabase();
-    $field += [
+    $field    += [
         'defaultValue' => null,
         'required'     => false,
     ];

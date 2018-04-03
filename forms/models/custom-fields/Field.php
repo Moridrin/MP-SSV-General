@@ -44,12 +44,13 @@ abstract class Field
     public static function titleFromDatabase(string $name): string
     {
         $database = SSV_Global::getDatabase();
-        $table = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
+        $table    = BaseFunctions::SHARED_BASE_FIELDS_TABLE;
         return $database->get_var("SELECT bf_title FROM $table WHERE bf_name = '$name'");
     }
 
     /**
      * @param string $json
+     *
      * @return Field
      * @throws Exception
      */

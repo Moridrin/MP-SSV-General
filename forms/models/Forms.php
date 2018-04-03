@@ -22,8 +22,8 @@ abstract class Forms
     public static function filterContent($content)
     {
         $database = SSV_Global::getDatabase();
-        $table = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $forms = $database->get_results("SELECT * FROM $table");
+        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+        $forms    = $database->get_results("SELECT * FROM $table");
         foreach ($forms as $form) {
             if (strpos($content, $form->f_tag) !== false) {
                 $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
@@ -34,7 +34,7 @@ abstract class Forms
 
     public static function getFormFieldsHTML(int $formId): string
     {
-        $database = SSV_Global::getDatabase();
+        $database   = SSV_Global::getDatabase();
         $tableName  = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
         $form       = $database->get_row("SELECT * FROM $tableName WHERE f_id = '$formId'");
         $formFields = self::getFormFields(json_decode($form->f_fields));
@@ -80,21 +80,21 @@ abstract class Forms
 
     public static function getFormFields(array $fieldNames): array
     {
-        $wordPressBaseFields  = self::getWordPressBaseFields();
-        $wordPressFormFields  = array_filter(
+        $wordPressBaseFields          = self::getWordPressBaseFields();
+        $wordPressFormFields          = array_filter(
             $wordPressBaseFields,
             function ($field) use ($fieldNames) {
                 return in_array($field->bf_name, $fieldNames);
             }
         );
-        $decorationBaseFields = self::getDecorationBaseFields();
-        $decorationFormFields = array_filter(
+        $decorationBaseFields         = self::getDecorationBaseFields();
+        $decorationFormFields         = array_filter(
             $decorationBaseFields,
             function ($field) use ($fieldNames) {
                 return in_array($field->bf_name, $fieldNames);
             }
         );
-        $database = SSV_Global::getDatabase();
+        $database                     = SSV_Global::getDatabase();
         $fieldNames                   = '"' . implode('", "', $fieldNames) . '"';
         $sharedBaseFieldsTable        = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
         $siteSpecificBaseFieldsTable  = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;

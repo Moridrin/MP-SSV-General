@@ -208,7 +208,8 @@ abstract class BaseFunctions
         ob_start();
         wp_nonce_field($adminReferer);
         if (is_string($saveButton)) {
-            ?><button type="submit"><?= $saveButton ?></button><?php
+            ?>
+            <button type="submit"><?= $saveButton ?></button><?php
         }
         return ob_get_clean();
     }
@@ -631,8 +632,8 @@ abstract class BaseFunctions
             self::$options[$group] = [];
         }
         self::$options[$group][] = [
-                'name' => $name,
-                'type' => $type,
+            'name' => $name,
+            'type' => $type,
         ];
         register_setting($group, $name, ['type' => $type]);
     }

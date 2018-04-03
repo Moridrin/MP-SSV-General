@@ -134,7 +134,7 @@ class User extends \WP_User
             default:
                 $response = update_user_meta($this->ID, $metaKey, $value);
                 if ($response === false) {
-                    $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to update '.$metaKey.' in the user\'s meta data.';
+                    $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to update ' . $metaKey . ' in the user\'s meta data.';
                     return false;
                 } else {
                     return true;
@@ -164,8 +164,11 @@ class User extends \WP_User
         }
     }
 
-    public function removeMeta(string $metaKey): bool
+    public function removeMeta(string $metaKey, $options = []): bool
     {
+        $options           += [
+            'ignore' => false,
+        ];
         $userProfileFields = [
             'email',
             'email_address',
@@ -181,13 +184,13 @@ class User extends \WP_User
 
         if (!in_array($metaKey, $userProfileFields)) {
             $success = delete_user_meta($this->ID, $metaKey);
-            if (!$success) {
-                $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to remove '.$metaKey.' from the user\'s meta data.';
+            if (!$success && !$options['ignore']) {
+                $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to remove ' . $metaKey . ' from the user\'s meta data.';
             }
             return $success;
-        } else {
+        } elseif (!$options['ignore']) {
             $_SESSION['SSV']['errors'][] = 'You cannot remove a profile field.';
-            return false;
         }
+        return false;
     }
 }

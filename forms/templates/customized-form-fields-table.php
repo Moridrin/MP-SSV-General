@@ -20,7 +20,12 @@ function show_customized_form_fields_table(int $formId, array $fields)
                 <th scope="col" id="author" class="manage-column column-author">Default Value</th>
             </tr>
             </thead>
-            <tbody id="the-list">
+            <tbody id="formFieldsList">
+            <tr id="dropPreview">
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
                     <?php

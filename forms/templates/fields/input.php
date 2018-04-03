@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 function show_default_input_field(string $formId, array $field)
 {
     $database = SSV_Global::getDatabase();
-    $field += [
+    $field    += [
         'defaultValue' => null,
         'required'     => false,
     ];
@@ -39,7 +39,7 @@ function show_default_input_field(string $formId, array $field)
         'pattern',
     ];
     if (current_theme_supports('materialize')) {
-        $field['classes']['div'][] = 'input-field';
+        $field['classes']['div'][]   = 'input-field';
         $field['classes']['input'][] = 'validate';
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>

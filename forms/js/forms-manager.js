@@ -25,3 +25,178 @@ let formsManager = {
         ;
     }
 };
+
+(function ($) {
+    $(document).ready(function () {
+        let $label = $('#title-prompt-text');
+        let $input = $('#title');
+        $label.focus(function () {
+            $(this).hide();
+        });
+        $input.focus(function () {
+            $label.hide();
+        });
+        $input.focusout(function () {
+            if ($input.val() === '') {
+                $label.show();
+            }
+        });
+        if ($input.val() !== '') {
+            $label.hide();
+        }
+
+        $('.hndle').click(function () {
+            $(this.nextSibling.nextSibling).toggle();
+            $(this.parentNode).toggleClass('closed');
+        });
+
+        $('.handlediv').click(function () {
+            $(this.nextSibling.nextSibling.nextSibling.nextSibling).toggle();
+            $(this.parentNode).toggleClass('closed');
+        });
+
+        let formFieldsListTop = document.getElementById('formFieldsListTop');
+        let formFieldsListBottom = document.getElementById('formFieldsListBottom');
+        let formFieldsList = document.getElementById('formFieldsList');
+        let wordPressBaseFieldsList = document.getElementById('wordPressBaseFieldsList');
+        let sharedBaseFieldsList = document.getElementById('sharedBaseFieldsList');
+        let siteSpecificBaseFieldsList = document.getElementById('siteSpecificBaseFieldsList');
+        let dropPreview = $('#dropPreview');
+        let dragElement = null;
+
+        function handleDragStart(e) {
+            dragElement = this;
+            e.dataTransfer.effectAllowed = 'copyMove';
+            e.dataTransfer.setData('text/html', this.outerHTML);
+            this.classList.add('dragElem');
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            if (dragElement && (dragElement.parentNode === wordPressBaseFieldsList || dragElement.parentNode === sharedBaseFieldsList || dragElement.parentNode === siteSpecificBaseFieldsList)) {
+                e.dataTransfer.dropEffect = 'copy';
+            } else {
+                e.dataTransfer.dropEffect = 'move';
+            }
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            dropPreview.show();
+            if (this === formFieldsListTop) {
+                dropPreview.insertBefore(formFieldsList.firstElementChild);
+            } else if (this === formFieldsListBottom && dragElement !== formFieldsList.lastElementChild) {
+                dropPreview.insertAfter($(formFieldsList.lastElementChild));
+            } else if (this !== dragElement && this !== dragElement.nextSibling) {
+                dropPreview.insertAfter($(this));
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            if (this === formFieldsListTop) {
+                formFieldsList.firstElementChild.classList.remove('topHeaderHover');
+            } else if (this === formFieldsListBottom) {
+                formFieldsList.lastElementChild.classList.remove('bottomHeaderHover');
+            } else {
+                this.classList.remove('hover');
+            }
+        }
+
+        function handleDrop(e) {
+            console.log('test');
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            let dropElement = null;
+            if (dragElement && (dragElement.parentNode === wordPressBaseFieldsList || dragElement.parentNode === sharedBaseFieldsList || dragElement.parentNode === siteSpecificBaseFieldsList)) {
+                let field = JSON.parse(dragElement.dataset.field);
+                dropElement = document.createElement('tr');
+                dropElement.setAttribute('draggable', 'true');
+                dropElement.setAttribute('class', 'formField');
+                dropElement.innerHTML =
+                    '<td>' +
+                    '   <input type="hidden" name="form_fields[]" value="' + field.name + '">' +
+                    '   <strong>' + field.name + '</strong>' +
+                    '</td>' +
+                    '<td>' + field.type + '</td>' +
+                    '<td>' + field.value + '</td>'
+                ;
+            } else {
+                dropElement = dragElement.cloneNode(true);
+                dropElement.setAttribute('class', 'formField');
+            }
+            if (this === formFieldsListTop) {
+                formFieldsList.insertBefore(dropElement, formFieldsList.children.item(0));
+            } else if (this === formFieldsListBottom) {
+                formFieldsList.appendChild(dropElement);
+            } else if (this && this.parentNode === formFieldsList) {
+                formFieldsList.insertBefore(dropElement, this);
+                generalFunctions.removeElement(document.getElementById('no-items'));
+            }
+            addDragEvents(dropElement);
+            addDropEvents(dropElement);
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            [].forEach.call(document.getElementsByClassName('topHeaderHover'), function (element) {
+                element.classList.remove("topHeaderHover");
+            });
+            [].forEach.call(document.getElementsByClassName('bottomHeaderHover'), function (element) {
+                element.classList.remove("bottomHeaderHover");
+            });
+            [].forEach.call(document.getElementsByClassName('hover'), function (element) {
+                element.classList.remove("hover");
+            });
+            this.classList.remove('dragElem');
+            dragElement = null;
+            if (!this.classList.contains('baseField')) {
+                generalFunctions.removeElement(this);
+                if (formFieldsList.children.length === 0) {
+                    let emptyRow = document.createElement('tr');
+                    emptyRow.setAttribute('id', 'no-items');
+                    emptyRow.setAttribute('class', 'no-items');
+                    emptyRow.innerHTML = '<td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>';
+                    formFieldsList.appendChild(emptyRow);
+                    addDropEvents(emptyRow);
+                }
+            }
+            dropPreview.insertAfter($(formFieldsList.lastElementChild));
+            dropPreview.hide();
+        }
+
+        function addDragEvents(elem) {
+            elem.addEventListener('dragstart', handleDragStart, false);
+            elem.addEventListener('dragend', handleDragEnd, false);
+        }
+
+        function addDropEvents(elem) {
+            elem.addEventListener('dragenter', handleDragEnter, false);
+            elem.addEventListener('dragover', handleDragOver, false);
+            elem.addEventListener('dragleave', handleDragLeave, false);
+            elem.addEventListener('drop', handleDrop, false);
+        }
+
+        addDropEvents(formFieldsListTop);
+        addDropEvents(formFieldsListBottom);
+        let noItemsTr = document.getElementById('no-items');
+        if (noItemsTr) {
+            addDropEvents(noItemsTr);
+        }
+        let baseFields = document.querySelectorAll('.baseField');
+        [].forEach.call(baseFields, addDragEvents);
+        let formFields = document.querySelectorAll('.formField');
+        [].forEach.call(formFields, addDragEvents);
+        [].forEach.call(formFields, addDropEvents);
+        addDropEvents(dropPreview[0]);
+        $(dropPreview).hide();
+    });
+})(jQuery);

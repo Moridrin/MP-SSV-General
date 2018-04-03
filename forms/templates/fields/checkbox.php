@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 function show_checkbox_input_field(array $field)
 {
     $database = SSV_Global::getDatabase();
-    $field += [
+    $field    += [
         'defaultValue' => null,
         'required'     => false,
     ];

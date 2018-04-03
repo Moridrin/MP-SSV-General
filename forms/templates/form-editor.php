@@ -71,9 +71,10 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                     <ul id="sharedBaseFieldsList">
                                         <?php if (!empty($sharedBaseFields)): ?>
                                             <?php foreach ($sharedBaseFields as $sharedBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField) ?>' data-type="Input" data-list="shared">
-                                                    <span><strong><?= $sharedBaseField->bf_title ?></strong></span>
-                                                    <span style="float: right"><?= $sharedBaseField->bf_inputType ?></span>
+                                                <?php $properties = json_decode($sharedBaseField->bf_properties); ?>
+                                                <li class="baseField" draggable="true" data-field='<?= $sharedBaseField->bf_properties ?>' data-type="Input" data-list="shared">
+                                                    <span><strong><?= $sharedBaseField->bf_name ?></strong></span>
+                                                    <span style="float: right"><?= $properties->type ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>

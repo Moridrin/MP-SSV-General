@@ -47,10 +47,6 @@ let generalFunctions = {
     },
 
     showError: function (message) {
-        document.getElementById('messagesContainer').innerHTML =
-            '<div class="notice notice-error">' +
-            '   <p>' + message + '</p>' +
-            '</div>'
-        ;
+        document.getElementById('messagesContainer').innerHTML = message;
     }
 };

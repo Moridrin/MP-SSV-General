@@ -12,15 +12,15 @@ if (!defined('ABSPATH')) {
 abstract class SSV_Forms
 {
     const PATH = SSV_FORMS_PATH;
-    const URL  = SSV_FORMS_URL;
+    const URL = SSV_FORMS_URL;
 
     const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
     const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
 
-    const SHARED_BASE_FIELDS_TABLE        = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
+    const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
     const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    const CUSTOMIZED_FIELDS_TABLE         = SSV_FORMS_CUSTOMIZED_FIELDS;
-    const SITE_SPECIFIC_FORMS_TABLE       = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
+    const CUSTOMIZED_FIELDS_TABLE = SSV_FORMS_CUSTOMIZED_FIELDS;
+    const SITE_SPECIFIC_FORMS_TABLE = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
 
     public static function setupForBlog(int $blogId = null)
     {
@@ -36,7 +36,8 @@ abstract class SSV_Forms
         $charset_collate = $database->get_charset_collate();
 
         $tableName = self::SHARED_BASE_FIELDS_TABLE;
-        $sql       = "
+        $sql
+                   = "
             CREATE TABLE IF NOT EXISTS $tableName (
             `bf_name` VARCHAR(50) PRIMARY KEY,
             `bf_properties` TEXT NOT NULL
@@ -44,7 +45,8 @@ abstract class SSV_Forms
         $database->query($sql);
 
         $tableName = $prefix . 'ssv_base_fields';
-        $sql       = "
+        $sql
+                   = "
         CREATE TABLE IF NOT EXISTS $tableName (
             `bf_name` VARCHAR(50) PRIMARY KEY,
             `bf_properties` TEXT NOT NULL
@@ -52,7 +54,8 @@ abstract class SSV_Forms
         $database->query($sql);
 
         $tableName = $database->get_blog_prefix($blogId) . 'ssv_forms';
-        $sql       = "
+        $sql
+                   = "
         CREATE TABLE IF NOT EXISTS $tableName (
             `f_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
             `f_tag` VARCHAR(50) UNIQUE,
@@ -62,7 +65,8 @@ abstract class SSV_Forms
         $database->query($sql);
 
         $tableName = $database->get_blog_prefix($blogId) . 'ssv_customized_fields';
-        $sql       = "
+        $sql
+                   = "
         CREATE TABLE IF NOT EXISTS $tableName (
             `f_id` BIGINT(20) NOT NULL,
             `bf_name` VARCHAR(50) NOT NULL,
@@ -72,7 +76,8 @@ abstract class SSV_Forms
         $database->query($sql);
     }
 
-    public static function addSite(int $blogId) {
+    public static function addSite(int $blogId)
+    {
         foreach (wp_get_active_network_plugins() as $plugin) {
             if (preg_match_all('/.*(ssv[a-z-]+).php/', $plugin)) {
                 self::setupForBlog($blogId);
@@ -81,7 +86,8 @@ abstract class SSV_Forms
         }
     }
 
-    public static function deleteSite(int $blogId) {
+    public static function deleteSite(int $blogId)
+    {
         self::cleanupBlog($blogId);
     }
 
@@ -98,9 +104,8 @@ abstract class SSV_Forms
     {
         $page      = isset($_GET['page']) ? $_GET['page'] : null;
         $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'shared';
-        if ($page === 'ssv_forms_fields_manager') {
-
-            $database                  = SSV_Global::getDatabase();
+        if ($page === 'ssv_forms_fields_manager' || $page === 'ssv_forms') {
+            $database              = SSV_Global::getDatabase();
             $sharedBaseFieldsTable = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
             $usedFieldNames        = $database->get_col("SELECT bf_name FROM $sharedBaseFieldsTable");
             if ($activeTab !== 'shared') {
@@ -113,7 +118,10 @@ abstract class SSV_Forms
             }
 
             wp_enqueue_script('mp-ssv-fields-manager', SSV_Forms::URL . '/js/fields-manager.js', ['jquery']);
-            wp_localize_script('mp-ssv-fields-manager', 'mp_ssv_fields_manager_params', [
+            wp_localize_script(
+                'mp-ssv-fields-manager',
+                'mp_ssv_fields_manager_params',
+                [
                     'urls'           => [
                         'plugins'  => plugins_url(),
                         'ajax'     => admin_url('admin-ajax.php'),
@@ -129,7 +137,30 @@ abstract class SSV_Forms
                     'usedFieldNames' => $usedFieldNames,
                     'inputTypes'     => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
                     'formId'         => isset($_GET['id']) ? $_GET['id'] : null,
-                ]);
+                ]
+            );
+        } elseif ($page === 'ssv_forms_add_new_form' || $page === 'ssv_forms') {
+            wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
+            wp_localize_script(
+                'mp-ssv-fields-manager',
+                'mp_ssv_fields_manager_params',
+                [
+                    'urls'    => [
+                        'plugins'  => plugins_url(),
+                        'ajax'     => admin_url('admin-ajax.php'),
+                        'base'     => get_home_url(),
+                        'basePath' => ABSPATH,
+                    ],
+                    'actions' => [
+                        'save'   => 'mp_ssv_general_forms_save_form',
+                        'delete' => 'mp_ssv_general_forms_delete_form',
+                    ],
+                    //                    'roles'          => array_keys(get_editable_roles()),
+                    //                    'usedFieldNames' => $usedFieldNames,
+                    //                    'inputTypes'     => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
+                    'formId'  => isset($_GET['id']) ? $_GET['id'] : null,
+                ]
+            );
         }
     }
 
