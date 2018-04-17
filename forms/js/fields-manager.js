@@ -566,13 +566,7 @@ let fieldsManager = {
         let tr = document.getElementById('field_' + this.editor.current);
         let properties = JSON.parse(tr.dataset.properties);
         let $nameInput = tr.querySelector('input[name="name"]');
-        if (params.usedFieldNames.indexOf($nameInput.value) !== -1) {
-            $nameInput.setCustomValidity('This field name is already used.');
-            $nameInput.reportValidity();
-            return;
-        } else {
-            properties.name = $nameInput.value;
-        }
+        properties.name = $nameInput.value;
         properties.type = tr.querySelector('select[name="type"]').value;
         if (properties.type === 'hidden') {
             properties.value = tr.querySelector('input[name="value"]').value;
@@ -598,11 +592,12 @@ let fieldsManager = {
                 oldName: this.editor.current,
             },
             function (data) {
-                fieldsManager.ajaxResponse(data);
+                if (fieldsManager.ajaxResponse(data)) {
+                    fieldsManager.closeEditor();
+                    tr.setAttribute('id', 'field_' + properties.name);
+                }
             }
         );
-        this.closeEditor();
-        tr.setAttribute('id', 'field_' + properties.name);
     },
 
     saveCustomization: function () {
@@ -689,7 +684,7 @@ let fieldsManager = {
     },
 
     ajaxResponse: function (data) {
-        if (data !== '' && data !== '0') {
+        if (data !== '' && data !== '0' && data !== 'success') {
             generalFunctions.showError(data);
         }
     },

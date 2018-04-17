@@ -57,8 +57,8 @@ if (!function_exists('mp_ssv_general_forms_save_field')) {
     add_action('wp_ajax_mp_ssv_general_forms_save_field', 'mp_ssv_general_forms_save_field', 10, 0);
 }
 
-if (!function_exists('mp_ssv_general_forms_delete_fields')) {
-    function mp_ssv_general_forms_delete_fields(bool $shared = null, int $formId = null)
+if (!function_exists('mp_ssv_general_forms_delete_field')) {
+    function mp_ssv_general_forms_delete_field(bool $shared = null, int $formId = null)
     {
         if ($shared === null && isset($_POST['shared'])) {
             $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
@@ -87,7 +87,7 @@ if (!function_exists('mp_ssv_general_forms_delete_fields')) {
         }
     }
 
-    add_action('wp_ajax_mp_ssv_general_forms_delete_fields', 'mp_ssv_general_forms_delete_fields');
+    add_action('wp_ajax_mp_ssv_general_forms_delete_field', 'mp_ssv_general_forms_delete_field');
 }
 
 if (!function_exists('mp_ssv_general_forms_delete_shared_forms')) {

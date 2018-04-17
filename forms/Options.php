@@ -34,11 +34,22 @@ abstract class Options
 
     public static function showSharedBaseFieldsPage()
     {
+        $activeTab = $_GET['tab'] ?? 'shared';
+        $blogs     = get_blogs_of_user(get_current_user_id());
         ?>
         <div class="wrap">
-            <?php
-            self::showSiteBaseFieldsSharedTab();
-            ?>
+            <h2 class="nav-tab-wrapper">
+                <a href="?page=<?= esc_html($_GET['page']) ?>&tab=shared" class="nav-tab <?= $activeTab === 'shared' ? 'nav-tab-active' : '' ?>">Shared</a>
+                <?php foreach ($blogs as $blog): ?>
+                    <?php $blogName = $blog->blogname ?: $blog->domain ?>
+                    <a href="?page=<?= esc_html($_GET['page']) ?>&tab=blog_<?= $blog->userblog_id ?>" class="nav-tab <?= $activeTab === 'blog_' . $blog->userblog_id ? 'nav-tab-active' : '' ?>"><?= $blogName ?></a>
+                <?php endforeach; ?>
+                <a href="http://bosso.nl/plugins/ssv-file-manager/" target="_blank" class="nav-tab">
+                    Help <!--suppress HtmlUnknownTarget -->
+                    <img src="<?= esc_url(SSV_Global::URL) ?>/images/link-new-tab-small.png" width="14" style="vertical-align:middle">
+                </a>
+            </h2>
+            <?php self::showSiteBaseFieldsSharedTab(); ?>
         </div>
         <?php
     }
@@ -148,7 +159,7 @@ abstract class Options
     {
         if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                mp_ssv_general_forms_delete_fields(true);
+                mp_ssv_general_forms_delete_field(true);
             } else {
                 $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
@@ -171,7 +182,7 @@ abstract class Options
     {
         if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                mp_ssv_general_forms_delete_fields(false);
+                mp_ssv_general_forms_delete_field(false);
             } else {
                 $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }

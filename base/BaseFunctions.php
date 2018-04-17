@@ -455,6 +455,9 @@ abstract class BaseFunctions
      */
     public static function var_export($variable, $die = false)
     {
+        if (!$die) {
+            echo '<div style="margin-left: 180px;">';
+        }
         if (is_string($variable) && strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
             ob_start();
             echo $variable . ';';
@@ -484,6 +487,8 @@ abstract class BaseFunctions
 
         if ($die) {
             die();
+        } else {
+            echo '</div>';
         }
         return null;
     }

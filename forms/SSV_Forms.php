@@ -102,66 +102,42 @@ abstract class SSV_Forms
 
     public static function enqueueAdminScripts()
     {
-        $page      = isset($_GET['page']) ? $_GET['page'] : null;
-        $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'shared';
-        if ($page === 'ssv_forms_fields_manager' || $page === 'ssv_forms') {
-            $database              = SSV_Global::getDatabase();
-            $sharedBaseFieldsTable = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-            $usedFieldNames        = $database->get_col("SELECT bf_name FROM $sharedBaseFieldsTable");
-            if ($activeTab !== 'shared') {
-                $siteSpecificBaseFieldsTable = SSV_Forms::SITE_SPECIFIC_BASE_FIELDS_TABLE;
-                $usedFieldNames              = array_merge($usedFieldNames, $database->get_col("SELECT bf_name FROM $siteSpecificBaseFieldsTable"));
-            }
-            $duplicateNames = array_diff_assoc($usedFieldNames, array_unique($usedFieldNames));
-            foreach ($duplicateNames as $duplicateName) {
-                $_SESSION['SSV']['errors'][] = 'The field with the name \'' . $duplicateName . '\' is not unique. Fields with the same name can cause loss of data!';
-            }
-
-            wp_enqueue_script('mp-ssv-fields-manager', SSV_Forms::URL . '/js/fields-manager.js', ['jquery']);
-            wp_localize_script(
-                'mp-ssv-fields-manager',
-                'mp_ssv_fields_manager_params',
-                [
-                    'urls'           => [
-                        'plugins'  => plugins_url(),
-                        'ajax'     => admin_url('admin-ajax.php'),
-                        'base'     => get_home_url(),
-                        'basePath' => ABSPATH,
-                    ],
-                    'actions'        => [
-                        'save'   => 'mp_ssv_general_forms_save_field',
-                        'delete' => 'mp_ssv_general_forms_delete_fields',
-                    ],
-                    'isShared'       => $activeTab === 'shared',
-                    'roles'          => array_keys(get_editable_roles()),
-                    'usedFieldNames' => $usedFieldNames,
-                    'inputTypes'     => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
-                    'formId'         => isset($_GET['id']) ? $_GET['id'] : null,
-                ]
-            );
-        } elseif ($page === 'ssv_forms_add_new_form' || $page === 'ssv_forms') {
-            wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
-            wp_localize_script(
-                'mp-ssv-fields-manager',
-                'mp_ssv_fields_manager_params',
-                [
-                    'urls'    => [
-                        'plugins'  => plugins_url(),
-                        'ajax'     => admin_url('admin-ajax.php'),
-                        'base'     => get_home_url(),
-                        'basePath' => ABSPATH,
-                    ],
-                    'actions' => [
-                        'save'   => 'mp_ssv_general_forms_save_form',
-                        'delete' => 'mp_ssv_general_forms_delete_form',
-                    ],
-                    //                    'roles'          => array_keys(get_editable_roles()),
-                    //                    'usedFieldNames' => $usedFieldNames,
-                    //                    'inputTypes'     => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
-                    'formId'  => isset($_GET['id']) ? $_GET['id'] : null,
-                ]
-            );
+        $page = $_GET['page'] ?? null;
+        if (!in_array($page, ['ssv_forms_fields_manager', 'ssv_forms'])) {
+            return;
         }
+        switch ($page) {
+            case 'ssv_forms':
+                if (is_network_admin()) {
+                    self::enquireFieldsManagerScripts();
+                }
+                break;
+            case 'ssv_forms_fields_manager':
+                self::enquireFieldsManagerScripts();
+                break;
+        }
+    }
+
+    private static function enquireFieldsManagerScripts()
+    {
+        $activeTab = $_GET['tab'] ?? 'shared';
+        wp_enqueue_script('mp-ssv-fields-manager', SSV_Forms::URL . '/js/fields-manager.js', ['jquery']);
+        wp_localize_script('mp-ssv-fields-manager', 'mp_ssv_fields_manager_params', [
+            'urls'       => [
+                'plugins'  => plugins_url(),
+                'ajax'     => admin_url('admin-ajax.php'),
+                'base'     => get_home_url(),
+                'basePath' => ABSPATH,
+            ],
+            'actions'    => [
+                'save'   => 'mp_ssv_general_forms_save_field',
+                'delete' => 'mp_ssv_general_forms_delete_field',
+            ],
+            'isShared'   => $activeTab === 'shared',
+            'roles'      => array_keys(get_editable_roles()),
+            'inputTypes' => BaseFunctions::getInputTypes($activeTab === 'shared' ? ['role_checkbox', 'role_select'] : []),
+            'formId'     => $_GET['id'] ?? null,
+        ]);
     }
 
     public static function cleanInstallBlog(int $blogId = null)
