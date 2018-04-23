@@ -56,9 +56,10 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <div class="inside">
                                     <ul id="wordPressBaseFieldsList">
                                         <?php foreach (Forms::getWordPressBaseFields() as $wordPressBaseField): ?>
-                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField) ?>' data-type="Input" data-list="wordpress">
-                                                <span><strong><?= $wordPressBaseField->bf_title ?></strong></span>
-                                                <span style="float: right"><?= $wordPressBaseField->bf_inputType ?></span>
+                                            <?php $properties = json_decode($wordPressBaseField->bf_properties); ?>
+                                            <li class="baseField" draggable="true" data-field='<?= $wordPressBaseField->bf_properties ?>' data-type="Input" data-list="wordpress">
+                                                <span><strong><?= $wordPressBaseField->bf_name ?></strong></span>
+                                                <span style="float: right"><?= $properties->type ?></span>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>

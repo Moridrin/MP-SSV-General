@@ -582,6 +582,11 @@ let fieldsManager = {
             properties.value = '';
         }
         tr.dataset.properties = JSON.stringify(properties);
+        console.log(params.actions.save);
+        console.log(params.isShared);
+        console.log(params.formId);
+        console.log(properties);
+        console.log(this.editor.current);
         jQuery.post(
             params.urls.ajax,
             {
@@ -592,6 +597,7 @@ let fieldsManager = {
                 oldName: this.editor.current,
             },
             function (data) {
+                console.log(data);
                 if (fieldsManager.ajaxResponse(data)) {
                     fieldsManager.closeEditor();
                     tr.setAttribute('id', 'field_' + properties.name);
@@ -684,8 +690,16 @@ let fieldsManager = {
     },
 
     ajaxResponse: function (data) {
-        if (data !== '' && data !== '0' && data !== 'success') {
-            generalFunctions.showError(data);
+        try {
+            data = JSON.parse(data);
+            if (data['error']) {
+                generalFunctions.showNotice(data['error']);
+                return false;
+            }
+        } catch (e) {
+            generalFunctions.showNotice('<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>');
+
         }
+        return true;
     },
 };

@@ -75,7 +75,7 @@ abstract class Options
                     );
                 } elseif (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
                     if ($_POST['action'] === 'delete-selected') {
-                        mp_ssv_general_forms_delete_shared_forms(false);
+                        mp_ssv_general_forms_delete_form();
                     } else {
                         echo '<div class="notice error"><p>Something unexpected happened. Please try again.</p></div>';
                     }

@@ -46,7 +46,7 @@ let generalFunctions = {
         }
     },
 
-    showError: function (message) {
+    showNotice: function (message) {
         document.getElementById('messagesContainer').innerHTML = message;
     }
 };

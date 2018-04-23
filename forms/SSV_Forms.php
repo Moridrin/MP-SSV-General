@@ -9,6 +9,13 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/base-form-fields-table.php';
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/forms-table.php';
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Forms::PATH . 'templates/form-editor.php';
+
 abstract class SSV_Forms
 {
     const PATH = SSV_FORMS_PATH;
@@ -140,6 +147,19 @@ abstract class SSV_Forms
         ]);
     }
 
+    public static function filterContent($content)
+    {
+        $database = SSV_Global::getDatabase();
+        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+        $forms    = $database->get_results("SELECT * FROM $table");
+        foreach ($forms as $form) {
+            if (strpos($content, $form->f_tag) !== false) {
+                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
+            }
+        }
+        return $content;
+    }
+
     public static function cleanInstallBlog(int $blogId = null)
     {
         if ($blogId === null) {
@@ -186,3 +206,4 @@ register_deactivation_hook(SSV_FORMS_ACTIVATOR_PLUGIN, [SSV_Forms::class, 'deact
 add_action('wpmu_new_blog', [SSV_Forms::class, 'addSite']);
 add_action('delete_blog', [SSV_Forms::class, 'deleteSite']);
 add_action('admin_enqueue_scripts', [SSV_Forms::class, 'enqueueAdminScripts']);
+add_filter('the_content', [SSV_Forms::class, 'filterContent']);

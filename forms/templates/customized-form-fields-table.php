@@ -21,11 +21,6 @@ function show_customized_form_fields_table(int $formId, array $fields)
             </tr>
             </thead>
             <tbody id="formFieldsList">
-            <tr id="dropPreview">
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
             <?php if (!empty($fields)): ?>
                 <?php foreach ($fields as $field): ?>
                     <?php
@@ -86,6 +81,11 @@ function show_customized_form_fields_table(int $formId, array $fields)
                     <td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>
                 </tr>
             <?php endif; ?>
+            <tr id="dropPreview">
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
             </tbody>
             <tfoot>
             <tr id="formFieldsListBottom">
