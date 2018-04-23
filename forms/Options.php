@@ -5,6 +5,7 @@ namespace mp_ssv_general\forms;
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Forms;
+use mp_ssv_general\forms\models\SharedBaseField;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -56,6 +57,9 @@ abstract class Options
 
     public static function showFormsPage()
     {
+        BaseFunctions::var_export('test');
+        echo SharedBaseField::getAll();
+        return;
         if (isset($_GET['action']) && $_GET['action'] === 'edit') {
             self::showEditFormPage();
         } else {

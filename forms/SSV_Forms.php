@@ -24,11 +24,6 @@ abstract class SSV_Forms
     const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
     const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
 
-    const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
-    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    const CUSTOMIZED_FIELDS_TABLE = SSV_FORMS_CUSTOMIZED_FIELDS;
-    const SITE_SPECIFIC_FORMS_TABLE = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
-
     public static function setupForBlog(int $blogId = null)
     {
         $database = SSV_Global::getDatabase();
@@ -46,8 +41,9 @@ abstract class SSV_Forms
         $sql
                    = "
             CREATE TABLE IF NOT EXISTS $tableName (
-            `bf_name` VARCHAR(50) PRIMARY KEY,
-            `bf_properties` TEXT NOT NULL
+            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `f_name` VARCHAR(50),
+            `f_properties` TEXT NOT NULL
             ) $charset_collate;";
         $database->query($sql);
 
@@ -55,8 +51,9 @@ abstract class SSV_Forms
         $sql
                    = "
         CREATE TABLE IF NOT EXISTS $tableName (
-            `bf_name` VARCHAR(50) PRIMARY KEY,
-            `bf_properties` TEXT NOT NULL
+            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `f_name` VARCHAR(50),
+            `f_properties` TEXT NOT NULL
         ) $charset_collate;";
         $database->query($sql);
 
@@ -64,21 +61,24 @@ abstract class SSV_Forms
         $sql
                    = "
         CREATE TABLE IF NOT EXISTS $tableName (
-            `f_id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
             `f_tag` VARCHAR(50) UNIQUE,
             `f_title` VARCHAR(50) NOT NULL,
             `f_fields` TEXT
         ) $charset_collate;";
         $database->query($sql);
 
-        $tableName = $database->get_blog_prefix($blogId) . 'ssv_customized_fields';
+        $tableName      = $database->get_blog_prefix($blogId) . 'ssv_form_fields';
+        $formsTableName = $database->get_blog_prefix($blogId) . 'ssv_forms';
         $sql
-                   = "
+                        = "
         CREATE TABLE IF NOT EXISTS $tableName (
-            `f_id` BIGINT(20) NOT NULL,
-            `bf_name` VARCHAR(50) NOT NULL,
-            `cf_properties` TEXT NOT NULL,
-            PRIMARY KEY (`f_id`, `bf_name`)
+            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `form_id` BIGINT(20) NOT NULL,
+            `f_name` VARCHAR(50) NOT NULL,
+            `f_properties` TEXT NOT NULL,
+            UNIQUE (`form_id`, `bf_name`),
+            FOREIGN KEY fk_form (`form_id`) REFERENCES $formsTableName (`id`)
         ) $charset_collate;";
         $database->query($sql);
     }

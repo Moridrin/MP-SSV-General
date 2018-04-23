@@ -3,6 +3,7 @@
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\Database;
 use mp_ssv_general\base\Message;
+use mp_ssv_general\base\models\Model;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\base\User;
 
@@ -27,6 +28,10 @@ if (!class_exists(SSV_Global::class)) {
     define('SSV_BASE_PATH', plugin_dir_path(__FILE__));
     define('SSV_BASE_URL', plugins_url() . '/' . plugin_basename(__DIR__));
     require_once 'SSV_Global.php';
+}
+
+if (!class_exists(Model::class)) {
+    require_once 'models/Model.php';
 }
 
 if (!class_exists(User::class)) {

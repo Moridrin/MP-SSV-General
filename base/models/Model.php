@@ -15,15 +15,14 @@ abstract class Model
     /** @var int */
     protected $id;
 
-    #region static
-
+    #region Class
     /**
      * @param string $table
-     * @param mixed  ...$data
+     * @param array  $data
      *
      * @return false|int
      */
-    protected static function doCreate(string $table, ...$data)
+    protected static function doCreate(string $table, array $data)
     {
         global $wpdb;
         $id = $wpdb->insert($table, $data);
@@ -33,7 +32,19 @@ abstract class Model
         return $id;
     }
 
-    public static function doFind(string $table, string $where): ?array
+    abstract public static function getAll(): array;
+
+    protected static function doFind(string $table, string $where): ?array
+    {
+        global $wpdb;
+        $results = $wpdb->get_results("SELECT * FROM $table WHERE $where", ARRAY_A);
+        if (!empty($wpdb->last_error)) {
+            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+        }
+        return $results;
+    }
+
+    protected static function doFindRow(string $table, string $where): ?array
     {
         global $wpdb;
         $row = $wpdb->get_row("SELECT * FROM $table WHERE $where", ARRAY_A);
@@ -46,11 +57,13 @@ abstract class Model
     abstract public static function getTableColumns(): array;
     #endregion
 
-    #region public
+    #region Instance
     protected function __construct(int $id)
     {
         $this->id = $id;
     }
+
+    abstract public function getTableRow(): array;
 
     abstract public function save(): bool;
 
@@ -67,7 +80,5 @@ abstract class Model
         }
         return true;
     }
-
-    abstract public function getTableRow(): array;
     #endregion
 }
