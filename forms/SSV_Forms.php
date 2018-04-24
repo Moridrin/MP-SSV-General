@@ -4,6 +4,10 @@ namespace mp_ssv_general\forms;
 
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
+use mp_ssv_general\forms\models\Form;
+use mp_ssv_general\forms\models\FormField;
+use mp_ssv_general\forms\models\SharedField;
+use mp_ssv_general\forms\models\SiteSpecificField;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -24,68 +28,14 @@ abstract class SSV_Forms
     const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
     const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
 
-    const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
-    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
-    const CUSTOMIZED_FIELDS_TABLE = SSV_FORMS_CUSTOMIZED_FIELDS;
-    const SITE_SPECIFIC_FORMS_TABLE = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
-
     public static function setupForBlog(int $blogId = null)
     {
-        $database = SSV_Global::getDatabase();
-        if ($blogId === null) {
-            global $wpdb;
-            $prefix = $wpdb->prefix;
-        } else {
-            $prefix = $database->get_blog_prefix($blogId);
-        }
-
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $charset_collate = $database->get_charset_collate();
-
-        $tableName = self::SHARED_BASE_FIELDS_TABLE;
-        $sql
-                   = "
-            CREATE TABLE IF NOT EXISTS $tableName (
-            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            `f_name` VARCHAR(50),
-            `f_properties` TEXT NOT NULL
-            ) $charset_collate;";
-        $database->query($sql);
-
-        $tableName = $prefix . 'ssv_base_fields';
-        $sql
-                   = "
-        CREATE TABLE IF NOT EXISTS $tableName (
-            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            `f_name` VARCHAR(50),
-            `f_properties` TEXT NOT NULL
-        ) $charset_collate;";
-        $database->query($sql);
-
-        $tableName = $database->get_blog_prefix($blogId) . 'ssv_forms';
-        $sql
-                   = "
-        CREATE TABLE IF NOT EXISTS $tableName (
-            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            `f_tag` VARCHAR(50) UNIQUE,
-            `f_title` VARCHAR(50) NOT NULL,
-            `f_fields` TEXT
-        ) $charset_collate;";
-        $database->query($sql);
-
-        $tableName = $database->get_blog_prefix($blogId) . 'ssv_form_fields';
-        $formsTableName = $database->get_blog_prefix($blogId) . 'ssv_forms';
-        $sql
-                   = "
-        CREATE TABLE IF NOT EXISTS $tableName (
-            `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            `form_id` BIGINT(20) NOT NULL,
-            `f_name` VARCHAR(50) NOT NULL,
-            `f_properties` TEXT NOT NULL,
-            UNIQUE (`form_id`, `bf_name`),
-            FOREIGN KEY fk_form (`form_id`) REFERENCES $formsTableName (`id`)
-        ) $charset_collate;";
-        $database->query($sql);
+        global $wpdb;
+        $wpdb->query(SharedField::getDatabaseCreateQuery());
+        $wpdb->query(SiteSpecificField::getDatabaseCreateQuery());
+        $wpdb->query(FormField::getDatabaseCreateQuery());
+        $wpdb->query(Form::getDatabaseCreateQuery());
     }
 
     public static function addSite(int $blogId)

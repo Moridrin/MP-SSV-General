@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general\forms\models;
 
+use mp_ssv_general\base\Database;
 use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
@@ -15,33 +16,7 @@ class Form extends Model
 
     public static function create(string $title, array $fields = []): Form
     {
-        global $wpdb;
-        parent::doCreate($wpdb->prefix . self::TABLE, ['f_title' => $title, 'f_fields' => json_encode($fields)]);
-    }
-
-    public static function getAll(): array
-    {
-        global $wpdb;
-        $results = parent::doFind($wpdb->prefix . self::TABLE, "1 = 1");
-        if ($results === null) {
-            return [];
-        }
-        $forms = [];
-        foreach ($results as $row) {
-            $forms[] = new Form($row['id'], $row['f_title'], json_decode($row['f_fields']));
-        }
-        return $forms;
-    }
-
-    public static function find(int $id): ?Form
-    {
-        global $wpdb;
-        $row = parent::doFindRow($wpdb->prefix . self::TABLE, "id = $id");
-        if ($row === null) {
-            return null;
-        } else {
-            return new Form($id, $row['f_title'], json_decode($row['f_fields']));
-        }
+        parent::doCreate(['f_title' => $title, 'f_fields' => json_encode($fields)]);
     }
 
     public static function findByTag(string $tag): ?Form
@@ -51,7 +26,7 @@ class Form extends Model
         if ($row === null) {
             return null;
         } else {
-            return new Form($row['id'], $row['f_title'], json_decode($row['f_fields']));
+            return new Form($row);
         }
     }
 
@@ -63,31 +38,29 @@ class Form extends Model
             'Fields',
         ];
     }
+
+    protected static function getDatabaseTableName(int $blogId = null): string
+    {
+        return Database::getPrefixForBlog($blogId).'ssv_forms';
+    }
+
+    protected static function getDatabaseFields(): array
+    {
+        return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
+    }
     #endregion
 
     #region Instance
-    /** @var string */
-    private $title;
-    /** @var array */
-    private $fields;
-
-    public function __construct(int $id, string $title, array $fields)
-    {
-        parent::__construct($id);
-        $this->title = $title;
-        $this->fields = $fields;
-    }
-
     #region getters & setters
     public function getTitle(): string
     {
-        return $this->title;
+        return $this->row['f_title'];
     }
 
     public function getFields(): array
     {
         $fields = [];
-        foreach ($this->fields as $fieldName) {
+        foreach ($this->row['f_fields'] as $fieldName) {
             $fields[] = Field::findByName($fieldName);
         }
         return $fields;
@@ -100,42 +73,30 @@ class Form extends Model
 
     public function setTitle(string $title): Form
     {
-        $this->title = $title;
+        $this->row['f_title'] = $title;
         return $this;
     }
 
     public function setFields(array $fields): Form
     {
-        $this->fields = $fields;
+        $this->row['f_fields'] = $fields;
         return $this;
     }
 
     public function addField(Field $field): Form
     {
-        $this->fields[] = $field->getName();
+        $this->row['f_fields'][] = $field->getName();
         return $this;
     }
 
     #endregion
 
-    public function save(): bool
-    {
-        global $wpdb;
-        return $this->doSave(
-            $wpdb->prefix . self::TABLE,
-            [
-                'f_title' => $this->title,
-                'f_fields' => $this->fields,
-            ]
-        );
-    }
-
     public function getTableRow(): array
     {
         return [
-            '[ssv-forms-' . $this->id . ']',
-            $this->title,
-            $this->fields,
+            '[ssv-forms-' . $this->row['id'] . ']',
+            $this->row['f_title'],
+            $this->row['f_fields'],
         ];
     }
     #endregion

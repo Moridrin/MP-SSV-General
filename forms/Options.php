@@ -7,7 +7,7 @@ use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\Forms;
-use mp_ssv_general\forms\models\SharedBaseField;
+use mp_ssv_general\forms\models\SharedField;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -37,6 +37,11 @@ abstract class Options
 
     public static function showSharedBaseFieldsPage()
     {
+        SharedField::getAll();
+        SharedField::deleteByIds([1,2,3,4,5,6]);
+        BaseFunctions::var_export(Field::getAll());
+        BaseFunctions::var_export('test', 1);
+        exit;
         $activeTab = $_GET['tab'] ?? 'shared';
         $blogs     = get_blogs_of_user(get_current_user_id());
         ?>
@@ -59,7 +64,6 @@ abstract class Options
 
     public static function showFormsPage()
     {
-        BaseFunctions::var_export(SharedBaseField::getAll(), 1);
         if (isset($_GET['action']) && $_GET['action'] === 'edit') {
             self::showEditFormPage();
         } else {

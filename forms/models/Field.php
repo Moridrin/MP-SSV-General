@@ -2,7 +2,6 @@
 
 namespace mp_ssv_general\forms\models;
 
-use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
@@ -12,19 +11,38 @@ if (!defined('ABSPATH')) {
 abstract class Field extends Model
 {
     #region Class
-    final public static function findByName(string $name, int $formId = null): ?Field
+    public static function create(string $name, array $properties = []): ?Field
     {
-        $field = FormField::doFindByName($name, $formId);
-        if ($field === null) {
-            $field = SiteSpecificBaseField::doFindByName($name, $formId);
+        $id = parent::doCreate(['f_name' => $name, 'f_properties' => json_encode($properties)]);
+        if ($id === null) {
+            return null;
         }
-        if ($field === null) {
-            $field = SharedBaseField::doFindByName($name, $formId);
-        }
-        return $field;
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return static::findById($id);
     }
 
-    abstract protected static function doFindByName(string $name, ?int $formId): ?Field;
+    final public static function findByName(string $name, ?int $formId = null): ?Field
+    {
+        // Form Field
+        $row = parent::doFindRow('f_name = '.$name.' AND form_id = '.$formId);
+        if ($row !== null) {
+            return new FormField($row);
+        }
+
+        // Site Specific Field
+        $row = parent::doFindRow('f_name = '.$name);
+        if ($row !== null) {
+            return new SiteSpecificField($row);
+        }
+
+        // Shared Field
+        $row = parent::doFindRow('f_name = '.$name);
+        if ($row !== null) {
+            return new SharedField($row);
+        }
+
+        return null;
+    }
 
     public static function getTableColumns(): array
     {
@@ -34,52 +52,51 @@ abstract class Field extends Model
             'Value',
         ];
     }
+
+    protected static function getDatabaseFields(): array
+    {
+        return ['`f_name` VARCHAR(50)', '`f_properties` TEXT NOT NULL'];
+    }
     #endregion
 
     #region Instance
-    /** @var string */
-    protected $name;
-    /** @var array */
-    protected $properties;
-
-    protected function __construct(int $id, string $name, array $properties)
-    {
-        parent::__construct($id);
-        $this->name       = $name;
-        $this->properties = $properties;
-    }
+    private $oldName = null;
 
     #region getters & setters
     public function getName(): string
     {
-        return $this->name;
+        return $this->row['f_name'];
     }
 
     public function getProperties(): array
     {
-        return $this->properties;
+        return $this->row['f_properties'];
     }
 
     public function getProperty(string $key)
     {
-        return $this->properties[$key];
+        return $this->row['f_properties'][$key];
     }
 
     public function setName(string $name): self
     {
-        $this->name = $name;
+        if ($this->oldName === null && $name !== $this->row['f_name']) {
+            $this->oldName = $this->row['f_name'];
+        }
+        $this->row['f_name'] = $name;
+        $this->setProperty('name', $name);
         return $this;
     }
 
     public function setProperties(array $properties): self
     {
-        $this->properties = $properties;
+        $this->row['f_properties'] = $properties;
         return $this;
     }
 
     public function setProperty(string $key, $value): self
     {
-        $this->properties[$key] = $value;
+        $this->row['f_properties'][$key] = $value;
         return $this;
     }
     #endregion
@@ -87,34 +104,10 @@ abstract class Field extends Model
     public function getTableRow(): array
     {
         return [
-            $this->name,
-            $this->properties['type'],
-            $this->properties['value'],
+            $this->row['f_name'],
+            $this->row['f_properties']['type'],
+            $this->row['f_properties']['value'],
         ];
     }
-
-    public function doSave(string $table, array $data): bool
-    {
-        $data += [
-            'f_name'       => $this->name,
-            'f_properties' => $this->properties,
-        ];
-        return parent::doSave($table, $data);
-    }
-
-    public function __toString()
-    {
-        switch ($this->properties['type'] ?? null) {
-            case 'checkbox':
-                show_checkbox_input_field($this->properties);
-                break;
-            case 'checkbox':
-                show_checkbox_input_field($this->properties);
-                break;
-            default:
-                show_default_input_field($this->properties);
-        }
-    }
-
     #endregion
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace mp_ssv_general\base;
+namespace mp_ssv_general\base\models;
+
+use mp_ssv_general\base\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -8,18 +10,14 @@ if (!defined('ABSPATH')) {
 
 class User extends \WP_User
 {
-    function __construct(\WP_User $user)
-    {
-        parent::__construct($user);
-    }
-
+    #region Class
     public static function getByID(int $id): ?User
     {
-        $user = new User(get_user_by('id', $id));
-        if ($user->ID != $id) {
+        $wordPressUser = get_user_by('id', $id);
+        if (!$wordPressUser) {
             return null;
         }
-        return $user;
+        return new User($wordPressUser);
     }
 
     public static function getCurrent(): ?User
@@ -37,7 +35,7 @@ class User extends \WP_User
             return null;
         }
         if (username_exists($username)) {
-            $_SESSION['SSV']['errors'][] = 'This username already exists.';
+            $_SESSION['SSV']['errors'][] = 'This username already exists. Try resetting your password.';
             return null;
         }
         if (email_exists($email)) {
@@ -56,10 +54,12 @@ class User extends \WP_User
         }
         return self::getByID($id);
     }
+    #endregion
 
+    #region Instance
     public function isCurrentUser(): bool
     {
-        return $this->ID == wp_get_current_user()->ID;
+        return $this->ID === wp_get_current_user()->ID;
     }
 
     public function checkPassword(string $password): bool
@@ -193,4 +193,5 @@ class User extends \WP_User
         }
         return false;
     }
+    #endregion
 }
