@@ -4,6 +4,8 @@ namespace mp_ssv_general\forms;
 
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
+use mp_ssv_general\forms\models\Field;
+use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\Forms;
 use mp_ssv_general\forms\models\SharedBaseField;
 
@@ -27,7 +29,7 @@ abstract class Options
 
     public static function setupSiteSpecificMenu()
     {
-        add_menu_page('SSV Forms', 'SSV Forms', 'ssv_not_allowed', 'ssv_forms', '', 'dashicons-feedback');
+        add_menu_page('SSV Forms', 'SSV Forms', 'edit_posts', 'ssv_forms', '', 'dashicons-feedback');
         add_submenu_page('ssv_forms', 'All Forms', 'All Forms', 'edit_posts', 'ssv_forms', [self::class, 'showFormsPage']);
         add_submenu_page('ssv_forms', 'Add New', 'Add New', 'edit_posts', 'ssv_forms_add_new_form', [self::class, 'showEditFormPage']);
         add_submenu_page('ssv_forms', 'Manage Fields', 'Manage Fields', 'edit_posts', 'ssv_forms_fields_manager', [self::class, 'showSiteBaseFieldsPage']);
@@ -57,9 +59,7 @@ abstract class Options
 
     public static function showFormsPage()
     {
-        BaseFunctions::var_export('test');
-        echo SharedBaseField::getAll();
-        return;
+        BaseFunctions::var_export(SharedBaseField::getAll(), 1);
         if (isset($_GET['action']) && $_GET['action'] === 'edit') {
             self::showEditFormPage();
         } else {

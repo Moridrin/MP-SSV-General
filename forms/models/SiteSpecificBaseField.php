@@ -14,7 +14,7 @@ class SiteSpecificBaseField extends Field
     public static function create(string $name, array $properties = []): FormField
     {
         global $wpdb;
-        parent::doCreate($wpdb->prefix . self::TABLE, ['f_name' => $name, 'f_properties' => $properties]);
+        parent::doCreate($wpdb->prefix.self::TABLE, ['f_name' => $name, 'f_properties' => $properties]);
     }
 
     public static function getAll(): array
@@ -34,7 +34,7 @@ class SiteSpecificBaseField extends Field
     protected static function doFindByName(string $name, ?int $formId = null): ?Field
     {
         global $wpdb;
-        $row = parent::doFindRow($wpdb->prefix . self::TABLE, "f_name = $name");
+        $row = parent::doFindRow($wpdb->prefix.self::TABLE, "f_name = $name");
         if ($row === null) {
             return SharedBaseField::findByName($name);
         } else {
@@ -47,7 +47,7 @@ class SiteSpecificBaseField extends Field
     public function save(): bool
     {
         global $wpdb;
-        return $this->doSave($wpdb->base_prefix . self::TABLE, []);
+        return $this->doSave($wpdb->base_prefix.self::TABLE, []);
     }
     #endregion
 }

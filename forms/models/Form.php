@@ -74,7 +74,7 @@ class Form extends Model
     public function __construct(int $id, string $title, array $fields)
     {
         parent::__construct($id);
-        $this->title  = $title;
+        $this->title = $title;
         $this->fields = $fields;
     }
 
@@ -124,7 +124,7 @@ class Form extends Model
         return $this->doSave(
             $wpdb->prefix . self::TABLE,
             [
-                'f_title'  => $this->title,
+                'f_title' => $this->title,
                 'f_fields' => $this->fields,
             ]
         );

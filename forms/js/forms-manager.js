@@ -111,6 +111,7 @@ let formsManager = {
         }
 
         function handleDrop(e) {
+            console.log('test');
             if (e.stopPropagation) {
                 e.stopPropagation();
             }

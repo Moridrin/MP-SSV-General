@@ -2,6 +2,8 @@
 
 namespace mp_ssv_general\forms\models;
 
+use mp_ssv_general\base\BaseFunctions;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -11,14 +13,10 @@ class FormField extends Field
     #region Class
     private const TABLE = 'ssv_form_fields';
 
-    public static function create(int $formId, string $name, array $properties = []): ?FormField
+    public static function create(int $formId, string $name, array $properties = []): FormField
     {
         global $wpdb;
-        $id = parent::doCreate($wpdb->prefix . self::TABLE, ['form_id' => $formId, 'f_name' => $name, 'f_properties' => $properties]);
-        if ($id === false) {
-            return null;
-        }
-        return new FormField($id, $formId, $name, $properties);
+        parent::doCreate($wpdb->prefix.self::TABLE, ['form_id' => $formId, 'f_name' => $name, 'f_properties' => $properties]);
     }
 
     public static function getAll(): array
@@ -38,7 +36,7 @@ class FormField extends Field
     protected static function dofindByName(string $name, ?int $formId): ?Field
     {
         global $wpdb;
-        $row = parent::doFindRow($wpdb->prefix . self::TABLE, "f_name = $name");
+        $row = parent::doFindRow($wpdb->prefix.self::TABLE, "f_name = $name");
         if ($row === null) {
             return SiteSpecificBaseField::findByName($name);
         } else {
@@ -60,7 +58,7 @@ class FormField extends Field
     public function save(): bool
     {
         global $wpdb;
-        return $this->doSave($wpdb->prefix . self::TABLE, ['form_id' => $this->formId]);
+        return $this->doSave($wpdb->prefix.self::TABLE, ['form_id' => $this->formId]);
     }
     #endregion
 }

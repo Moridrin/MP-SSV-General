@@ -24,6 +24,11 @@ abstract class SSV_Forms
     const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
     const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
 
+    const SHARED_BASE_FIELDS_TABLE = SSV_FORMS_SHARED_BASE_FIELDS_TABLE;
+    const SITE_SPECIFIC_BASE_FIELDS_TABLE = SSV_FORMS_SITE_SPECIFIC_BASE_FIELDS_TABLE;
+    const CUSTOMIZED_FIELDS_TABLE = SSV_FORMS_CUSTOMIZED_FIELDS;
+    const SITE_SPECIFIC_FORMS_TABLE = SSV_FORMS_SITE_SPECIFIC_FORMS_TABLE;
+
     public static function setupForBlog(int $blogId = null)
     {
         $database = SSV_Global::getDatabase();
@@ -68,10 +73,10 @@ abstract class SSV_Forms
         ) $charset_collate;";
         $database->query($sql);
 
-        $tableName      = $database->get_blog_prefix($blogId) . 'ssv_form_fields';
+        $tableName = $database->get_blog_prefix($blogId) . 'ssv_form_fields';
         $formsTableName = $database->get_blog_prefix($blogId) . 'ssv_forms';
         $sql
-                        = "
+                   = "
         CREATE TABLE IF NOT EXISTS $tableName (
             `id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
             `form_id` BIGINT(20) NOT NULL,

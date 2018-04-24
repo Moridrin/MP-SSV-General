@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general\forms\models;
 
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
@@ -81,7 +82,6 @@ abstract class Field extends Model
         $this->properties[$key] = $value;
         return $this;
     }
-
     #endregion
 
     public function getTableRow(): array

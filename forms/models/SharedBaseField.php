@@ -16,14 +16,13 @@ class SharedBaseField extends Field
     public static function create(string $name, array $properties = []): FormField
     {
         global $wpdb;
-        parent::doCreate($wpdb->base_prefix . self::TABLE, ['f_name' => $name, 'f_properties' => $properties]);
+        parent::doCreate($wpdb->base_prefix.self::TABLE, ['f_name' => $name, 'f_properties' => $properties]);
     }
 
     public static function getAll(): array
     {
         global $wpdb;
         $results = parent::doFind($wpdb->prefix . self::TABLE, "1 = 1");
-        BaseFunctions::var_export($results);
         if ($results === null) {
             return [];
         }
@@ -37,7 +36,7 @@ class SharedBaseField extends Field
     protected static function doFindByName(string $name, ?int $formId = null): ?Field
     {
         global $wpdb;
-        $row = parent::doFindRow($wpdb->base_prefix . self::TABLE, "f_name = $name");
+        $row = parent::doFindRow($wpdb->base_prefix.self::TABLE, "f_name = $name");
         if ($row === null) {
             return null;
         } else {
@@ -50,7 +49,7 @@ class SharedBaseField extends Field
     public function save(): bool
     {
         global $wpdb;
-        return $this->doSave($wpdb->base_prefix . self::TABLE, []);
+        return $this->doSave($wpdb->base_prefix.self::TABLE, []);
     }
     #endregion
 }
