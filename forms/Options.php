@@ -39,11 +39,10 @@ abstract class Options
 
     public static function showSharedBaseFieldsPage()
     {
-        SharedField::create('test', []);
-        SiteSpecificField::create('test', []);
-        FormField::create('test', [], 1);
-        BaseFunctions::var_export(Field::_getAll());
-        BaseFunctions::var_export('test', 1);
+        BaseFunctions::var_export(SharedField::getDatabaseCreateQuery(4));
+        BaseFunctions::var_export(SiteSpecificField::getDatabaseCreateQuery(4));
+        BaseFunctions::var_export(FormField::getDatabaseCreateQuery());
+        BaseFunctions::var_export(Form::getDatabaseCreateQuery());
         exit;
         $activeTab = $_GET['tab'] ?? 'shared';
         $blogs     = get_blogs_of_user(get_current_user_id());

@@ -2,6 +2,10 @@
 
 namespace mp_ssv_general\base\models;
 
+use mp_ssv_general\forms\models\FormField;
+use mp_ssv_general\forms\models\SharedField;
+use mp_ssv_general\forms\models\SiteSpecificField;
+
 /**
  * Created by PhpStorm.
  * User: moridrin
@@ -27,7 +31,13 @@ abstract class Model
         return $wpdb->insert_id;
     }
 
-    abstract public static function getAll(): array;
+    public static function getAll(): array
+    {
+        $sharedFields = SharedField::getAll();
+        $siteSpecificFields = SiteSpecificField::getAll();
+        $formFields = FormField::getAll();
+        return array_merge($sharedFields, $siteSpecificFields, $formFields);
+    }
 
     protected static function _getAll(): array
     {
@@ -108,7 +118,7 @@ abstract class Model
 
     abstract protected static function _getDatabaseFields(): array;
 
-    abstract public static function getDatabaseCreateQuery(): string;
+    abstract public static function getDatabaseCreateQuery(int $blogId = null): string;
 
     protected static function _getDatabaseCreateQuery(int $blogId = null): string
     {
@@ -116,7 +126,7 @@ abstract class Model
         $charset_collate = $wpdb->get_charset_collate();
         $tableName = static::getDatabaseTableName($blogId);
         $fields = implode(', ', static::_getDatabaseFields());
-        return 'CREATE TABLE IF NOT EXISTS '.$tableName.' (`id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT '.$fields.') '.$charset_collate.';';
+        return 'CREATE TABLE IF NOT EXISTS '.$tableName.' (`id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT, '.$fields.') '.$charset_collate.';';
     }
     #endregion
 
@@ -131,23 +141,41 @@ abstract class Model
     final public function save(): bool
     {
         global $wpdb;
-        $wpdb->replace(static::getDatabaseTableName(), $this->row);
+        $success = true;
+        if (method_exists($this, '_beforeSave')) {
+            $success = call_user_func([$this, '_beforeSave']);
+        }
+        if ($success) {
+            $wpdb->replace(static::getDatabaseTableName(), $this->row);
+        }
+        if (method_exists($this, '_afterSave')) {
+            $success = call_user_func([$this, '_afterSave']);
+        }
         if (!empty($wpdb->last_error)) {
             $_SESSION['SSV']['errors'][] = $wpdb->last_error;
-            return false;
+            $success = false;
         }
-        return true;
+        return $success;
     }
 
     public function delete(): bool
     {
         global $wpdb;
-        $wpdb->delete(static::getDatabaseTableName(), ['id' => $this->row['id']]);
+        $success = true;
+        if (method_exists($this, '_beforeDelete')) {
+            $success = call_user_func([$this, '_beforeDelete']);
+        }
+        if ($success) {
+            $wpdb->delete(static::getDatabaseTableName(), ['id' => $this->row['id']]);
+        }
+        if (method_exists($this, '_afterDelete')) {
+            $success = call_user_func([$this, '_afterDelete']);
+        }
         if (!empty($wpdb->last_error)) {
             $_SESSION['SSV']['errors'][] = $wpdb->last_error;
-            return false;
+            $success = false;
         }
-        return true;
+        return $success;
     }
     #endregion
 }

@@ -66,9 +66,9 @@ class Form extends Model
         return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
     }
 
-    public static function getDatabaseCreateQuery(): string
+    public static function getDatabaseCreateQuery(int $blogId = null): string
     {
-        return parent::_getDatabaseCreateQuery();
+        return parent::_getDatabaseCreateQuery($blogId);
     }
     #endregion
 

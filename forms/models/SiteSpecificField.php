@@ -34,12 +34,12 @@ class SiteSpecificField extends Field
 
     public static function getDatabaseTableName(int $blogId = null): string
     {
-        return Database::getPrefixForBlog($blogId).'ssv_base_fields';
+        return Database::getPrefixForBlog($blogId).'ssv_site_specific_fields';
     }
 
-    public static function getDatabaseCreateQuery(): string
+    public static function getDatabaseCreateQuery(int $blogId = null): string
     {
-        return parent::_getDatabaseCreateQuery();
+        return parent::_getDatabaseCreateQuery($blogId);
     }
     #endregion
 }

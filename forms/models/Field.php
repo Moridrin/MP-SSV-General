@@ -108,6 +108,13 @@ abstract class Field extends Model
         ];
     }
 
+    protected function _afterSave(): bool
+    {
+        if ($this->oldName) {
+
+        }
+    }
+
     public function __toString(): string
     {
         switch ($this->row['f_properties']['inputType']) {

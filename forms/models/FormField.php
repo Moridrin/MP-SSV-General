@@ -42,9 +42,9 @@ class FormField extends Field
         return Database::getPrefixForBlog($blogId).'ssv_form_fields';
     }
 
-    public static function getDatabaseCreateQuery(): string
+    public static function getDatabaseCreateQuery(int $blogId = null): string
     {
-        return parent::_getDatabaseCreateQuery();
+        return parent::_getDatabaseCreateQuery($blogId);
     }
 
     protected static function _getDatabaseFields(): array

@@ -34,12 +34,12 @@ class SharedField extends Field
 
     public static function getDatabaseTableName(int $blogId = null): string
     {
-        return Database::getBasePrefix().'ssv_shared_base_fields';
+        return Database::getBasePrefix().'ssv_shared_fields';
     }
 
-    public static function getDatabaseCreateQuery(): string
+    public static function getDatabaseCreateQuery(int $blogId = null): string
     {
-        return parent::_getDatabaseCreateQuery();
+        return parent::_getDatabaseCreateQuery($blogId);
     }
     #endregion
 }

@@ -32,10 +32,22 @@ abstract class SSV_Forms
     {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         global $wpdb;
-        $wpdb->query(SharedField::_getDatabaseCreateQuery());
-        $wpdb->query(SiteSpecificField::_getDatabaseCreateQuery());
-        $wpdb->query(FormField::_getDatabaseCreateQuery());
-        $wpdb->query(Form::_getDatabaseCreateQuery());
+        $wpdb->query(SharedField::getDatabaseCreateQuery($blogId));
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $wpdb->query(SiteSpecificField::getDatabaseCreateQuery($blogId));
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $wpdb->query(FormField::getDatabaseCreateQuery($blogId));
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $wpdb->query(Form::getDatabaseCreateQuery($blogId));
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
     }
 
     public static function addSite(int $blogId)
@@ -53,12 +65,23 @@ abstract class SSV_Forms
         self::cleanupBlog($blogId);
     }
 
-    public static function setup($networkEnable)
+    public static function setup($network_wide)
     {
-        if ($networkEnable) {
+        if (is_multisite() && $network_wide) {
             SSV_Global::runFunctionOnAllSites([self::class, 'setupForBlog']);
         } else {
             self::setupForBlog();
+        }
+    }
+
+    public static function deactivate($network_wide)
+    {
+        file_put_contents('testlog', var_export($network_wide, true));
+        if (is_multisite() && $network_wide) {
+//            SSV_Global::runFunctionOnAllSites([self::class, 'cleanupBlog']); // Don't remove the databases on a netword disable (to keep the data for when a blog still wants to use the data).
+        } else {
+            // Check if this is the last SSV plugin to be deactivated.
+            self::cleanupBlog();
         }
     }
 
@@ -126,20 +149,23 @@ abstract class SSV_Forms
 
     public static function cleanupBlog(int $blogId = null)
     {
-        $database = SSV_Global::getDatabase();
-        if ($blogId === null) {
-            global $wpdb;
-            $prefix = $wpdb->prefix;
-        } else {
-            $prefix = $database->get_blog_prefix($blogId);
-        }
+        global $wpdb;
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = $prefix . 'ssv_base_fields';
-        $database->query("DROP TABLE $tableName;");
-        $tableName = $prefix . 'ssv_customized_fields';
-        $database->query("DROP TABLE $tableName;");
-        $tableName = $prefix . 'ssv_forms';
-        $database->query("DROP TABLE $tableName;");
+        $tableName = SiteSpecificField::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $tableName = FormField::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $tableName = Form::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
     }
 
     public static function CLEAN_INSTALL($networkEnable)
