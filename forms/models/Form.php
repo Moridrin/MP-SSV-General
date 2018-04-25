@@ -17,19 +17,19 @@ class Form extends Model
         return parent::_create(['f_title' => $title, 'f_fields' => json_encode($fields)]);
     }
 
-    public static function getAll(): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
     {
-        return parent::_getAll();
+        return parent::_getAll($orderBy, $order);
     }
 
-    public static function findById(int $id): ?Model
+    public static function findById(?int $id, string $orderBy = 'id', string $order = 'ASC'): ?Model
     {
         return parent::_findById($id);
     }
 
-    public static function findByIds(array $ids): array
+    public static function findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC'): array
     {
-        return parent::_findByIds($ids);
+        return parent::_findByIds($ids, $orderBy, $order);
     }
 
     public static function findByTag(string $tag): ?Form

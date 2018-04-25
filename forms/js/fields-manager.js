@@ -169,6 +169,7 @@ let fieldsManager = {
     editor: {
 
         current: null,
+        isOpen: false,
 
         getInputField: function (title, name, value, type, events) {
             events.onkeydown = 'fieldsManager.editor.onKeyDown()';
@@ -324,20 +325,21 @@ let fieldsManager = {
             type: 'text',
         };
 
-        tr.setAttribute('id', 'field_' + properties.name);
+        tr.setAttribute('id', 'field_' + null);
         tr.dataset.properties = JSON.stringify(properties);
 
         generalFunctions.removeElement(document.getElementById('no-items'));
         container.appendChild(tr);
 
-        this.edit(properties.name);
+        this.edit(null);
         tr.querySelector('[name="name"]').focus();
     },
 
-    edit: function (fieldName) {
+    edit: function (id) {
         this.closeEditor();
-        this.editor.current = fieldName;
-        let tr = document.getElementById("field_" + fieldName);
+        this.editor.current = id;
+        this.editor.isOpen = true;
+        let tr = document.getElementById("field_" + id);
         let properties = jQuery.parseJSON(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
 
@@ -365,16 +367,17 @@ let fieldsManager = {
         ;
         tr.innerHTML = html;
 
-        jQuery('#field_' + fieldName + ' select[name="type"]').select2({
+        jQuery('#field_' + id + ' select[name="type"]').select2({
             tags: true,
         });
         this.typeChanged();
     },
 
-    customize: function (fieldName) {
+    customize: function (id) {
         this.closeEditor();
-        this.editor.current = fieldName;
-        let tr = document.getElementById('field_' + fieldName);
+        this.editor.current = id;
+        this.editor.isOpen = true;
+        let tr = document.getElementById('field_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
         tr.removeAttribute('draggable');
@@ -385,7 +388,7 @@ let fieldsManager = {
             fieldSpecification = this.fieldSpecifications['custom'];
         }
         let html =
-            '<input type="hidden" name="form_fields[]" value="' + tr.dataset.baseFieldName + '">' +
+            '<input type="hidden" name="form_fields[]" value="' + tr.dataset.baseid + '">' +
             '<td colspan="5" class="colspanchange">' +
             '   <fieldset class="inline-edit-col" style="width: 50%;">' +
             '       <legend class="inline-edit-legend" id="edit-type" data-edit-type="customize">Customize</legend>'
@@ -507,9 +510,9 @@ let fieldsManager = {
         html +=
             '   </fieldset>' +
             '   <div class="submit inline-edit-save" style="float: none;">' +
-            '      <button type="button" class="button cancel alignleft" onclick="fieldsManager.cancel(\'' + fieldName + '\')">Cancel</button>' +
-            '      <input type="hidden" id="_inline_edit" name="_inline_edit" value="' + fieldName + '">' +
-            '      <button type="button" class="button button-primary save alignright" onclick="fieldsManager.saveCustomization(\'' + fieldName + '\')">Update</button>' +
+            '      <button type="button" class="button cancel alignleft" onclick="fieldsManager.cancel(\'' + id + '\')">Cancel</button>' +
+            '      <input type="hidden" id="_inline_edit" name="_inline_edit" value="' + id + '">' +
+            '      <button type="button" class="button button-primary save alignright" onclick="fieldsManager.saveCustomization(\'' + id + '\')">Update</button>' +
             '      <br class="clear">' +
             '   </div>' +
             '</td>'
@@ -517,18 +520,18 @@ let fieldsManager = {
         tr.innerHTML = html;
     },
 
-    deleteRow: function (fieldName) {
-        let tr = document.getElementById('field_' + fieldName);
+    deleteRow: function (id) {
+        let tr = document.getElementById('field_' + id);
         let container = tr.parentElement;
         generalFunctions.removeElement(tr);
-        if (fieldName !== '') {
+        if (id !== '') {
             jQuery.post(
                 params.urls.ajax,
                 {
                     action: params.actions.delete,
                     shared: params.isShared,
                     formId: params.formId,
-                    fieldNames: [fieldName],
+                    ids: [id],
                 },
                 function (data) {
                     fieldsManager.ajaxResponse(data);
@@ -563,7 +566,9 @@ let fieldsManager = {
     },
 
     saveEdit: function () {
-        let tr = document.getElementById('field_' + this.editor.current);
+        let editor = this.editor;
+        let tr = document.getElementById('field_' + editor.current);
+        let id = editor.current;
         let properties = JSON.parse(tr.dataset.properties);
         let $nameInput = tr.querySelector('input[name="name"]');
         properties.name = $nameInput.value;
@@ -582,33 +587,30 @@ let fieldsManager = {
             properties.value = '';
         }
         tr.dataset.properties = JSON.stringify(properties);
-        console.log(params.actions.save);
-        console.log(params.isShared);
-        console.log(params.formId);
-        console.log(properties);
-        console.log(this.editor.current);
         jQuery.post(
             params.urls.ajax,
             {
                 action: params.actions.save,
                 shared: params.isShared,
                 formId: params.formId,
+                id: id,
+                name: $nameInput.value,
                 properties: properties,
-                oldName: this.editor.current,
+                oldName: editor.current,
             },
             function (data) {
-                console.log(data);
                 if (fieldsManager.ajaxResponse(data)) {
+                    editor.current = data['id'];
                     fieldsManager.closeEditor();
-                    tr.setAttribute('id', 'field_' + properties.name);
+                    tr.setAttribute('id', 'field_' + id);
                 }
             }
         );
     },
 
     saveCustomization: function () {
-        let fieldName = this.editor.current;
-        let tr = document.getElementById('field_' + fieldName);
+        let id = this.editor.current;
+        let tr = document.getElementById('field_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         let fieldSpecification = null;
         if (typeof(fieldsManager.fieldSpecifications[properties.type]) === 'undefined') {
@@ -643,7 +645,7 @@ let fieldsManager = {
                 shared: params.isShared,
                 formId: params.formId,
                 properties: properties,
-                oldName: fieldName,
+                oldName: id,
             },
             function (data) {
                 fieldsManager.ajaxResponse(data);
@@ -652,25 +654,25 @@ let fieldsManager = {
     },
 
     closeEditor: function () {
-        if (this.editor.current === null) {
+        if (this.editor.isOpen === false) {
             return;
         }
-        let fieldName = this.editor.current;
-        let tr = document.getElementById('field_' + fieldName);
+        let id = this.editor.current;
+        let tr = document.getElementById('field_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         if (properties.name === '') {
-            this.deleteRow(properties.name);
+            this.deleteRow(id);
         }
         tr.innerHTML =
             '<th class="check-column">' +
-            '   <input type="checkbox" name="fieldNames[]" value="\'' + fieldName + '\'">' +
+            '   <input type="checkbox" name="ids[]" value="\'' + id + '\'">' +
             '</th>' +
             '<td>' +
             '   <strong>' + properties.name + '</strong>' +
             '   <div class="row-actions">' +
-            '       <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.edit(\'' + properties.name + '\')" class="editinline">Edit</a> | </span>' +
-            '       <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.customize(\'' + properties.name + '\')" class="editinline">Customize</a> | </span>' +
-            '       <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow(\'' + properties.name + '\')" class="submitdelete">Trash</a></span>' +
+            '       <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.edit(\'' + id + '\')" class="editinline">Edit</a> | </span>' +
+            '       <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.customize(\'' + id + '\')" class="editinline">Customize</a> | </span>' +
+            '       <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow(\'' + id + '\')" class="submitdelete">Trash</a></span>' +
             '   </div>' +
             '</td>' +
             '<td>' + properties.type + '</td>' +
@@ -679,6 +681,7 @@ let fieldsManager = {
         tr.setAttribute('class', 'inactive');
         tr.setAttribute('draggable', 'draggable');
         this.editor.current = null;
+        this.editor.isOpen = false;
     },
 
     getEmptyRow: function () {
@@ -692,8 +695,8 @@ let fieldsManager = {
     ajaxResponse: function (data) {
         try {
             data = JSON.parse(data);
-            if (data['error']) {
-                generalFunctions.showNotice(data['error']);
+            if (data['errors']) {
+                generalFunctions.showNotice(data['errors']);
                 return false;
             }
         } catch (e) {

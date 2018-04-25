@@ -19,22 +19,30 @@ abstract class Field extends Model
         return parent::_create(['f_name' => $name, 'f_properties' => json_encode($properties)]);
     }
 
-    final public static function findByName(string $name, ?int $formId = null): ?Field
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    {
+        $sharedFields = SharedField::getAll($orderBy, $order);
+        $siteSpecificFields = SiteSpecificField::getAll($orderBy, $order);
+        $formFields = FormField::getAll($orderBy, $order);
+        return array_merge($sharedFields, $siteSpecificFields, $formFields);
+    }
+
+    final public static function findByName(string $name, ?int $formId = null, string $orderBy = 'id', string $order = 'ASC'): ?Field
     {
         // Form Field
-        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
+        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId, $orderBy, $order);
         if ($row !== null) {
             return new FormField($row);
         }
 
         // Site Specific Field
-        $row = parent::_findRow('f_name = ' . $name);
+        $row = parent::_findRow('f_name = ' . $name, $orderBy, $order);
         if ($row !== null) {
             return new SiteSpecificField($row);
         }
 
         // Shared Field
-        $row = parent::_findRow('f_name = ' . $name);
+        $row = parent::_findRow('f_name = ' . $name, $orderBy, $order);
         if ($row !== null) {
             return new SharedField($row);
         }
@@ -60,6 +68,11 @@ abstract class Field extends Model
     #region Instance
     private $oldName = null;
 
+    protected function __init(): void
+    {
+        $this->row['f_properties'] = json_decode($this->row['f_properties'], true);
+    }
+
     #region getters & setters
     public function getName(): string
     {
@@ -73,6 +86,9 @@ abstract class Field extends Model
 
     public function getProperty(string $key)
     {
+        if (!isset($this->row['f_properties'][$key])) {
+            $this->row['f_properties'][$key] = null;
+        }
         return $this->row['f_properties'][$key];
     }
 
@@ -108,11 +124,17 @@ abstract class Field extends Model
         ];
     }
 
+    protected function _beforeSave(): bool
+    {
+        $this->row['f_properties'] = json_encode($this->row['f_properties']);
+        return true;
+    }
+
     protected function _afterSave(): bool
     {
         if ($this->oldName) {
-
         }
+        return true;
     }
 
     public function __toString(): string

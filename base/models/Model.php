@@ -31,17 +31,11 @@ abstract class Model
         return $wpdb->insert_id;
     }
 
-    public static function getAll(): array
-    {
-        $sharedFields = SharedField::getAll();
-        $siteSpecificFields = SiteSpecificField::getAll();
-        $formFields = FormField::getAll();
-        return array_merge($sharedFields, $siteSpecificFields, $formFields);
-    }
+    abstract public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array;
 
-    protected static function _getAll(): array
+    protected static function _getAll(string $orderBy = 'id', string $order = 'ASC'): array
     {
-        $results = self::_find("1 = 1");
+        $results = self::_find("1 = 1", $orderBy, $order);
         if ($results === null) {
             return [];
         }
@@ -52,10 +46,13 @@ abstract class Model
         return $fields;
     }
 
-    abstract public static function findById(int $id): ?Model;
+    abstract public static function findById(?int $id, string $orderBy = 'id', string $order = 'ASC'): ?Model;
 
-    protected static function _findById(int $id): ?Model
+    protected static function _findById(?int $id): ?Model
     {
+        if ($id === null) {
+            return null;
+        }
         $row = self::_findRow('id = ' . $id);
         if ($row === null) {
             return null;
@@ -63,11 +60,11 @@ abstract class Model
         return new static($row);
     }
 
-    abstract public static function findByIds(array $ids): array;
+    abstract public static function findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC'): array;
 
-    protected static function _findByIds(array $ids): array
+    protected static function _findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC'): array
     {
-        $results = self::_find('id IN (' . implode(', ', $ids) . ')');
+        $results = self::_find('id IN (' . implode(', ', $ids) . ')', $orderBy, $order);
         $items = [];
         foreach ($results as $row) {
             $items[] = new static($row);
@@ -75,11 +72,11 @@ abstract class Model
         return $items;
     }
 
-    protected static function _find(string $where): ?array
+    protected static function _find(string $where, string $orderBy = 'id', string $order = 'ASC'): ?array
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
-        $results = $wpdb->get_results("SELECT * FROM $table WHERE $where", ARRAY_A);
+        $results = $wpdb->get_results("SELECT * FROM $table WHERE $where ORDER BY $orderBy $order", ARRAY_A);
         if (!empty($wpdb->last_error)) {
             $_SESSION['SSV']['errors'][] = $wpdb->last_error;
         }
@@ -134,6 +131,14 @@ abstract class Model
     final protected function __construct(array $row)
     {
         $this->row = $row;
+        if (method_exists($this, '__init')) {
+            call_user_func([$this, '__init']);
+        }
+    }
+
+    public function getId(): int
+    {
+        return $this->row['id'];
     }
 
     abstract public function getTableRow(): array;
@@ -153,6 +158,7 @@ abstract class Model
         }
         if (!empty($wpdb->last_error)) {
             $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            $_SESSION['SSV']['errors'][] = $wpdb->last_query;
             $success = false;
         }
         return $success;

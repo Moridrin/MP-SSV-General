@@ -9,18 +9,22 @@ use mp_ssv_general\forms\models\SiteSpecificField;
 
 function mp_ssv_general_forms_save_field()
 {
+    ob_start();
     $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
     $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
-    $type = BaseFunctions::sanitize($_POST['type'], 'text');
+    $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
+    $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
+    $type = $shared ? 'shared' : ($formId === null ? 'siteSpecific' : 'formField');
+    $id = BaseFunctions::sanitize($_POST['id'], 'int');
     switch ($type) {
         case 'shared':
-            $field = SharedField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
+            $field = SharedField::findById($id);
             break;
         case 'siteSpecific':
-            $field = SiteSpecificField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
+            $field = SiteSpecificField::findById($id);
             break;
         case 'formField':
-            $field = FormField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
+            $field = FormField::findById($id);
             break;
         default:
             $_SESSION['SSV']['errors'][] = 'Unknown type: '.$type;
@@ -35,89 +39,47 @@ function mp_ssv_general_forms_save_field()
     } else {
         switch ($type) {
             case 'shared':
-                SharedField::create($name, $properties);
+                $id = SharedField::create($name, $properties);
                 break;
             case 'siteSpecific':
-                SiteSpecificField::create($name, $properties);
+                $id = SiteSpecificField::create($name, $properties);
                 break;
             case 'formField':
-                FormField::create($name, $properties);
+                $id = FormField::create($name, $properties, $formId);
                 break;
         }
     }
-}
-
-function mp_ssv_general_forms_save_shared_field()
-{
-    $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
-    $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
-    $field = SharedField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
-    if ($field instanceof Field) {
-        $field
-            ->setName($name)
-            ->setProperties($properties)
-            ->save()
-        ;
-    } else {
-        SharedField::create($name, $properties);
-    }
-}
-
-function mp_ssv_general_forms_save_site_specific_field()
-{
-    $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
-    $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
-    $field = SiteSpecificField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
-    if ($field instanceof Field) {
-        $field
-            ->setName($name)
-            ->setProperties($properties)
-            ->save()
-        ;
-    } else {
-        SiteSpecificField::create($name, $properties);
-    }
-}
-
-function mp_ssv_general_forms_save_form_field()
-{
-    $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
-    $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
-    $field = FormField::_findById(BaseFunctions::sanitize($_POST['id'], 'int'));
-    if ($field instanceof Field) {
-        $field
-            ->setName($name)
-            ->setProperties($properties)
-            ->save()
-        ;
-    } else {
-        FormField::create($name, $properties);
-    }
+    wp_die(json_encode(['id' => $id]));
 }
 
 add_action('wp_ajax_mp_ssv_general_forms_save_field', 'mp_ssv_general_forms_save_field', 10, 0);
 
 function mp_ssv_general_forms_delete_fields()
 {
+    ob_start();
     $ids = BaseFunctions::sanitize($_POST['ids'], 'int');
-    switch (BaseFunctions::sanitize($_POST['type'], 'text')) {
+    $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
+    $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
+    $type = $shared ? 'shared' : ($formId ? 'formField' : 'siteSpecific');
+    switch ($type) {
         case 'shared':
-            SharedField::_deleteByIds($ids);
+            SharedField::deleteByIds($ids);
             break;
         case 'siteSpecific':
-            SiteSpecificField::_deleteByIds($ids);
+            SiteSpecificField::deleteByIds($ids);
             break;
         case 'formField':
-            FormField::_deleteByIds($ids);
+            FormField::deleteByIds($ids);
             break;
     }
+    wp_die();
 }
 
 add_action('wp_ajax_mp_ssv_general_forms_delete_fields', 'mp_ssv_general_forms_delete_fields');
 
 function mp_ssv_general_forms_delete_forms()
 {
-    Form::_deleteByIds(BaseFunctions::sanitize($_POST['formIds'], 'int'));
+    Form::deleteByIds(BaseFunctions::sanitize($_POST['formIds'], 'int'));
 }
 
 add_action('wp_ajax_mp_ssv_general_forms_delete_forms', 'mp_ssv_general_forms_delete_forms');

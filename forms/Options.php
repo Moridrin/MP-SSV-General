@@ -3,6 +3,7 @@
 namespace mp_ssv_general\forms;
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\models\Model;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
@@ -14,13 +15,6 @@ use mp_ssv_general\forms\models\SiteSpecificField;
 if (!defined('ABSPATH')) {
     exit;
 }
-
-/** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/base-form-fields-table.php';
-/** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/forms-table.php';
-/** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/form-editor.php';
 
 abstract class Options
 {
@@ -39,11 +33,6 @@ abstract class Options
 
     public static function showSharedBaseFieldsPage()
     {
-        BaseFunctions::var_export(SharedField::getDatabaseCreateQuery(4));
-        BaseFunctions::var_export(SiteSpecificField::getDatabaseCreateQuery(4));
-        BaseFunctions::var_export(FormField::getDatabaseCreateQuery());
-        BaseFunctions::var_export(Form::getDatabaseCreateQuery());
-        exit;
         $activeTab = $_GET['tab'] ?? 'shared';
         $blogs     = get_blogs_of_user(get_current_user_id());
         ?>
@@ -169,22 +158,20 @@ abstract class Options
     {
         if (BaseFunctions::isValidPOST(SSV_Forms::ALL_FORMS_ADMIN_REFERER)) {
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
-                mp_ssv_general_forms_delete_field(true);
+                SharedField::deleteByIds(BaseFunctions::sanitize($_POST['ids'], 'int'));
             } else {
                 $_SESSION['SSV']['errors'][] = 'Unknown action.';
             }
         }
-        $database   = SSV_Global::getDatabase();
+        $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_name', 'text');
         $order      = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
-        $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'name', 'text');
-        $baseTable  = SSV_Forms::SHARED_BASE_FIELDS_TABLE;
-        $baseFields = $database->get_results("SELECT *, JSON_EXTRACT(bf_properties, '$.$orderBy') AS $orderBy FROM $baseTable ORDER BY $orderBy $order");
+        $fields     = Field::getAll($orderBy, $order);
         $addNew     = '<a href="javascript:void(0)" class="page-title-action" onclick="fieldsManager.addNew(\'the-list\', \'\')">Add New</a>';
         ?>
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
         <p>These fields will be available for all sites.</p>
         <?php
-        self::showFieldsManager($baseFields, $order, $orderBy, current_user_can('manage_shared_base_fields'));
+        self::showFieldsManager($fields, $order, $orderBy, current_user_can('manage_shared_base_fields'));
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -215,7 +202,7 @@ abstract class Options
         ?>
         <form method="post" action="#">
             <?php
-            show_base_form_fields_table($fields, $order, $orderBy, $hasManageRight);
+            mp_ssv_show_fields_table($fields, $order, $orderBy, $hasManageRight);
             if ($hasManageRight) {
                 echo BaseFunctions::getAdminFormSecurityFields(SSV_Forms::ALL_FORMS_ADMIN_REFERER, false, false);
             }

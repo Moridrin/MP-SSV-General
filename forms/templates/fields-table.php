@@ -1,20 +1,36 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\forms\models\Field;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_base_form_fields_table(array $fields, string $order = 'asc', string $orderBy = 'bf_title', bool $canManage = false)
+function mp_ssv_show_fields_table(array $fields, string $order = 'asc', string $orderBy = 'bf_title', bool $canManage = false)
 {
-    $newOrder         = $order === 'asc' ? 'desc' : 'asc';
-    $orderByName      = ($orderBy === 'name' ? 'sorted' : '');
-    $orderByInputType = ($orderBy === 'inputType' ? 'sorted' : '');
-    $orderByValue     = ($orderBy === 'value' ? 'sorted' : '');
-    $orderName        = ($orderBy === 'name' ? $newOrder : $order);
-    $orderInputType   = ($orderBy === 'inputType' ? $newOrder : $order);
-    $orderValue       = ($orderBy === 'value' ? $newOrder : $order);
+    $newOrder         = ($order === 'asc' ? 'desc' : 'asc');
+    $orderByName      = '';
+    $orderByInputType = '';
+    $orderByValue     = '';
+    $orderName        = $order;
+    $orderInputType   = $order;
+    $orderValue       = $order;
+    switch ($orderBy) {
+        case 'f_properties/inputType':
+            $orderByInputType = 'sorted';
+            $orderInputType   = $newOrder;
+            break;
+        case 'f_properties/value':
+            $orderByValue = 'sorted';
+            $orderValue   = $newOrder;
+            break;
+        case 'f_name':
+        default:
+            $orderByName = 'sorted';
+            $orderName   = $newOrder;
+            break;
+    }
     ?>
     <div style="overflow-x: auto;">
         <?php if ($canManage): ?>
@@ -49,54 +65,47 @@ function show_base_form_fields_table(array $fields, string $order = 'asc', strin
                 </th>
             </tr>
             </thead>
-            <tbody id="the-list">
+            <tbody id="the-list" >
             <?php if (!empty($fields)): ?>
+                <?php /** @var Field $field */ ?>
                 <?php foreach ($fields as $field): ?>
-                    <?php $properties = json_decode($field->bf_properties); ?>
-                    <?php $properties->value = isset($properties->value) ? $properties->value : '' ?>
-                    <?php if ($field->bf_name !== null): ?>
-                        <tr id="field_<?= $field->bf_name ?>" class="inactive" data-properties='<?= json_encode($properties) ?>'>
-                            <th class="check-column">
-                                <?php if ($canManage): ?>
-                                    <input type="checkbox" name="fieldNames[]" value="<?= $field->bf_name ?>">
-                                <?php endif; ?>
-                            </th>
-                            <td>
-                                <strong><?= $field->bf_name ?></strong>
-                                <div class="row-actions">
-                                    <?php if ($canManage): ?>
-                                        <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.edit('<?= $field->bf_name ?>')" class="editinline">Edit</a> | </span>
-                                        <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.customize('<?= $field->bf_name ?>')" class="editinline">Customize</a> | </span>
-                                        <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->bf_name ?>')" class="submitdelete">Trash</a></span>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                            <td>
-                                <?= $properties->type ?>
-                            </td>
-                            <?php if ($properties->type === 'select' || $properties->type === 'role_select' || $properties->type === 'hidden'): ?>
-                                <td class="value_td">
-                                    <?php
-                                    if (is_array($properties->value)) {
-                                        $properties->value = implode(',', $properties->value);
-                                    }
-                                    echo $properties->value;
-                                    ?>
-                                </td>
-                            <?php else: ?>
-                                <td></td>
+                    <?php
+//                \mp_ssv_general\forms\models\SharedField::deleteByIds([15]);
+//                BaseFunctions::var_export($field);
+                    ?>
+                    <tr id="field_<?= $field->getId() ?>" class="inactive" data-properties='<?= json_encode($field->getProperties()) ?>'>
+                        <th class="check-column">
+                            <?php if ($canManage): ?>
+                                <input type="checkbox" name="ids[]" value="<?= $field->getId() ?>">
                             <?php endif; ?>
-                        </tr>
-                    <?php else: ?>
-                        <tr>
-                            <th class="check-column">
-                            </th>
-                            <td><strong><?= $properties->title ?></strong></td>
-                            <td><?= $properties->name ?></td>
-                            <td><?= $properties->inputType ?></td>
+                        </th>
+                        <td>
+                            <strong><?= $field->getName() ?></strong>
+                            <div class="row-actions">
+                                <?php if ($canManage): ?>
+                                    <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.edit('<?= $field->getId() ?>')" class="editinline">Edit</a> | </span>
+                                    <span class="inline"><a href="javascript:void(0)" onclick="fieldsManager.customize('<?= $field->getId() ?>')" class="editinline">Customize</a> | </span>
+                                    <span class="trash"><a href="javascript:void(0)" onclick="fieldsManager.deleteRow('<?= $field->getId() ?>')" class="submitdelete">Trash</a></span>
+                                <?php endif; ?>
+                            </div>
+                        </td>
+                        <td>
+                            <?= $field->getProperty('type') ?>
+                        </td>
+                        <?php if ($field->getProperty('type') === 'select' || $field->getProperty('type') === 'role_select' || $field->getProperty('type') === 'hidden'): ?>
+                            <td class="value_td">
+                                <?php
+                                $value = $field->getProperty('value');
+                                if (is_array($value)) {
+                                    $value = implode(',', $value);
+                                }
+                                echo $value;
+                                ?>
+                            </td>
+                        <?php else: ?>
                             <td></td>
-                        </tr>
-                    <?php endif; ?>
+                        <?php endif; ?>
+                    </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr id="no-items" class="no-items">

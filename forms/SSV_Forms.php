@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 /** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/base-form-fields-table.php';
+require_once SSV_Forms::PATH . 'templates/fields-table.php';
 /** @noinspection PhpIncludeInspection */
 require_once SSV_Forms::PATH . 'templates/forms-table.php';
 /** @noinspection PhpIncludeInspection */
@@ -116,7 +116,7 @@ abstract class SSV_Forms
             ],
             'actions'    => [
                 'save'   => 'mp_ssv_general_forms_save_field',
-                'delete' => 'mp_ssv_general_forms_delete_field',
+                'delete' => 'mp_ssv_general_forms_delete_fields',
             ],
             'isShared'   => $activeTab === 'shared',
             'roles'      => array_keys(get_editable_roles()),
