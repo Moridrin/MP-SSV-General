@@ -12,22 +12,39 @@ if (!defined('ABSPATH')) {
 class Form extends Model
 {
     #region Class
-    private const TABLE = 'ssv_forms';
-
-    public static function create(string $title, array $fields = []): Form
+    public static function create(string $title, array $fields = []): ?int
     {
-        parent::doCreate(['f_title' => $title, 'f_fields' => json_encode($fields)]);
+        return parent::_create(['f_title' => $title, 'f_fields' => json_encode($fields)]);
+    }
+
+    public static function getAll(): array
+    {
+        return parent::_getAll();
+    }
+
+    public static function findById(int $id): ?Model
+    {
+        return parent::_findById($id);
+    }
+
+    public static function findByIds(array $ids): array
+    {
+        return parent::_findByIds($ids);
     }
 
     public static function findByTag(string $tag): ?Form
     {
-        global $wpdb;
-        $row = parent::doFindRow($wpdb->prefix . self::TABLE, "f_tag = $tag");
+        $row = parent::_findRow("f_tag = $tag");
         if ($row === null) {
             return null;
         } else {
             return new Form($row);
         }
+    }
+
+    public static function deleteByIds(array $ids): bool
+    {
+        return parent::_deleteByIds($ids);
     }
 
     public static function getTableColumns(): array
@@ -39,14 +56,19 @@ class Form extends Model
         ];
     }
 
-    protected static function getDatabaseTableName(int $blogId = null): string
+    public static function getDatabaseTableName(int $blogId = null): string
     {
         return Database::getPrefixForBlog($blogId).'ssv_forms';
     }
 
-    protected static function getDatabaseFields(): array
+    protected static function _getDatabaseFields(): array
     {
         return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
+    }
+
+    public static function getDatabaseCreateQuery(): string
+    {
+        return parent::_getDatabaseCreateQuery();
     }
     #endregion
 

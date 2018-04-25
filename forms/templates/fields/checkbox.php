@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_checkbox_input_field(array $field)
+function show_checkbox_input_field(Field $field)
 {
     $database = SSV_Global::getDatabase();
     $field    += [

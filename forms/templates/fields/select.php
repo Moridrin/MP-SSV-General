@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_select_input_field(string $formId, array $field)
+function show_select_input_field(Field $field)
 {
     $database = SSV_Global::getDatabase();
     $field    += [

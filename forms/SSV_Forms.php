@@ -32,10 +32,10 @@ abstract class SSV_Forms
     {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         global $wpdb;
-        $wpdb->query(SharedField::getDatabaseCreateQuery());
-        $wpdb->query(SiteSpecificField::getDatabaseCreateQuery());
-        $wpdb->query(FormField::getDatabaseCreateQuery());
-        $wpdb->query(Form::getDatabaseCreateQuery());
+        $wpdb->query(SharedField::_getDatabaseCreateQuery());
+        $wpdb->query(SiteSpecificField::_getDatabaseCreateQuery());
+        $wpdb->query(FormField::_getDatabaseCreateQuery());
+        $wpdb->query(Form::_getDatabaseCreateQuery());
     }
 
     public static function addSite(int $blogId)

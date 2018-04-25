@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_hidden_input_field(array $field)
+function show_hidden_input_field(Field $field)
 {
     $field += [
         'defaultValue' => null,

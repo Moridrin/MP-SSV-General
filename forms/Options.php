@@ -6,8 +6,10 @@ use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
+use mp_ssv_general\forms\models\FormField;
 use mp_ssv_general\forms\models\Forms;
 use mp_ssv_general\forms\models\SharedField;
+use mp_ssv_general\forms\models\SiteSpecificField;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -37,9 +39,10 @@ abstract class Options
 
     public static function showSharedBaseFieldsPage()
     {
-        SharedField::getAll();
-        SharedField::deleteByIds([1,2,3,4,5,6]);
-        BaseFunctions::var_export(Field::getAll());
+        SharedField::create('test', []);
+        SiteSpecificField::create('test', []);
+        FormField::create('test', [], 1);
+        BaseFunctions::var_export(Field::_getAll());
         BaseFunctions::var_export('test', 1);
         exit;
         $activeTab = $_GET['tab'] ?? 'shared';

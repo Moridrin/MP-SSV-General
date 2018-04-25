@@ -16,7 +16,7 @@ abstract class Model
     protected $row;
 
     #region Class
-    protected static function doCreate(array $data): ?int
+    protected static function _create(array $data): ?int
     {
         global $wpdb;
         $wpdb->insert(static::getDatabaseTableName(), $data);
@@ -27,9 +27,11 @@ abstract class Model
         return $wpdb->insert_id;
     }
 
-    final public static function getAll(): array
+    abstract public static function getAll(): array;
+
+    protected static function _getAll(): array
     {
-        $results = self::doFind("1 = 1");
+        $results = self::_find("1 = 1");
         if ($results === null) {
             return [];
         }
@@ -40,26 +42,30 @@ abstract class Model
         return $fields;
     }
 
-    final public static function findById(int $id): ?Model
+    abstract public static function findById(int $id): ?Model;
+
+    protected static function _findById(int $id): ?Model
     {
-        $row = self::doFindRow('id = '.$id);
+        $row = self::_findRow('id = ' . $id);
         if ($row === null) {
             return null;
         }
         return new static($row);
     }
 
-    final public static function findByIds(array $ids): array
+    abstract public static function findByIds(array $ids): array;
+
+    protected static function _findByIds(array $ids): array
     {
-        $results = self::doFind('id IN ('.implode(', ', $ids).')');
+        $results = self::_find('id IN (' . implode(', ', $ids) . ')');
         $items = [];
         foreach ($results as $row) {
-            $irems[] = new static($row);
+            $items[] = new static($row);
         }
         return $items;
     }
 
-    protected static function doFind(string $where): ?array
+    protected static function _find(string $where): ?array
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
@@ -70,7 +76,7 @@ abstract class Model
         return $results;
     }
 
-    protected static function doFindRow(string $where): ?array
+    protected static function _findRow(string $where): ?array
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
@@ -81,7 +87,9 @@ abstract class Model
         return $row;
     }
 
-    final public static function deleteByIds(array $ids): bool
+    abstract public static function deleteByIds(array $ids): bool;
+
+    protected static function _deleteByIds(array $ids): bool
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
@@ -96,17 +104,19 @@ abstract class Model
 
     abstract public static function getTableColumns(): array;
 
-    abstract protected static function getDatabaseTableName(int $blogId = null): string;
+    abstract public static function getDatabaseTableName(int $blogId = null): string;
 
-    abstract protected static function getDatabaseFields(): array;
+    abstract protected static function _getDatabaseFields(): array;
 
-    public static function getDatabaseCreateQuery(int $blogId = null): string
+    abstract public static function getDatabaseCreateQuery(): string;
+
+    protected static function _getDatabaseCreateQuery(int $blogId = null): string
     {
         global $wpdb;
         $charset_collate = $wpdb->get_charset_collate();
         $tableName = static::getDatabaseTableName($blogId);
-        $fields = implode(', ', static::getDatabaseFields());
-        return "CREATE TABLE IF NOT EXISTS $tableName (`id` bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT, $fields) $charset_collate;";
+        $fields = implode(', ', static::_getDatabaseFields());
+        return 'CREATE TABLE IF NOT EXISTS '.$tableName.' (`id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT '.$fields.') '.$charset_collate.';';
     }
     #endregion
 

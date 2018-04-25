@@ -2,7 +2,10 @@
 
 namespace mp_ssv_general\forms\models;
 
+use DateTime;
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
+use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -11,32 +14,27 @@ if (!defined('ABSPATH')) {
 abstract class Field extends Model
 {
     #region Class
-    public static function create(string $name, array $properties = []): ?Field
+    public static function create(string $name, array $properties = []): ?int
     {
-        $id = parent::doCreate(['f_name' => $name, 'f_properties' => json_encode($properties)]);
-        if ($id === null) {
-            return null;
-        }
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return static::findById($id);
+        return parent::_create(['f_name' => $name, 'f_properties' => json_encode($properties)]);
     }
 
     final public static function findByName(string $name, ?int $formId = null): ?Field
     {
         // Form Field
-        $row = parent::doFindRow('f_name = '.$name.' AND form_id = '.$formId);
+        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
         if ($row !== null) {
             return new FormField($row);
         }
 
         // Site Specific Field
-        $row = parent::doFindRow('f_name = '.$name);
+        $row = parent::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SiteSpecificField($row);
         }
 
         // Shared Field
-        $row = parent::doFindRow('f_name = '.$name);
+        $row = parent::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SharedField($row);
         }
@@ -53,7 +51,7 @@ abstract class Field extends Model
         ];
     }
 
-    protected static function getDatabaseFields(): array
+    protected static function _getDatabaseFields(): array
     {
         return ['`f_name` VARCHAR(50)', '`f_properties` TEXT NOT NULL'];
     }
@@ -108,6 +106,134 @@ abstract class Field extends Model
             $this->row['f_properties']['type'],
             $this->row['f_properties']['value'],
         ];
+    }
+
+    public function __toString(): string
+    {
+        switch ($this->row['f_properties']['inputType']) {
+            case 'hidden':
+                return $this->_getHiddenInputFieldHtml();
+            case 'select':
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/select.php';
+                show_select_input_field($this);
+                break;
+            case 'checkbox':
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/checkbox.php';
+                show_checkbox_input_field($this);
+                break;
+            case 'datetime':
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/datetime.php';
+                show_datetime_input_field($this);
+                break;
+            default:
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/input.php';
+                show_default_input_field($this);
+                break;
+        }
+    }
+
+    private function _getHiddenInputFieldHtml(): string
+    {
+        $this->row['f_properties'] += [
+            'defaultValue' => '',
+        ];
+        if (strtolower($this->row['f_properties']['defaultValue']) === 'now') {
+            $this->row['f_properties']['defaultValue '] = (new DateTime($this->row['f_properties']['defaultValue']))->format('Y-m-d');
+        }
+        $id                = BaseFunctions::escape('input_' . $this->row['f_properties']['name'], 'attr');
+        return '<input '.Field::getElementAttributesString($id, ['type', 'value'], '').'/>';
+    }
+
+    private function getElementAttributesString(string $element, array $options = [], string $nameSuffix = null): string
+    {
+        $properties = $this->row['f_properties'] + [
+            'inputType'      => 'text',
+            'classes'        => [],
+            'styles'         => [],
+            'overrideRights' => [],
+            'required'       => false,
+            'disabled'       => false,
+            'checked'        => false,
+            'value'          => null,
+            'autocomplete'   => null,
+            'placeholder'    => null,
+            'list'           => null,
+            'pattern'        => null,
+            'multiple'       => false,
+            'selected'       => false,
+            'profileField'   => true,
+            'size'           => 1,
+        ];
+        $currentUserCanOverride = $this->_currentUserCanOverride();
+        $attributesString       = 'id="' . BaseFunctions::escape($properties['form_id'] . '_' . $element . '_' . $properties['name'], 'attr') . '"';
+        if (in_array('type', $options)) {
+            $attributesString .= ' type="' . $properties['inputType'] . '"';
+        }
+        if (isset($properties['classes'][$element])) {
+            $attributesString .= ' class="' . BaseFunctions::escape($properties['classes'][$element], 'attr', ' ') . '"';
+        }
+        if (isset($properties['styles'][$element])) {
+            $attributesString .= ' style="' . BaseFunctions::escape($properties['styles'][$element], 'attr', ' ') . '"';
+        }
+        if ($nameSuffix !== null) {
+            $attributesString .= ' name="' . BaseFunctions::escape($properties['name'] . $nameSuffix, 'attr') . '"';
+        }
+        if (!$currentUserCanOverride && in_array('required', $options) && $properties['required']) {
+            $attributesString .= $properties['required'] ? 'required="required"' : '';
+        }
+        if (!$currentUserCanOverride && in_array('disabled', $options) && $properties['disabled']) {
+            $attributesString .= disabled($properties['disabled'], true, false);
+        }
+        if (in_array('checked', $options) && $properties['checked']) {
+            $attributesString .= checked($properties['checked'], true, false);
+        }
+        if (in_array('value', $options)) {
+            $profileValue = User::getCurrent()->getMeta($properties['name']);
+            if (!empty($properties['value'])) {
+                $attributesString .= ' value="' . BaseFunctions::escape($properties['value'], 'attr') . '"';
+            } elseif ($properties['profileField'] && !empty($profileValue)) {
+                $attributesString .= ' value="' . BaseFunctions::escape($profileValue, 'attr') . '"';
+            } elseif (!empty($properties['defaultValue'])) {
+                $attributesString .= ' value="' . BaseFunctions::escape($properties['defaultValue'], 'attr') . '"';
+            }
+        }
+        if (in_array('multiple', $options) && $properties['multiple']) {
+            $attributesString .= ' multiple="multiple"';
+        }
+        if (in_array('size', $options) && $properties['size'] > 1) {
+            $attributesString .= ' size="' . BaseFunctions::escape($properties['size'], 'attr') . '"';
+        }
+        if (in_array('for', $options)) {
+            $attributesString .= ' for="' . BaseFunctions::escape($properties['formId'] . '_' . 'input_' . $properties['name'], 'attr') . '"';
+        }
+        if (in_array('autocomplete', $options) && !empty($properties['autocomplete'])) {
+            $attributesString .= ' autocomplete="' . $properties['autocomplete'] . '"';
+        }
+        if (in_array('placeholder', $options) && !empty($properties['placeholder'])) {
+            $attributesString .= ' placeholder="' . $properties['placeholder'] . '"';
+        }
+        if (in_array('list', $options) && !empty($properties['list'])) {
+            $attributesString .= ' list="' . $properties['list'] . '"';
+        }
+        if (in_array('pattern', $options) && !empty($properties['pattern'])) {
+            $attributesString .= ' pattern="' . $properties['pattern'] . '"';
+        }
+        return $attributesString;
+    }
+
+    private function _currentUserCanOverride(): bool
+    {
+        $overrideRights = $this->row['f_properties']['overrideRights'] ?? [];
+        foreach ($overrideRights as $overrideRight) {
+            if (current_user_can($overrideRight)) {
+                return true;
+            }
+        }
+        return false;
     }
     #endregion
 }

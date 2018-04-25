@@ -3,6 +3,7 @@
 namespace mp_ssv_general\forms\models;
 
 use mp_ssv_general\base\Database;
+use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -11,17 +12,42 @@ if (!defined('ABSPATH')) {
 class FormField extends Field
 {
     #region Class
-    public static function create(string $name, array $properties = [], int $formId = null): Field
+    public static function create(string $name, array $properties = [], int $formId = null): ?int
     {
-        parent::doCreate(['form_id' => $formId, 'f_name' => $name, 'f_properties' => $properties]);
+        return parent::_create(['form_id' => $formId, 'f_name' => $name, 'f_properties' => json_encode($properties)]);
     }
 
-    protected static function getDatabaseTableName(int $blogId = null): string
+    public static function getAll(): array
+    {
+        return parent::_getAll();
+    }
+
+    public static function findById(int $id): ?Model
+    {
+        return parent::_findById($id);
+    }
+
+    public static function findByIds(array $ids): array
+    {
+        return parent::_findByIds($ids);
+    }
+
+    public static function deleteByIds(array $ids): bool
+    {
+        return parent::_deleteByIds($ids);
+    }
+
+    public static function getDatabaseTableName(int $blogId = null): string
     {
         return Database::getPrefixForBlog($blogId).'ssv_form_fields';
     }
 
-    protected static function getDatabaseFields(): array
+    public static function getDatabaseCreateQuery(): string
+    {
+        return parent::_getDatabaseCreateQuery();
+    }
+
+    protected static function _getDatabaseFields(): array
     {
         return ['`form_id` BIGINT(20) NOT NULL', '`f_name` VARCHAR(50)', '`f_properties` TEXT NOT NULL'];
     }
