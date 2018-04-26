@@ -109,7 +109,7 @@ function mp_ssv_show_fields_table(array $fields, string $order = 'asc', string $
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr id="no-items" class="no-items">
-                    <td class="colspanchange" colspan="8">No Base Fields found</td>
+                    <td class="colspanchange" colspan="8">No Fields found</td>
                 </tr>
             <?php endif; ?>
             </tbody>

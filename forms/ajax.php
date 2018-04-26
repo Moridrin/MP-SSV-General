@@ -9,7 +9,6 @@ use mp_ssv_general\forms\models\SiteSpecificField;
 
 function mp_ssv_general_forms_save_field()
 {
-    ob_start();
     $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
     $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
     $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
@@ -56,7 +55,6 @@ add_action('wp_ajax_mp_ssv_general_forms_save_field', 'mp_ssv_general_forms_save
 
 function mp_ssv_general_forms_delete_fields()
 {
-    ob_start();
     $ids = BaseFunctions::sanitize($_POST['ids'], 'int');
     $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
     $formId = BaseFunctions::sanitize($_POST['formId'], 'int');

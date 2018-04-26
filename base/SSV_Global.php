@@ -74,7 +74,6 @@ abstract class SSV_Global
 
     public static function showErrors()
     {
-        BaseFunctions::var_export(ob_get_contents());
         if (!defined('DOING_AJAX') || !DOING_AJAX) {
             ?>
             <div id="messagesContainer" class="notice">
@@ -86,15 +85,19 @@ abstract class SSV_Global
                 });
             </script>
             <?php
-        } else {
-            wp_die(json_encode(['errors' => SSV_Global::getErrors() ?: false]));
+//        } else {
+//            wp_die(json_encode(['errors' => SSV_Global::getErrors() ?: false]));
         }
     }
 
-    public static function showAjaxErrors(...$args)
+    public static function showAjaxErrors()
     {
-        BaseFunctions::var_export($args);
-        BaseFunctions::var_export(ob_get_clean());
+        return function ($output) {
+            $output = json_decode($output, true);
+            $output['errors'] = SSV_Global::getErrors() ?: false;
+            echo json_encode($output);
+            die();
+        };
     }
 }
 

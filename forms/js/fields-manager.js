@@ -566,9 +566,8 @@ let fieldsManager = {
     },
 
     saveEdit: function () {
-        let editor = this.editor;
-        let tr = document.getElementById('field_' + editor.current);
-        let id = editor.current;
+        let tr = document.getElementById('field_' + this.editor.current);
+        let id = this.editor.current;
         let properties = JSON.parse(tr.dataset.properties);
         let $nameInput = tr.querySelector('input[name="name"]');
         properties.name = $nameInput.value;
@@ -596,13 +595,14 @@ let fieldsManager = {
                 id: id,
                 name: $nameInput.value,
                 properties: properties,
-                oldName: editor.current,
+                oldName: this.editor.current,
             },
             function (data) {
                 if (fieldsManager.ajaxResponse(data)) {
-                    editor.current = data['id'];
-                    fieldsManager.closeEditor();
+                    let id = JSON.parse(data)['id'];
                     tr.setAttribute('id', 'field_' + id);
+                    fieldsManager.editor.current = id;
+                    fieldsManager.closeEditor();
                 }
             }
         );
@@ -659,13 +659,21 @@ let fieldsManager = {
         }
         let id = this.editor.current;
         let tr = document.getElementById('field_' + id);
+        if (id === null) {
+            let container = tr.parentElement;
+            generalFunctions.removeElement(tr);
+            if (container.childElementCount === 0) {
+                container.innerHTML = this.getEmptyRow();
+            }
+            return;
+        }
         let properties = JSON.parse(tr.dataset.properties);
         if (properties.name === '') {
             this.deleteRow(id);
         }
         tr.innerHTML =
             '<th class="check-column">' +
-            '   <input type="checkbox" name="ids[]" value="\'' + id + '\'">' +
+            '   <input type="checkbox" name="ids[]" value="' + id + '">' +
             '</th>' +
             '<td>' +
             '   <strong>' + properties.name + '</strong>' +
