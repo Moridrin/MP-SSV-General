@@ -331,6 +331,9 @@ let fieldsManager = {
         generalFunctions.removeElement(document.getElementById('no-items'));
         container.appendChild(tr);
 
+        console.log(tr);
+        console.log(container);
+
         this.edit(null);
         tr.querySelector('[name="name"]').focus();
     },
@@ -340,6 +343,8 @@ let fieldsManager = {
         this.editor.current = id;
         this.editor.isOpen = true;
         let tr = document.getElementById("field_" + id);
+        console.log(tr);
+        console.log(id);
         let properties = jQuery.parseJSON(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
 
@@ -637,7 +642,6 @@ let fieldsManager = {
         }
         tr.dataset.properties = JSON.stringify(properties);
         this.closeEditor();
-        tr.setAttribute('id', 'field_' + properties.name);
         jQuery.post(
             params.urls.ajax,
             {
@@ -645,7 +649,8 @@ let fieldsManager = {
                 shared: params.isShared,
                 formId: params.formId,
                 properties: properties,
-                oldName: id,
+                oldName: properties['name'],
+                id: id,
             },
             function (data) {
                 fieldsManager.ajaxResponse(data);
@@ -665,6 +670,8 @@ let fieldsManager = {
             if (container.childElementCount === 0) {
                 container.innerHTML = this.getEmptyRow();
             }
+            this.editor.current = null;
+            this.editor.isOpen = false;
             return;
         }
         let properties = JSON.parse(tr.dataset.properties);
