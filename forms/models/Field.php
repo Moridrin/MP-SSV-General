@@ -27,22 +27,22 @@ abstract class Field extends Model
         return array_merge($sharedFields, $siteSpecificFields, $formFields);
     }
 
-    final public static function findByName(string $name, ?int $formId = null, string $orderBy = 'id', string $order = 'ASC'): ?Field
+    final public static function findByName(string $name, ?int $formId = null): ?Field
     {
         // Form Field
-        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId, $orderBy, $order);
+        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
         if ($row !== null) {
             return new FormField($row);
         }
 
         // Site Specific Field
-        $row = parent::_findRow('f_name = ' . $name, $orderBy, $order);
+        $row = parent::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SiteSpecificField($row);
         }
 
         // Shared Field
-        $row = parent::_findRow('f_name = ' . $name, $orderBy, $order);
+        $row = parent::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SharedField($row);
         }
@@ -53,9 +53,9 @@ abstract class Field extends Model
     public static function getTableColumns(): array
     {
         return [
-            'Name',
-            'Input Type',
-            'Value',
+            'f_name' => 'Name',
+            'f_properties/type' => 'Input Type',
+            'f_properties/value' => 'Value',
         ];
     }
 
@@ -118,9 +118,33 @@ abstract class Field extends Model
     public function getTableRow(): array
     {
         return [
-            $this->row['f_name'],
-            $this->row['f_properties']['type'],
-            $this->row['f_properties']['value'],
+            'f_name' => $this->row['f_name'],
+            'f_properties/type' => $this->row['f_properties']['type'],
+            'f_properties/value' => $this->row['f_properties']['value'],
+        ];
+    }
+
+    public function getRowActions(): array
+    {
+        return [
+            [
+                'spanClass' => 'inline',
+                'onclick' => 'fieldsManager.edit(\'' . $this->getId() . '\')',
+                'linkClass' => 'editinline',
+                'linkText' => 'Edit',
+            ],
+            [
+                'spanClass' => 'inline',
+                'onclick' => 'fieldsManager.customize(\'' . $this->getId() . '\')',
+                'linkClass' => 'editinline',
+                'linkText' => 'Customize',
+            ],
+            [
+                'spanClass' => 'trash',
+                'onclick' => 'fieldsManager.deleteRow(\'' . $this->getId() . '\')',
+                'linkClass' => 'submitdelete',
+                'linkText' => 'Trash',
+            ],
         ];
     }
 
@@ -132,7 +156,8 @@ abstract class Field extends Model
 
     protected function _afterSave(): bool
     {
-        if ($this->oldName) {
+        if ($this->oldName !== $this->row['f_name']) {
+            // TODO Rename
         }
         return true;
     }

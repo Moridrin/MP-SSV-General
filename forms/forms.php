@@ -14,4 +14,5 @@ require_once 'models/Field.php';
 require_once 'models/FormField.php';
 require_once 'models/SharedField.php';
 require_once 'models/SiteSpecificField.php';
+require_once 'models/WordPressField.php';
 require_once 'ajax.php';

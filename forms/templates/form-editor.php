@@ -1,7 +1,11 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\Forms;
+use mp_ssv_general\forms\models\SharedField;
+use mp_ssv_general\forms\models\SiteSpecificField;
+use mp_ssv_general\forms\models\WordPressField;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -10,8 +14,10 @@ if (!defined('ABSPATH')) {
 
 require_once 'customized-form-fields-table.php';
 
-function show_form_editor(int $id, string $title, array $sharedBaseFields, array $siteSpecificBaseFields, array $formFields = [])
+function show_form_editor(Form $form)
 {
+    $sharedFields = SharedField::getAll();
+    $siteSpecificFields = SiteSpecificField::getAll();
     ?>
     <div class="wrap">
         <h1 class="wp-heading-inline">Add New Form</h1>
@@ -23,9 +29,9 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                         <div id="titlediv">
                             <div id="titlewrap">
                                 <label id="title-prompt-text" for="title">Enter title here</label>
-                                <input type="text" name="form_title" size="30" value="<?= $title ?>" id="title" spellcheck="true" autocomplete="off" required="required">
-                                <input type="hidden" name="form_tag" value="[ssv-form-<?= $id ?>]">
-                                <input type="hidden" id="form_id" name="form_id" value="<?= $id ?>">
+                                <input type="text" name="form_title" size="30" value="<?= BaseFunctions::escape($form->getTitle(), 'attr') ?>" id="title" spellcheck="true" autocomplete="off" required="required">
+                                <input type="hidden" name="form_tag" value="[ssv-form-<?= BaseFunctions::escape($form->getId(), 'attr') ?>]">
+                                <input type="hidden" id="form_id" name="form_id" value="<?= BaseFunctions::escape($form->getId(), 'attr') ?>">
                             </div>
                         </div>
                     </div>
@@ -41,7 +47,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                                 <a class="submitdelete deletion" href="#">Move to Trash</a>
                                             </div>
                                             <div id="publishing-action">
-                                                <?= BaseFunctions::getAdminFormSecurityFields(SSV_Forms::EDIT_FORM_ADMIN_REFERER, false, false); ?>
+                                                <?= BaseFunctions::getAdminFormSecurityFields(SSV_Forms::ADMIN_REFERER, false, false); ?>
                                                 <input type="submit" name="publish" id="publish" class="button button-primary button-large" value="<?= empty($title) ? 'Publish' : 'Update' ?>">
                                             </div>
                                             <div class="clear"></div>
@@ -55,11 +61,10 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>WordPress User Fields</span></h2>
                                 <div class="inside">
                                     <ul id="wordPressBaseFieldsList">
-                                        <?php foreach (Forms::getWordPressBaseFields() as $wordPressBaseField): ?>
-                                            <?php $properties = json_decode($wordPressBaseField->bf_properties); ?>
-                                            <li class="baseField" draggable="true" data-field='<?= $wordPressBaseField->bf_properties ?>' data-type="Input" data-list="wordpress">
-                                                <span><strong><?= $wordPressBaseField->bf_name ?></strong></span>
-                                                <span style="float: right"><?= $properties->type ?></span>
+                                        <?php foreach (WordPressField::getAll() as $wordPressBaseField): ?>
+                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                                <span><strong><?= BaseFunctions::escape($wordPressBaseField->getName(), 'html') ?></strong></span>
+                                                <span style="float: right"><?= BaseFunctions::escape($wordPressBaseField->getProperty('type'), 'html') ?></span>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
@@ -70,12 +75,11 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Shared Forms Fields</span></h2>
                                 <div class="inside">
                                     <ul id="sharedBaseFieldsList">
-                                        <?php if (!empty($sharedBaseFields)): ?>
-                                            <?php foreach ($sharedBaseFields as $sharedBaseField): ?>
-                                                <?php $properties = json_decode($sharedBaseField->bf_properties); ?>
-                                                <li class="baseField" draggable="true" data-field='<?= $sharedBaseField->bf_properties ?>' data-type="Input" data-list="shared">
-                                                    <span><strong><?= $sharedBaseField->bf_name ?></strong></span>
-                                                    <span style="float: right"><?= $properties->type ?></span>
+                                        <?php if (!empty($sharedFields)): ?>
+                                            <?php foreach ($sharedFields as $sharedBaseField): ?>
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                                    <span><strong><?= BaseFunctions::escape($sharedBaseField->getName(), 'html') ?></strong></span>
+                                                    <span style="float: right"><?= BaseFunctions::escape($sharedBaseField->getProperty('type'), 'html') ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>
@@ -89,11 +93,11 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Site Specific Forms Fields</span></h2>
                                 <div class="inside">
                                     <ul id="siteSpecificBaseFieldsList">
-                                        <?php if (!empty($siteSpecificBaseFields)): ?>
-                                            <?php foreach ($siteSpecificBaseFields as $siteSpecificBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField) ?>' data-type="Input" data-list="siteSpecific">
-                                                    <span><strong><?= $siteSpecificBaseField->bf_title ?></strong></span>
-                                                    <span style="float: right"><?= $siteSpecificBaseField->bf_inputType ?></span>
+                                        <?php if (!empty($siteSpecificFields)): ?>
+                                            <?php foreach ($siteSpecificFields as $siteSpecificBaseField): ?>
+                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                                    <span><strong><?= BaseFunctions::escape($siteSpecificBaseField->getName(), 'html') ?></strong></span>
+                                                    <span style="float: right"><?= BaseFunctions::escape($siteSpecificBaseField->getProperty('type'), 'html') ?></span>
                                                 </li>
                                             <?php endforeach; ?>
                                         <?php else: ?>
@@ -111,7 +115,7 @@ function show_form_editor(int $id, string $title, array $sharedBaseFields, array
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>
                                 <div class="inside" style="margin: 0; padding: 0;">
                                     <?php
-                                    show_customized_form_fields_table($id, $formFields);
+                                    show_customized_form_fields_table($form->getFields());
                                     ?>
                                 </div>
                             </div>

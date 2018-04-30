@@ -12,12 +12,17 @@ if (!defined('ABSPATH')) {
 class SharedField extends Field
 {
     #region Class
+    /**
+     * @param string $orderBy
+     * @param string $order
+     * @return SharedField[]
+     */
     public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
     {
         return parent::_getAll($orderBy, $order);
     }
 
-    public static function findById(?int $id, string $orderBy = 'id', string $order = 'ASC'): ?Model
+    public static function findById(?int $id): ?Model
     {
         return parent::_findById($id);
     }

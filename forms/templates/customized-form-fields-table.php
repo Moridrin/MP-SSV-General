@@ -1,15 +1,14 @@
 <?php
 
-use mp_ssv_general\base\SSV_Global;
-use mp_ssv_general\forms\SSV_Forms;
+use mp_ssv_general\forms\models\Field;
+use mp_ssv_general\base\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_customized_form_fields_table(int $formId, array $fields)
+function show_customized_form_fields_table(array $fields)
 {
-    $database = SSV_Global::getDatabase();
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
@@ -22,57 +21,28 @@ function show_customized_form_fields_table(int $formId, array $fields)
             </thead>
             <tbody id="formFieldsList">
             <?php if (!empty($fields)): ?>
+                <?php /** @var Field $field */ ?>
                 <?php foreach ($fields as $field): ?>
-                    <?php
-                    $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
-                    $name            = $field->bf_name;
-                    $properties      = [
-                        'title'        => $field->bf_title,
-                        'classes'      => ['div' => '', 'title' => '', 'input' => ''],
-                        'styles'       => ['div' => '', 'title' => '', 'input' => ''],
-                        'defaultValue' => '',
-                        'required'     => false,
-                        'placeholder'  => '',
-                        'autocomplete' => true,
-                        'list'         => '',
-                        'pattern'      => '',
-                        'step'         => null,
-                        'min'          => null,
-                        'max'          => null,
-                        'profileField' => true,
-                    ];
-                    $customizedField = $database->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
-                    if ($customizedField !== null) {
-                        $customizedField = json_decode($customizedField, true);
-                        foreach ($customizedField as $key => $value) {
-                            $properties[$key] = $value;
-                        }
-                    }
-                    ?>
                     <tr
-                            id="<?= $field->bf_list . '_' . $field->bf_id ?>_tr"
+                            id="<?= BaseFunctions::escape(get_class($field) . '_' . $field->getId(), 'attr') ?>_tr"
                             draggable="true"
                             class="formField"
-                            data-base-field-name="<?= $field->bf_name ?>"
-                            data-list="<?= $field->bf_list ?>"
-                            data-type="<?= $field->bf_type ?>"
-                            data-input-type="<?= $field->bf_inputType ?>"
-                            data-options='<?= $field->bf_options ?>'
-                            data-properties='<?= json_encode($properties) ?>'
+                            data-base-field-name="<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
+                            data-properties='<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>'
                     >
                         <td>
-                            <input type="hidden" name="form_fields[]" value="<?= $field->bf_name ?>">
-                            <strong id="<?= $field->bf_id ?>_title"><?= $properties['title'] ?></strong>
-                            <?php if ($field->bf_inputType !== 'hidden'): ?>
-                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= $field->bf_list ?>', '<?= $field->bf_id ?>')" class="editinline"
+                            <input type="hidden" name="form_fields[]" value="<?= $field->getName() ?>">
+                            <strong id="<?= $field->getId() ?>_title"><?= BaseFunctions::escape($field->getProperty('title'), 'html') ?></strong>
+                            <?php if ($field->getProperty('type') !== 'hidden'): ?>
+                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= BaseFunctions::escape(get_class($field), 'attr') ?>', '<?= $field->getId() ?>')" class="editinline"
                                                                    aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
                             <?php endif; ?>
                         </td>
-                        <td id="<?= $field->bf_id ?>_inputType"><?= $field->bf_inputType ?></td>
-                        <?php if ($field->bf_inputType !== 'hidden'): ?>
-                            <td id="<?= $field->bf_id ?>_defaultValue"><?= $properties['defaultValue'] ?></td>
+                        <td id="<?= $field->getId() ?>_inputType"><?= $field->getProperty('type') ?></td>
+                        <?php if ($field->getProperty('type') !== 'hidden'): ?>
+                            <td id="<?= $field->getId() ?>_defaultValue"><?= $field->getProperty('defaultValue') ?></td>
                         <?php else: ?>
-                            <td id="<?= $field->bf_id ?>_value"><?= $field->bf_value ?></td>
+                            <td id="<?= $field->getId() ?>_value"><?= $field->getProperty('value') ?></td>
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>

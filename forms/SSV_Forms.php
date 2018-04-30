@@ -14,9 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 /** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/fields-table.php';
-/** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/forms-table.php';
+require_once SSV_Forms::PATH . 'templates/table.php';
 /** @noinspection PhpIncludeInspection */
 require_once SSV_Forms::PATH . 'templates/form-editor.php';
 
@@ -25,8 +23,7 @@ abstract class SSV_Forms
     const PATH = SSV_FORMS_PATH;
     const URL = SSV_FORMS_URL;
 
-    const ALL_FORMS_ADMIN_REFERER = 'ssv_forms__all_forms_admin_referer';
-    const EDIT_FORM_ADMIN_REFERER = 'ssv_forms__edit_form_admin_referer';
+    const ADMIN_REFERER = 'ssv_forms__admin_referer';
 
     public static function setupForBlog(int $blogId = null)
     {
@@ -127,14 +124,14 @@ abstract class SSV_Forms
 
     public static function filterContent($content)
     {
-        $database = SSV_Global::getDatabase();
-        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-        $forms    = $database->get_results("SELECT * FROM $table");
-        foreach ($forms as $form) {
-            if (strpos($content, $form->f_tag) !== false) {
-                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
-            }
-        }
+//        $database = SSV_Global::getDatabase();
+//        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+//        $forms    = $database->get_results("SELECT * FROM $table");
+//        foreach ($forms as $form) {
+//            if (strpos($content, $form->f_tag) !== false) {
+//                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
+//            }
+//        }
         return $content;
     }
 

@@ -22,7 +22,7 @@ class Form extends Model
         return parent::_getAll($orderBy, $order);
     }
 
-    public static function findById(?int $id, string $orderBy = 'id', string $order = 'ASC'): ?Model
+    public static function findById(?int $id): ?Model
     {
         return parent::_findById($id);
     }
@@ -50,9 +50,9 @@ class Form extends Model
     public static function getTableColumns(): array
     {
         return [
-            'Tag',
-            'Title',
-            'Fields',
+            'id' => 'Tag',
+            'f_title' => 'Title',
+            'f_fields' => 'Fields',
         ];
     }
 
@@ -73,6 +73,11 @@ class Form extends Model
     #endregion
 
     #region Instance
+    protected function __init(): void
+    {
+        $this->row['f_fields'] = json_decode($this->row['f_fields']);
+    }
+
     #region getters & setters
     public function getTitle(): string
     {
@@ -116,9 +121,27 @@ class Form extends Model
     public function getTableRow(): array
     {
         return [
-            '[ssv-forms-' . $this->row['id'] . ']',
-            $this->row['f_title'],
-            $this->row['f_fields'],
+            'id' => '[ssv-forms-' . $this->row['id'] . ']',
+            'f_title' => $this->row['f_title'],
+            'f_fields' => $this->row['f_fields'],
+        ];
+    }
+
+    public function getRowActions(): array
+    {
+        return [
+            [
+                'spanClass' => 'inline',
+                'onclick' => 'formManager.edit(\'' . $this->getId() . '\')',
+                'linkClass' => 'editinline',
+                'linkText' => 'Edit',
+            ],
+            [
+                'spanClass' => 'trash',
+                'onclick' => 'formManager.deleteRow(\'' . $this->getId() . '\')',
+                'linkClass' => 'submitdelete',
+                'linkText' => 'Trash',
+            ],
         ];
     }
     #endregion

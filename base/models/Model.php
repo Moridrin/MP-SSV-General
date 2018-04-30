@@ -2,10 +2,6 @@
 
 namespace mp_ssv_general\base\models;
 
-use mp_ssv_general\forms\models\FormField;
-use mp_ssv_general\forms\models\SharedField;
-use mp_ssv_general\forms\models\SiteSpecificField;
-
 /**
  * Created by PhpStorm.
  * User: moridrin
@@ -46,7 +42,7 @@ abstract class Model
         return $fields;
     }
 
-    abstract public static function findById(?int $id, string $orderBy = 'id', string $order = 'ASC'): ?Model;
+    abstract public static function findById(?int $id): ?Model;
 
     protected static function _findById(?int $id): ?Model
     {
@@ -142,6 +138,8 @@ abstract class Model
     }
 
     abstract public function getTableRow(): array;
+
+    abstract public function getRowActions(): array;
 
     final public function save(): bool
     {
