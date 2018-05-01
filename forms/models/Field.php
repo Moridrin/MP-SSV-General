@@ -27,24 +27,30 @@ abstract class Field extends Model
         return array_merge($sharedFields, $siteSpecificFields, $formFields);
     }
 
-    final public static function findByName(string $name, ?int $formId = null): ?Field
+    final public static function findByName(string $name, int $formId): ?Field
     {
         // Form Field
-        $row = parent::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
+        $row = FormField::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new FormField($row);
         }
 
         // Site Specific Field
-        $row = parent::_findRow('f_name = ' . $name);
+        $row = SiteSpecificField::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SiteSpecificField($row);
         }
 
         // Shared Field
-        $row = parent::_findRow('f_name = ' . $name);
+        $row = SharedField::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new SharedField($row);
+        }
+
+        // WordPress Field
+        $row = WordPressField::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
+        if ($row !== null) {
+            return new WordPressField($row);
         }
 
         return null;

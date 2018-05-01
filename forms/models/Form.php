@@ -88,14 +88,14 @@ class Form extends Model
     {
         $fields = [];
         foreach ($this->row['f_fields'] as $fieldName) {
-            $fields[] = Field::findByName($fieldName);
+            $fields[] = Field::findByName($fieldName, $this->getId());
         }
         return $fields;
     }
 
     public function getFieldByName(string $name): Field
     {
-        return Field::findByName($name);
+        return Field::findByName($name, $this->getId());
     }
 
     public function setTitle(string $title): Form
