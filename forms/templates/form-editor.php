@@ -62,8 +62,9 @@ function show_form_editor(Form $form)
                                 <div class="inside">
                                     <ul id="fieldsList">
                                         <?php foreach ($fields as $field): ?>
-                                            <li class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                            <li id="field_<?= BaseFunctions::escape($field->getName(), 'attr') ?>" class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input" data-list="wordpress">
                                                 <span><strong><?= BaseFunctions::escape($field->getName(), 'html') ?></strong></span>
+                                                <span style="font-size: 9px;">(<?= $field->getType() ?>)</span>
                                                 <span style="float: right"><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></span>
                                             </li>
                                         <?php endforeach; ?>

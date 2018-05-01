@@ -27,9 +27,9 @@ abstract class Model
         return $wpdb->insert_id;
     }
 
-    abstract public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array;
+    abstract public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array;
 
-    protected static function _getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    protected static function _getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
         $results = self::_find("1 = 1", $orderBy, $order);
         if ($results === null) {
@@ -37,7 +37,7 @@ abstract class Model
         }
         $fields = [];
         foreach ($results as $row) {
-            $fields[] = new static($row);
+            $fields[$row[$key]] = new static($row);
         }
         return $fields;
     }

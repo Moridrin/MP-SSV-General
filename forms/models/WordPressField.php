@@ -12,27 +12,57 @@ if (!defined('ABSPATH')) {
 class WordPressField extends Field
 {
     #region Class
-
+    private static $fieldArrays = [
+        'username' => [
+            'id' => 0,
+            'f_name' => 'username',
+            'f_properties' => ['name' => 'username', 'type' => 'text', 'value' => ''],
+        ],
+        'first_name' => [
+            'id' => 0,
+            'f_name' => 'first_name',
+            'f_properties' => ['name' => 'first_name', 'type' => 'text', 'value' => ''],
+        ],
+        'last_name' => [
+            'id' => 0,
+            'f_name' => 'last_name',
+            'f_properties' => ['name' => 'last_name', 'type' => 'text', 'value' => ''],
+        ],
+        'email' => [
+            'id' => 0,
+            'f_name' => 'email',
+            'f_properties' => ['name' => 'email', 'type' => 'text', 'value' => ''],
+        ],
+        'password' => [
+            'id' => 0,
+            'f_name' => 'password',
+            'f_properties' => ['name' => 'password', 'type' => 'password', 'value' => ''],
+        ],
+        'password_confirm' => [
+            'id' => 0,
+            'f_name' => 'password_confirm',
+            'f_properties' => ['name' => 'password_confirm', 'type' => 'password', 'value' => ''],
+        ],
+    ];
     /**
      * @param string $orderBy
      * @param string $order
+     * @param string $key
      * @return WordPressField[]
      */
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
-        return [
-            'username' => new WordPressField(['id' => 0, 'f_name' => 'username', 'f_properties' => json_encode(['name' => 'username', 'type' => 'text', 'value' => ''])]),
-            'first_name' => new WordPressField(['id' => 0, 'f_name' => 'first_name', 'f_properties' => json_encode(['name' => 'first_name', 'type' => 'text', 'value' => ''])]),
-            'last_name' => new WordPressField(['id' => 0, 'f_name' => 'last_name', 'f_properties' => json_encode(['name' => 'last_name', 'type' => 'text', 'value' => ''])]),
-            'email' => new WordPressField(['id' => 0, 'f_name' => 'email', 'f_properties' => json_encode(['name' => 'email', 'type' => 'text', 'value' => ''])]),
-            'password' => new WordPressField(['id' => 0, 'f_name' => 'password', 'f_properties' => json_encode(['name' => 'password', 'type' => 'password', 'value' => ''])]),
-            'password_confirm' => new WordPressField(['id' => 0, 'f_name' => 'password_confirm', 'f_properties' => json_encode(['name' => 'password_confirm', 'type' => 'password', 'value' => ''])]),
-        ];
+        $fields = [];
+        foreach (self::$fieldArrays as $fieldArray) {
+            $fieldArray['f_properties'] = json_encode($fieldArray['f_properties']);
+            $fields[$fieldArray[$key]] = new WordPressField($fieldArray);
+        }
+        return $fields;
     }
 
-    public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
-        $fields = self::getAll($orderBy, $order);
+        $fields = self::getAll($orderBy, $order, $key);
         foreach ($except as $field) {
             if ($field instanceof Field) {
                 unset($fields[$field->getName()]);
@@ -139,6 +169,11 @@ class WordPressField extends Field
     protected function _beforeSave(): bool
     {
         throw new \Exception('Can\'t edit WordPress Fields');
+    }
+
+    public function getType(): string
+    {
+        return 'WordPress';
     }
     #endregion
 }

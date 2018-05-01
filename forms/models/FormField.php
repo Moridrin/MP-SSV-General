@@ -17,7 +17,7 @@ class FormField extends Field
         return parent::_create(['form_id' => $formId, 'f_name' => $name, 'f_properties' => json_encode($properties)]);
     }
 
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
         return parent::_getAll($orderBy, $order);
     }
@@ -50,6 +50,11 @@ class FormField extends Field
     protected static function _getDatabaseFields(): array
     {
         return ['`form_id` BIGINT(20) NOT NULL', '`f_name` VARCHAR(50)', '`f_properties` TEXT NOT NULL'];
+    }
+
+    public function getType(): string
+    {
+        return 'Form';
     }
     #endregion
 }

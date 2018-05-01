@@ -15,11 +15,12 @@ class SiteSpecificField extends Field
     /**
      * @param string $orderBy
      * @param string $order
+     * @param string $key
      * @return SiteSpecificField[]
      */
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
-        return parent::_getAll($orderBy, $order);
+        return parent::_getAll($orderBy, $order, $key);
     }
 
     public static function findById(?int $id): ?Model
@@ -45,6 +46,11 @@ class SiteSpecificField extends Field
     public static function getDatabaseCreateQuery(int $blogId = null): string
     {
         return parent::_getDatabaseCreateQuery($blogId);
+    }
+
+    public function getType(): string
+    {
+        return 'Site';
     }
     #endregion
 }

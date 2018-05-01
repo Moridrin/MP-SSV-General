@@ -58,10 +58,9 @@ let formEditor = {
         let formFieldsListTop = document.getElementById('formFieldsListTop');
         let formFieldsListBottom = document.getElementById('formFieldsListBottom');
         let formFieldsList = document.getElementById('formFieldsList');
-        let wordPressBaseFieldsList = document.getElementById('wordPressBaseFieldsList');
-        let sharedBaseFieldsList = document.getElementById('sharedBaseFieldsList');
-        let siteSpecificBaseFieldsList = document.getElementById('siteSpecificBaseFieldsList');
-        let dropPreview = $('#dropPreview');
+        let fieldsList = document.getElementById('fieldsList');
+        let $dropPreview = $('#dropPreview');
+        let $noItems = $('#no-items');
         let dragElement = null;
 
         function handleDragStart(e) {
@@ -75,7 +74,7 @@ let formEditor = {
             if (e.preventDefault) {
                 e.preventDefault();
             }
-            if (dragElement && (dragElement.parentNode === wordPressBaseFieldsList || dragElement.parentNode === sharedBaseFieldsList || dragElement.parentNode === siteSpecificBaseFieldsList)) {
+            if (dragElement && (dragElement.parentNode === fieldsList)) {
                 e.dataTransfer.dropEffect = 'copy';
             } else {
                 e.dataTransfer.dropEffect = 'move';
@@ -87,13 +86,13 @@ let formEditor = {
             if (e.preventDefault) {
                 e.preventDefault();
             }
-            dropPreview.show();
+            $dropPreview.show();
             if (this === formFieldsListTop) {
-                dropPreview.insertBefore(formFieldsList.firstElementChild);
-            } else if (this === formFieldsListBottom && dragElement !== formFieldsList.lastElementChild) {
-                dropPreview.insertAfter($(formFieldsList.lastElementChild));
-            } else if (this !== dragElement && this !== dragElement.nextSibling) {
-                dropPreview.insertAfter($(this));
+                formFieldsList.insertBefore($dropPreview[0], formFieldsList.firstElementChild);
+            } else if (this === formFieldsListBottom) {
+                formFieldsList.insertBefore($dropPreview[0], $noItems[0]);
+            } else {
+                $dropPreview.insertAfter($(this));
             }
         }
 
@@ -115,7 +114,7 @@ let formEditor = {
                 e.stopPropagation();
             }
             let dropElement = null;
-            if (dragElement && (dragElement.parentNode === wordPressBaseFieldsList || dragElement.parentNode === sharedBaseFieldsList || dragElement.parentNode === siteSpecificBaseFieldsList)) {
+            if (dragElement && dragElement.parentNode === fieldsList) {
                 let field = JSON.parse(dragElement.dataset.field);
                 dropElement = document.createElement('tr');
                 dropElement.setAttribute('draggable', 'true');
@@ -123,7 +122,7 @@ let formEditor = {
                 dropElement.innerHTML =
                     '<td>' +
                     '   <input type="hidden" name="form_fields[]" value="' + field.name + '">' +
-                    '   <strong>' + field.name + '</strong>' +
+                    '   <strong class="fieldName_js">' + field.name + '</strong>' +
                     '</td>' +
                     '<td>' + field.type + '</td>' +
                     '<td>' + field.value + '</td>'
@@ -133,19 +132,19 @@ let formEditor = {
                 dropElement.setAttribute('class', 'formField');
             }
             if (this === formFieldsListTop) {
-                formFieldsList.insertBefore(dropElement, formFieldsList.children.item(0));
+                formFieldsList.insertBefore(dropElement, formFieldsList.firstElementChild);
             } else if (this === formFieldsListBottom) {
-                formFieldsList.appendChild(dropElement);
-            } else if (this && this.parentNode === formFieldsList) {
-                formFieldsList.insertBefore(dropElement, this);
-                generalFunctions.removeElement(document.getElementById('no-items'));
+                formFieldsList.insertBefore(dropElement, $noItems[0]);
+            } else {
+                $(dropElement).insertAfter(this);
             }
+            dragElement.isDropped = true;
             addDragEvents(dropElement);
             addDropEvents(dropElement);
             return false;
         }
 
-        function handleDragEnd(e) {
+        function handleDragEnd() {
             [].forEach.call(document.getElementsByClassName('topHeaderHover'), function (element) {
                 element.classList.remove("topHeaderHover");
             });
@@ -155,21 +154,29 @@ let formEditor = {
             [].forEach.call(document.getElementsByClassName('hover'), function (element) {
                 element.classList.remove("hover");
             });
-            this.classList.remove('dragElem');
-            dragElement = null;
-            if (!this.classList.contains('baseField')) {
-                generalFunctions.removeElement(this);
-                if (formFieldsList.children.length === 0) {
-                    let emptyRow = document.createElement('tr');
-                    emptyRow.setAttribute('id', 'no-items');
-                    emptyRow.setAttribute('class', 'no-items');
-                    emptyRow.innerHTML = '<td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>';
-                    formFieldsList.appendChild(emptyRow);
-                    addDropEvents(emptyRow);
+            if (dragElement.parentElement === fieldsList) {
+                if (dragElement.isDropped) {
+                    $(dragElement).hide();
                 }
+            } else {
+                let fieldId = $(dragElement).find('.fieldName_js')[0].innerText;
+                if (dragElement.isDropped) {
+                    $('#field_' + fieldId).hide();
+                } else {
+                    $('#field_' + fieldId).show();
+                }
+                generalFunctions.removeElement(dragElement);
             }
-            dropPreview.insertAfter($(formFieldsList.lastElementChild));
-            dropPreview.hide();
+            dragElement.classList.remove('dragElem');
+            if (formFieldsList.children.length > 2) {
+                $noItems.hide();
+                $noItems.insertAfter($(formFieldsList.lastElementChild));
+            } else {
+                $noItems.show();
+            }
+            $dropPreview.insertAfter($(formFieldsList.lastElementChild));
+            $dropPreview.hide();
+            dragElement = null;
         }
 
         function addDragEvents(elem) {
@@ -186,16 +193,16 @@ let formEditor = {
 
         addDropEvents(formFieldsListTop);
         addDropEvents(formFieldsListBottom);
-        let noItemsTr = document.getElementById('no-items');
-        if (noItemsTr) {
-            addDropEvents(noItemsTr);
-        }
         let baseFields = document.querySelectorAll('.baseField');
         [].forEach.call(baseFields, addDragEvents);
         let formFields = document.querySelectorAll('.formField');
         [].forEach.call(formFields, addDragEvents);
         [].forEach.call(formFields, addDropEvents);
-        addDropEvents(dropPreview[0]);
-        $(dropPreview).hide();
+        addDropEvents($dropPreview[0]);
+        $dropPreview.hide();
+        addDropEvents($noItems[0]);
+        if (formFieldsList.children.length > 2) {
+            $noItems.hide();
+        }
     });
 })(jQuery);

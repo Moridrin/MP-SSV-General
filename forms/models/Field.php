@@ -16,35 +16,25 @@ abstract class Field extends Model
     #region Class
     public static function create(string $name, array $properties = []): ?int
     {
-        return parent::_create(['f_name' => $name, 'f_properties' => json_encode($properties)]);
+        return parent::_create(['f_name' => strtolower($name), 'f_properties' => json_encode($properties)]);
     }
 
     /**
      * @param string $orderBy
      * @param string $order
+     * @param string $key
      * @return Field[]
      */
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
-        BaseFunctions::var_export('### Site Specific ###');
-        foreach (SiteSpecificField::getAll($orderBy, $order) as $field) {
-            BaseFunctions::var_export($field->getName());
-        }
-        BaseFunctions::var_export('### Shared ###');
-        foreach (SharedField::getAll($orderBy, $order) as $field) {
-            BaseFunctions::var_export($field->getName());
-        }
-        BaseFunctions::var_export('### WordPress ###');
-        foreach (WordPressField::getAll($orderBy, $order) as $field) {
-            BaseFunctions::var_export($field->getName());
-        }
-        $fields = SiteSpecificField::getAll($orderBy, $order);
-        $fields = array_merge($fields, SharedField::getAllExcept($fields, $orderBy, $order));
-        $fields = array_merge($fields, WordPressField::getAllExcept($fields, $orderBy, $order));
+        $fields = SiteSpecificField::getAll($orderBy, $order, $key);
+        $fields += SharedField::getAllExcept($fields, $orderBy, $order, $key);
+        $fields += WordPressField::getAllExcept($fields, $orderBy, $order, $key);
+        ksort($fields);
         return $fields;
     }
 
-    public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
         $names = [];
         foreach ($except as $field) {
@@ -55,7 +45,7 @@ abstract class Field extends Model
             }
         }
         if (empty($names)) {
-            return self::getAll();
+            return self::_getAll($orderBy, $order, $key);
         } else {
             $names = implode('\', \'', $names);
             $results = self::_find("f_name NOT IN ('$names')", $orderBy, $order);
@@ -64,7 +54,7 @@ abstract class Field extends Model
             }
             $fields = [];
             foreach ($results as $row) {
-                $fields[] = new static($row);
+                $fields[$row['f_name']] = new static($row);
             }
             return $fields;
         }
@@ -143,6 +133,7 @@ abstract class Field extends Model
 
     public function setName(string $name): self
     {
+        $name = strtolower($name);
         if ($this->oldName === null && $name !== $this->row['f_name']) {
             $this->oldName = $this->row['f_name'];
         }
@@ -327,6 +318,8 @@ abstract class Field extends Model
         }
         return $attributesString;
     }
+
+    abstract public function getType(): string;
 
     private function _currentUserCanOverride(): bool
     {

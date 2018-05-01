@@ -15,9 +15,10 @@ class SharedField extends Field
     /**
      * @param string $orderBy
      * @param string $order
+     * @param string $key
      * @return SharedField[]
      */
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
         return parent::_getAll($orderBy, $order);
     }
@@ -45,6 +46,11 @@ class SharedField extends Field
     public static function getDatabaseCreateQuery(int $blogId = null): string
     {
         return parent::_getDatabaseCreateQuery($blogId);
+    }
+
+    public function getType(): string
+    {
+        return 'Shared';
     }
     #endregion
 }

@@ -46,11 +46,10 @@ function show_customized_form_fields_table(array $fields)
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
-            <?php else: ?>
-                <tr id="no-items" class="no-items">
-                    <td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>
-                </tr>
             <?php endif; ?>
+            <tr id="no-items" class="no-items" <?= !empty($fields) ? 'style="display: none;"' : '' ?>>
+                <td class="colspanchange" colspan="8">There are no fields in the form yet.<br/>Drag and drop a field from the fields list to add it to the form.</td>
+            </tr>
             <tr id="dropPreview">
                 <td></td>
                 <td></td>

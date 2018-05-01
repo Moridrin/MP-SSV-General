@@ -17,7 +17,7 @@ class Form extends Model
         return parent::_create(['f_title' => $title, 'f_fields' => json_encode($fields)]);
     }
 
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
         return parent::_getAll($orderBy, $order);
     }
