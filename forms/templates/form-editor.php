@@ -1,6 +1,7 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\Forms;
 use mp_ssv_general\forms\models\SharedField;
@@ -16,8 +17,7 @@ require_once 'customized-form-fields-table.php';
 
 function show_form_editor(Form $form)
 {
-    $sharedFields = SharedField::getAll();
-    $siteSpecificFields = SiteSpecificField::getAll();
+    $fields = Field::getAll();
     ?>
     <div class="wrap">
         <h1 class="wp-heading-inline">Add New Form</h1>
@@ -57,52 +57,16 @@ function show_form_editor(Form $form)
                                 </div>
                             </div>
                             <div class="postbox">
-                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: WordPress User Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>WordPress User Fields</span></h2>
+                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
+                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Fields</span></h2>
                                 <div class="inside">
-                                    <ul id="wordPressBaseFieldsList">
-                                        <?php foreach (WordPressField::getAll() as $wordPressBaseField): ?>
-                                            <li class="baseField" draggable="true" data-field='<?= json_encode($wordPressBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
-                                                <span><strong><?= BaseFunctions::escape($wordPressBaseField->getName(), 'html') ?></strong></span>
-                                                <span style="float: right"><?= BaseFunctions::escape($wordPressBaseField->getProperty('type'), 'html') ?></span>
+                                    <ul id="fieldsList">
+                                        <?php foreach ($fields as $field): ?>
+                                            <li class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                                <span><strong><?= BaseFunctions::escape($field->getName(), 'html') ?></strong></span>
+                                                <span style="float: right"><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></span>
                                             </li>
                                         <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="postbox">
-                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: SSV Shared Forms Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Shared Forms Fields</span></h2>
-                                <div class="inside">
-                                    <ul id="sharedBaseFieldsList">
-                                        <?php if (!empty($sharedFields)): ?>
-                                            <?php foreach ($sharedFields as $sharedBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($sharedBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
-                                                    <span><strong><?= BaseFunctions::escape($sharedBaseField->getName(), 'html') ?></strong></span>
-                                                    <span style="float: right"><?= BaseFunctions::escape($sharedBaseField->getProperty('type'), 'html') ?></span>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_fields_manager">Click Here</a> to create one.</li>
-                                        <?php endif; ?>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="postbox">
-                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: SSV Site Specific Forms Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
-                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>SSV Site Specific Forms Fields</span></h2>
-                                <div class="inside">
-                                    <ul id="siteSpecificBaseFieldsList">
-                                        <?php if (!empty($siteSpecificFields)): ?>
-                                            <?php foreach ($siteSpecificFields as $siteSpecificBaseField): ?>
-                                                <li class="baseField" draggable="true" data-field='<?= json_encode($siteSpecificBaseField->getProperties()) ?>' data-type="Input" data-list="wordpress">
-                                                    <span><strong><?= BaseFunctions::escape($siteSpecificBaseField->getName(), 'html') ?></strong></span>
-                                                    <span style="float: right"><?= BaseFunctions::escape($siteSpecificBaseField->getProperty('type'), 'html') ?></span>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        <?php else: ?>
-                                            <li style="margin: 13px;">There are no base fields. <a href="admin.php?page=ssv_forms_fields_manager">Click Here</a> to create one.</li>
-                                        <?php endif; ?>
                                     </ul>
                                 </div>
                             </div>

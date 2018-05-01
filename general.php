@@ -1,14 +1,4 @@
 <?php
-/**
- * Plugin Name: SSV Forms
- * Plugin URI: http://moridrin.com/ssv-forms
- * Description: This is a plugin to create forms with ease.
- * Version: 0.1.9
- * Author: Jeroen Berkvens
- * Author URI: http://nl.linkedin.com/in/jberkvens/
- * License: WTFPL
- * License URI: http://www.wtfpl.net/txt/copying/
- */
 
 use mp_ssv_general\base\BaseFunctions;
 

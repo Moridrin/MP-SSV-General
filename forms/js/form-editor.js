@@ -1,4 +1,4 @@
-let formsManager = {
+let formEditor = {
     deleteRow: function (formId) {
         let tr = document.getElementById(formId + '_tr');
         let container = tr.parentElement;
@@ -12,7 +12,7 @@ let formsManager = {
         );
         event.preventDefault();
         if (container.childElementCount === 0) {
-            formsManager.showEmptyTable(container.id);
+            formEditor.showEmptyTable(container.id);
         }
     },
 
@@ -111,7 +111,6 @@ let formsManager = {
         }
 
         function handleDrop(e) {
-            console.log('test');
             if (e.stopPropagation) {
                 e.stopPropagation();
             }

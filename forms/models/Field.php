@@ -19,18 +19,61 @@ abstract class Field extends Model
         return parent::_create(['f_name' => $name, 'f_properties' => json_encode($properties)]);
     }
 
+    /**
+     * @param string $orderBy
+     * @param string $order
+     * @return Field[]
+     */
     public static function getAll(string $orderBy = 'id', string $order = 'ASC'): array
     {
-        $sharedFields = SharedField::getAll($orderBy, $order);
-        $siteSpecificFields = SiteSpecificField::getAll($orderBy, $order);
-        $formFields = FormField::getAll($orderBy, $order);
-        return array_merge($sharedFields, $siteSpecificFields, $formFields);
+        BaseFunctions::var_export('### Site Specific ###');
+        foreach (SiteSpecificField::getAll($orderBy, $order) as $field) {
+            BaseFunctions::var_export($field->getName());
+        }
+        BaseFunctions::var_export('### Shared ###');
+        foreach (SharedField::getAll($orderBy, $order) as $field) {
+            BaseFunctions::var_export($field->getName());
+        }
+        BaseFunctions::var_export('### WordPress ###');
+        foreach (WordPressField::getAll($orderBy, $order) as $field) {
+            BaseFunctions::var_export($field->getName());
+        }
+        $fields = SiteSpecificField::getAll($orderBy, $order);
+        $fields = array_merge($fields, SharedField::getAllExcept($fields, $orderBy, $order));
+        $fields = array_merge($fields, WordPressField::getAllExcept($fields, $orderBy, $order));
+        return $fields;
+    }
+
+    public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC'): array
+    {
+        $names = [];
+        foreach ($except as $field) {
+            if ($field instanceof Field) {
+                $names[] = $field->getName();
+            } elseif (is_string($field)) {
+                $names[] = $field;
+            }
+        }
+        if (empty($names)) {
+            return self::getAll();
+        } else {
+            $names = implode('\', \'', $names);
+            $results = self::_find("f_name NOT IN ('$names')", $orderBy, $order);
+            if ($results === null) {
+                return [];
+            }
+            $fields = [];
+            foreach ($results as $row) {
+                $fields[] = new static($row);
+            }
+            return $fields;
+        }
     }
 
     final public static function findByName(string $name, int $formId): ?Field
     {
         // Form Field
-        $row = FormField::_findRow('f_name = ' . $name);
+        $row = FormField::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
         if ($row !== null) {
             return new FormField($row);
         }
@@ -48,7 +91,7 @@ abstract class Field extends Model
         }
 
         // WordPress Field
-        $row = WordPressField::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
+        $row = WordPressField::_findRow('f_name = ' . $name);
         if ($row !== null) {
             return new WordPressField($row);
         }
