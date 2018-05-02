@@ -2,6 +2,8 @@
 
 namespace mp_ssv_general\base\models;
 
+use mp_ssv_general\exceptions\NotFoundException;
+
 /**
  * Created by PhpStorm.
  * User: moridrin
@@ -42,16 +44,13 @@ abstract class Model
         return $fields;
     }
 
-    abstract public static function findById(?int $id): ?Model;
+    abstract public static function findById(int $id): Model;
 
-    protected static function _findById(?int $id): ?Model
+    protected static function _findById(int $id): Model
     {
-        if ($id === null) {
-            return null;
-        }
         $row = self::_findRow('id = ' . $id);
         if ($row === null) {
-            return null;
+            throw new NotFoundException('The '.self::class.' with ID '.$id.' could not be found.');
         }
         return new static($row);
     }
@@ -140,6 +139,11 @@ abstract class Model
     abstract public function getTableRow(): array;
 
     abstract public function getRowActions(): array;
+
+    public function getData(): array
+    {
+        return $this->row;
+    }
 
     final public function save(): bool
     {

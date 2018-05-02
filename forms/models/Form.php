@@ -17,12 +17,21 @@ class Form extends Model
         return parent::_create(['f_title' => $title, 'f_fields' => json_encode($fields)]);
     }
 
+    public static function getDummy(): Form
+    {
+        return new Form(['id' => -1, 'f_title' => '', 'f_fields' => json_encode([])]);
+    }
+
     public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
         return parent::_getAll($orderBy, $order);
     }
 
-    public static function findById(?int $id): ?Model
+    /**
+     * @param int|null $id
+     * @return Form|null
+     */
+    public static function findById(int $id): Model
     {
         return parent::_findById($id);
     }
@@ -131,18 +140,29 @@ class Form extends Model
     {
         return [
             [
-                'spanClass' => 'inline',
-                'onclick' => 'formManager.edit(\'' . $this->getId() . '\')',
-                'linkClass' => 'editinline',
+                'spanClass' => '',
+                'href' => admin_url('admin.php').'?page=ssv_forms&action=edit&id='.$this->getId(),
+                'linkClass' => 'edit',
                 'linkText' => 'Edit',
             ],
             [
                 'spanClass' => 'trash',
-                'onclick' => 'formManager.deleteRow(\'' . $this->getId() . '\')',
+                'onclick' => 'formsManager.deleteRow(\'' . $this->getId() . '\')',
                 'linkClass' => 'submitdelete',
                 'linkText' => 'Trash',
             ],
         ];
+    }
+
+    public function getData(): array
+    {
+        return $this->getFields();
+    }
+
+    protected function _beforeSave(): bool
+    {
+        $this->row['f_fields'] = json_encode($this->row['f_fields']);
+        return true;
     }
     #endregion
 }

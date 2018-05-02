@@ -2,7 +2,6 @@
 
 namespace mp_ssv_general\forms\models;
 
-use mp_ssv_general\base\Database;
 use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
@@ -16,34 +15,35 @@ class WordPressField extends Field
         'username' => [
             'id' => 0,
             'f_name' => 'username',
-            'f_properties' => ['name' => 'username', 'type' => 'text', 'value' => ''],
+            'f_properties' => ['name' => 'username', 'type' => 'text', 'value' => '', 'title' => 'Username'],
         ],
         'first_name' => [
             'id' => 0,
             'f_name' => 'first_name',
-            'f_properties' => ['name' => 'first_name', 'type' => 'text', 'value' => ''],
+            'f_properties' => ['name' => 'first_name', 'type' => 'text', 'value' => '', 'title' => 'First Name'],
         ],
         'last_name' => [
             'id' => 0,
             'f_name' => 'last_name',
-            'f_properties' => ['name' => 'last_name', 'type' => 'text', 'value' => ''],
+            'f_properties' => ['name' => 'last_name', 'type' => 'text', 'value' => '', 'title' => 'Last Name'],
         ],
         'email' => [
             'id' => 0,
             'f_name' => 'email',
-            'f_properties' => ['name' => 'email', 'type' => 'text', 'value' => ''],
+            'f_properties' => ['name' => 'email', 'type' => 'text', 'value' => '', 'title' => 'Email'],
         ],
         'password' => [
             'id' => 0,
             'f_name' => 'password',
-            'f_properties' => ['name' => 'password', 'type' => 'password', 'value' => ''],
+            'f_properties' => ['name' => 'password', 'type' => 'password', 'value' => '', 'title' => 'Password'],
         ],
         'password_confirm' => [
             'id' => 0,
             'f_name' => 'password_confirm',
-            'f_properties' => ['name' => 'password_confirm', 'type' => 'password', 'value' => ''],
+            'f_properties' => ['name' => 'password_confirm', 'type' => 'password', 'value' => '', 'title' => 'Confirm Password'],
         ],
     ];
+
     /**
      * @param string $orderBy
      * @param string $order
@@ -73,13 +73,24 @@ class WordPressField extends Field
         return $fields;
     }
 
+    protected static function _findRow(string $where): ?array
+    {
+        preg_match('/f_name(.*)/', $where, $matches);
+        preg_match_all('/"(.*?)"/', $matches[1], $values);
+        foreach ($values[1] as $value) {
+            return self::$fieldArrays[$value];
+        }
+        return null;
+    }
+
+
     /**
      * @deprecated WordPress Fields are not findable by ID.
      * @param int|null $id
      * @return Model|null
      * @throws \Exception
      */
-    public static function findById(?int $id): ?Model
+    public static function findById(int $id): Model
     {
         throw new \Exception('Can\'t get WordPress fields by ID');
     }

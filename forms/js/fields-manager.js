@@ -172,7 +172,10 @@ let fieldsManager = {
         isOpen: false,
 
         getInputField: function (title, name, value, type, events) {
-            events.onkeydown = 'fieldsManager.editor.onKeyDown()';
+            // console.log(events.onkeydown);
+            // if (events.onkeydown === undefined) {
+                events.onkeydown = 'fieldsManager.editor.onKeyDown()';
+            // }
             let eventsString = '';
             for (let [eventName, event] of Object.entries(events)) {
                 eventsString += eventName + '="' + event + '" ';
@@ -343,8 +346,7 @@ let fieldsManager = {
         this.editor.current = id;
         this.editor.isOpen = true;
         let tr = document.getElementById("field_" + id);
-        console.log(tr);
-        console.log(id);
+        console.log(tr.dataset.properties);
         let properties = jQuery.parseJSON(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
 
@@ -536,10 +538,10 @@ let fieldsManager = {
                     action: params.actions.delete,
                     shared: params.isShared,
                     formId: params.formId,
-                    ids: [id],
+                    id: id,
                 },
                 function (data) {
-                    fieldsManager.ajaxResponse(data);
+                    generalFunctions.ajaxResponse(data);
                 }
             );
         }
@@ -603,7 +605,7 @@ let fieldsManager = {
                 oldName: this.editor.current,
             },
             function (data) {
-                if (fieldsManager.ajaxResponse(data)) {
+                if (generalFunctions.ajaxResponse(data)) {
                     let id = JSON.parse(data)['id'];
                     tr.setAttribute('id', 'field_' + id);
                     fieldsManager.editor.current = id;
@@ -653,7 +655,7 @@ let fieldsManager = {
                 id: id,
             },
             function (data) {
-                fieldsManager.ajaxResponse(data);
+                generalFunctions.ajaxResponse(data);
             }
         );
     },
@@ -694,7 +696,6 @@ let fieldsManager = {
             '<td>' + properties.value + '</td>'
         ;
         tr.setAttribute('class', 'inactive');
-        tr.setAttribute('draggable', 'draggable');
         this.editor.current = null;
         this.editor.isOpen = false;
     },
@@ -702,22 +703,8 @@ let fieldsManager = {
     getEmptyRow: function () {
         return '' +
             '<tr id="no-items" class="no-items">' +
-            '    <td class="colspanchange" colspan="8">No Fields found</td>' +
+            '    <td class="colspanchange" colspan="8">No Items found</td>' +
             '</tr>'
             ;
-    },
-
-    ajaxResponse: function (data) {
-        try {
-            data = JSON.parse(data);
-            if (data['errors']) {
-                generalFunctions.showNotice(data['errors']);
-                return false;
-            }
-        } catch (e) {
-            generalFunctions.showNotice('<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>');
-
-        }
-        return true;
     },
 };

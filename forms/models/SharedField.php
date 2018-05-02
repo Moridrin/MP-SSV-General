@@ -23,7 +23,7 @@ class SharedField extends Field
         return parent::_getAll($orderBy, $order);
     }
 
-    public static function findById(?int $id): ?Model
+    public static function findById(int $id): Model
     {
         return parent::_findById($id);
     }

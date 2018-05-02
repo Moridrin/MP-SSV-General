@@ -1,12 +1,13 @@
+// noinspection JSUnusedGlobalSymbols
 /**
  * Created by moridrin on 5-6-17.
  */
 let generalFunctions = {
     getCurrentDate: function () {
-        var today = new Date();
-        var yyyy = today.getFullYear();
-        var mm = today.getMonth() + 1; //January is 0!
-        var dd = today.getDate();
+        let today = new Date();
+        let yyyy = today.getFullYear();
+        let mm = today.getMonth() + 1; //January is 0!
+        let dd = today.getDate();
         if (dd < 10) {
             dd = '0' + dd
         }
@@ -17,9 +18,9 @@ let generalFunctions = {
     },
 
     getCurrentTime: function () {
-        var today = new Date();
-        var hh = today.getHours();
-        var mm = today.getMinutes();
+        let today = new Date();
+        let hh = today.getHours();
+        let mm = today.getMinutes();
         if (hh < 10) {
             hh = '0' + hh
         }
@@ -46,7 +47,17 @@ let generalFunctions = {
         }
     },
 
-    showNotice: function (message) {
-        document.getElementById('messagesContainer').innerHTML = message;
-    }
+    ajaxResponse: function (data) {
+        let messageContainer = document.getElementById('messagesContainer');
+        try {
+            data = JSON.parse(data);
+            if (data['errors']) {
+                messageContainer.innerHTML = data['errors']; // TODO Fix possible security risk
+                return false;
+            }
+        } catch (e) {
+            messageContainer.innerHTML = '<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>';
+        }
+        return true;
+    },
 };

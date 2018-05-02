@@ -3,13 +3,10 @@
 namespace mp_ssv_general\forms;
 
 use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\base\models\Model;
 use mp_ssv_general\base\SSV_Global;
-use mp_ssv_general\exceptions\NotImplementedException;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\FormField;
-use mp_ssv_general\forms\models\Forms;
 use mp_ssv_general\forms\models\SharedField;
 use mp_ssv_general\forms\models\SiteSpecificField;
 
@@ -59,7 +56,34 @@ abstract class Options
         <div class="wrap">
             <?php
             if (BaseFunctions::isValidPOST(SSV_Forms::ADMIN_REFERER)) {
-                throw new NotImplementedException('Actions in Forms Page.');
+                $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
+                $formTitle = BaseFunctions::sanitize($_POST['formTitle'], 'text');
+                if ($formId === -1) {
+                    $formId = Form::create($formTitle);
+                }
+                $fields = [];
+                if (isset($_POST['fields'])) {
+                    foreach ($_POST['fields'] as $field) {
+                        $field = BaseFunctions::sanitize(json_decode(stripslashes($field), true), 'string');
+                        $found = Field::findByName($field['name'], $formId);
+                        if ($found === null) {
+                            FormField::create($field['name'], $field, $formId);
+                        } elseif ($found instanceof FormField) {
+                            $found
+                                ->setProperties($field)
+                                ->save()
+                            ;
+                        } elseif (!$found->equals($field)) {
+                            FormField::create($field['name'], $field, $formId);
+                        }
+                        $fields[] = $field['name'];
+                    }
+                }
+                Form::findById($formId)
+                    ->setTitle($formTitle)
+                    ->setFields($fields)
+                    ->save()
+                ;
             }
             $order    = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
             $orderBy  = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');
@@ -68,7 +92,7 @@ abstract class Options
             <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
             <p>These forms will only be available for <?= get_bloginfo() ?>.</p>
             <?php
-            mp_ssv_show_table(Form::getTableColumns(), Form::getAll(), $orderBy, $order, current_user_can('manage_site_specific_forms'))
+            mp_ssv_show_table(Form::class, $orderBy, $order, current_user_can('manage_site_specific_forms'))
             ?>
         </div>
         <?php
@@ -76,19 +100,23 @@ abstract class Options
 
     public static function showFormPageEdit()
     {
+        if (BaseFunctions::isValidPOST(SSV_Forms::ADMIN_REFERER)) {
+            BaseFunctions::var_export($_POST, 1);
+        }
         if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
             $form = Form::findById($_GET['id']);
             if ($form === null) {
                 throw new \Exception('Form not found');
             }
         } else {
-            $formId = Form::create('');
-            if ($formId === null) {
-                throw new \Exception('Form could not be created');
-            }
-            $form = Form::findById($formId);
+            $form = Form::getDummy();
+//            $formId = Form::create('');
+//            if ($formId === null) {
+//                throw new \Exception('Form could not be created');
+//            }
+//            $form = Form::findById($formId);
         }
-        show_form_editor($form);
+        mp_ssv_show_form_editor($form);
     }
 
     public static function showCombinedFieldsPage()
@@ -136,7 +164,7 @@ abstract class Options
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
         <p>These fields will be available for all sites.</p>
         <?php
-        mp_ssv_show_table(SharedField::getTableColumns(), SharedField::getAll(), $orderBy, $order, current_user_can('manage_shared_base_fields'));
+        mp_ssv_show_table(SharedField::class, $orderBy, $order, current_user_can('manage_shared_base_fields'));
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -161,7 +189,7 @@ abstract class Options
         </h1>
         <p>These fields will only be available for <?= get_bloginfo() ?>.</p>
         <?php
-        mp_ssv_show_table(SiteSpecificField::getTableColumns(), SiteSpecificField::getAll(), $orderBy, $order, current_user_can('manage_site_specific_base_fields'));
+        mp_ssv_show_table(SiteSpecificField::class, $orderBy, $order, current_user_can('manage_site_specific_base_fields'));
     }
 }
 

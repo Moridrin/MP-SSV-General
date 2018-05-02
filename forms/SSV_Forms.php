@@ -95,10 +95,18 @@ abstract class SSV_Forms
             case 'ssv_forms':
                 if (is_network_admin()) {
                     self::enquireFieldsManagerScripts();
+                } else {
+                    if (isset($_GET['action']) && $_GET['action'] === 'edit' && isset($_GET['id'])) {
+                        self::enquireFormEditorScripts();
+                        self::enquireFieldsManagerScripts();
+                    } else {
+                        self::enquireFormsManagerScripts();
+                    }
                 }
                 break;
             case 'ssv_forms_add_new_form':
                 self::enquireFormEditorScripts();
+                self::enquireFieldsManagerScripts();
                 break;
         }
     }
@@ -116,7 +124,7 @@ abstract class SSV_Forms
             ],
             'actions'    => [
                 'save'   => 'mp_ssv_general_forms_save_field',
-                'delete' => 'mp_ssv_general_forms_delete_fields',
+                'delete' => 'mp_ssv_general_forms_delete_field',
             ],
             'isShared'   => $activeTab === 'shared',
             'roles'      => array_keys(get_editable_roles()),
@@ -128,12 +136,20 @@ abstract class SSV_Forms
     private static function enquireFormEditorScripts()
     {
         wp_enqueue_script('mp-ssv-form-editor', SSV_Forms::URL . '/js/form-editor.js', ['jquery']);
-        wp_localize_script('mp-ssv-form-editor', 'mp_ssv_form_editor_params', [
+    }
+
+    private static function enquireFormsManagerScripts()
+    {
+        wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
+        wp_localize_script('mp-ssv-forms-manager', 'mp_ssv_forms_manager_params', [
             'urls'       => [
                 'plugins'  => plugins_url(),
                 'ajax'     => admin_url('admin-ajax.php'),
                 'base'     => get_home_url(),
                 'basePath' => ABSPATH,
+            ],
+            'actions'    => [
+                'delete' => 'mp_ssv_general_forms_delete_form',
             ],
             'formId'     => $_GET['id'] ?? null,
         ]);
@@ -184,10 +200,10 @@ abstract class SSV_Forms
 
     public static function CLEAN_INSTALL($networkEnable)
     {
-        $database = SSV_Global::getDatabase();
+        global $wpdb;
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = self::SHARED_BASE_FIELDS_TABLE;
-        $database->query("DROP TABLE $tableName;");
+        $tableName = SharedField::getDatabaseTableName();
+        $wpdb->query("DROP TABLE $tableName;");
         if ($networkEnable) {
             SSV_Global::runFunctionOnAllSites([self::class, 'cleanInstallBlog']);
         } else {

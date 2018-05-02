@@ -7,43 +7,40 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_customized_form_fields_table(array $fields)
+function mp_ssv_show_form_fields_table(array $fields)
 {
     ?>
     <div style="overflow-x: auto;">
         <table id="formFieldsContainer" class="wp-list-table widefat striped">
             <thead>
             <tr id="formFieldsListTop">
-                <th scope="col" id="author" class="manage-column column-author">Title</th>
-                <th scope="col" id="author" class="manage-column column-author">Input Type</th>
-                <th scope="col" id="author" class="manage-column column-author">Default Value</th>
+                <th scope="col" id="author" class="manage-column">Title</th>
+                <th scope="col" id="author" class="manage-column">Input Type</th>
+                <th scope="col" id="author" class="manage-column">Default Value</th>
             </tr>
             </thead>
-            <tbody id="formFieldsList">
+            <tbody id="the-list">
             <?php if (!empty($fields)): ?>
                 <?php /** @var Field $field */ ?>
                 <?php foreach ($fields as $field): ?>
                     <tr
-                            id="<?= BaseFunctions::escape(get_class($field) . '_' . $field->getId(), 'attr') ?>_tr"
+                            id="field_<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
                             draggable="true"
                             class="formField"
-                            data-base-field-name="<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
-                            data-properties='<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>'
+                            data-properties="<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>"
                     >
                         <td>
-                            <input type="hidden" name="form_fields[]" value="<?= $field->getName() ?>">
-                            <strong id="<?= $field->getId() ?>_title"><?= BaseFunctions::escape($field->getProperty('title'), 'html') ?></strong>
-                            <?php if ($field->getProperty('type') !== 'hidden'): ?>
-                                <span class="inline-actions"> | <a href="javascript:void(0)" onclick="fieldsCustomizer.inlineEdit('<?= BaseFunctions::escape(get_class($field), 'attr') ?>', '<?= $field->getId() ?>')" class="editinline"
-                                                                   aria-label="Quick edit “<?= $field->bf_title ?>” inline">Quick Edit</a></span>
-                            <?php endif; ?>
+                            <strong class="fieldName_js"><?= BaseFunctions::escape($field->getProperty('title'), 'html') ?></strong>
+                            <input type="hidden" name="fields[]" value="<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>">
                         </td>
-                        <td id="<?= $field->getId() ?>_inputType"><?= $field->getProperty('type') ?></td>
-                        <?php if ($field->getProperty('type') !== 'hidden'): ?>
-                            <td id="<?= $field->getId() ?>_defaultValue"><?= $field->getProperty('defaultValue') ?></td>
-                        <?php else: ?>
-                            <td id="<?= $field->getId() ?>_value"><?= $field->getProperty('value') ?></td>
-                        <?php endif; ?>
+                        <td><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></td>
+                        <td>
+                            <div class="row-actions" style="float: right">
+                                <a href="javascript:void(0)" onclick="formEditor.customize('<?= BaseFunctions::escape($field->getName(), 'attr') ?>')" class="editinline">
+                                    <span class="dashicons dashicons-admin-customizer"></span>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -58,9 +55,9 @@ function show_customized_form_fields_table(array $fields)
             </tbody>
             <tfoot>
             <tr id="formFieldsListBottom">
-                <th scope="col" id="author" class="manage-column column-author">Title</th>
-                <th scope="col" id="author" class="manage-column column-author">Input Type</th>
-                <th scope="col" id="author" class="manage-column column-author">Default Value</th>
+                <th scope="col" id="author" class="manage-column">Title</th>
+                <th scope="col" id="author" class="manage-column">Input Type</th>
+                <th scope="col" id="author" class="manage-column">Default Value</th>
             </tr>
             </tfoot>
         </table>

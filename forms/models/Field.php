@@ -5,6 +5,7 @@ namespace mp_ssv_general\forms\models;
 use DateTime;
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
+use mp_ssv_general\base\models\User;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -63,25 +64,25 @@ abstract class Field extends Model
     final public static function findByName(string $name, int $formId): ?Field
     {
         // Form Field
-        $row = FormField::_findRow('f_name = ' . $name . ' AND form_id = ' . $formId);
+        $row = FormField::_findRow('f_name = "' . $name . '" AND form_id = "' . $formId . '"');
         if ($row !== null) {
             return new FormField($row);
         }
 
         // Site Specific Field
-        $row = SiteSpecificField::_findRow('f_name = ' . $name);
+        $row = SiteSpecificField::_findRow('f_name = "' . $name . '"');
         if ($row !== null) {
             return new SiteSpecificField($row);
         }
 
         // Shared Field
-        $row = SharedField::_findRow('f_name = ' . $name);
+        $row = SharedField::_findRow('f_name = "' . $name . '"');
         if ($row !== null) {
             return new SharedField($row);
         }
 
         // WordPress Field
-        $row = WordPressField::_findRow('f_name = ' . $name);
+        $row = WordPressField::_findRow('f_name = "' . $name . '"');
         if ($row !== null) {
             return new WordPressField($row);
         }
@@ -109,7 +110,9 @@ abstract class Field extends Model
 
     protected function __init(): void
     {
-        $this->row['f_properties'] = json_decode($this->row['f_properties'], true);
+        if (!is_array($this->row['f_properties'])) {
+            $this->row['f_properties'] = json_decode($this->row['f_properties'], true);
+        }
     }
 
     #region getters & setters
@@ -121,6 +124,11 @@ abstract class Field extends Model
     public function getProperties(): array
     {
         return $this->row['f_properties'];
+    }
+
+    public function hasProperty(string $key)
+    {
+        return isset($this->row['f_properties'][$key]);
     }
 
     public function getProperty(string $key)
@@ -188,6 +196,11 @@ abstract class Field extends Model
         ];
     }
 
+    public function getData(): array
+    {
+        return $this->getProperties();
+    }
+
     protected function _beforeSave(): bool
     {
         $this->row['f_properties'] = json_encode($this->row['f_properties']);
@@ -228,6 +241,26 @@ abstract class Field extends Model
                 show_default_input_field($this);
                 break;
         }
+    }
+
+    public function equals($object): bool
+    {
+        if (is_array($object)) {
+            foreach ($object as $name => $value) {
+                if (!$this->hasProperty($name) || $this->getProperty($name) !== $value) {
+                    return false;
+                }
+            }
+            return true;
+        } elseif ($object instanceof Field) {
+            foreach ($object->row as $name => $value) {
+                if (!isset($this->row[$name]) || $this->row[$name] !== $value) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private function _getHiddenInputFieldHtml(): string
