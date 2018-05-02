@@ -8,13 +8,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order = 'asc', bool $canManage = false)
+function mp_ssv_show_table(?array $columns, array $items, ?string $orderBy = 'id', string $order = 'asc', bool $canManage = false)
 {
-    if (!is_subclass_of($class, Model::class)) {
-        throw new InvalidArgumentException('The class ' . $class . ' is not a subclass of ' . Model::class);
-    }
-    $columns = call_user_func([$class, 'getTableColumns']);
-    $items = call_user_func([$class, 'getAll']);
     $newOrder = ($order === 'asc' ? 'desc' : 'asc');
     ?>
     <form method="post" action="#">
@@ -32,58 +27,34 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                 </div>
             <?php endif; ?>
             <table class="wp-list-table widefat striped">
-                <thead>
-                <tr>
-                    <td id="cb" class="manage-column column-cb check-column">
-                        <?php if ($canManage): ?>
-                            <label class="screen-reader-text" for="cb-select-all-1">Select All</label>
-                            <input id="cb-select-all-1" type="checkbox">
-                        <?php endif; ?>
-                    </td>
-                    <?php foreach ($columns as $key => $column): ?>
-                        <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
-                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column, 'attr') ?></span><span class="sorting-indicator"></span></a>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-                </thead>
+                <?php if ($columns !== null): ?>
+                    <thead>
+                    <tr>
+                        <td id="cb" class="manage-column column-cb check-column">
+                            <?php if ($canManage): ?>
+                                <label class="screen-reader-text" for="cb-select-all-1">Select All</label>
+                                <input id="cb-select-all-1" type="checkbox">
+                            <?php endif; ?>
+                        </td>
+                        <?php foreach ($columns as $key => $column): ?>
+                            <?php if ($orderBy !== null): ?>
+                                <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
+                                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column, 'attr') ?></span><span class="sorting-indicator"></span></a>
+                                </th>
+                            <?php else: ?>
+                                <th scope="col" class="manage-column">
+                                    <span><?= BaseFunctions::escape($column, 'attr') ?></span>
+                                </th>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tr>
+                    </thead>
+                <?php endif; ?>
                 <tbody id="the-list">
                 <?php if (!empty($items)): ?>
                     <?php /** @var Model $item */ ?>
                     <?php foreach ($items as $item): ?>
-                        <?php $row = $item->getTableRow(); ?>
-                        <?php $rowActions = $item->getRowActions(); ?>
-                        <tr id="field_<?= $item->getId() ?>" class="inactive" data-properties='<?= json_encode($item->getProperties()) ?>'><?php // TODO Fix this ?>
-                            <th class="check-column">
-                                <?php if ($canManage): ?>
-                                    <input type="checkbox" name="ids[]" value="<?= $item->getId() ?>">
-                                <?php endif; ?>
-                            </th>
-                            <?php $first = true; ?>
-                            <?php foreach ($row as $cell): ?>
-                                <td>
-                                    <?php if ($first): ?>
-                                        <string><?= BaseFunctions::escape($cell, 'html') ?></string>
-                                        <div class="row-actions">
-                                            <?php
-                                            if ($canManage && !empty($rowActions)) {
-                                                $i = 0;
-                                                $last = count($rowActions) - 1;
-                                                foreach ($rowActions as $action) {
-                                                    $isLast = ($i === $last);
-                                                    ?><span class="<?= BaseFunctions::escape($action['spanClass'], 'attr') ?>"><a href="javascript:void(0)" onclick="<?= BaseFunctions::escape($action['onclick'], 'attr') ?>" class="<?= BaseFunctions::escape($action['linkClass'], 'attr') ?>"><?= BaseFunctions::escape($action['linkText'], 'html') ?></a><?= !$isLast ? ' | ' : '' ?></span><?php
-                                                    ++$i;
-                                                }
-                                            }
-                                            ?>
-                                        </div>
-                                        <?php $first = false; ?>
-                                    <?php else: ?>
-                                        <?= BaseFunctions::escape($cell, 'html', ', ') ?>
-                                    <?php endif; ?>
-                                </td>
-                            <?php endforeach; ?>
-                        </tr>
+                    <?php mp_ssv_show_table_row($item, $canManage); ?>
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr id="no-items" class="no-items">
@@ -91,21 +62,29 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                     </tr>
                 <?php endif; ?>
                 </tbody>
-                <tfoot>
-                <tr>
-                    <td id="cb" class="manage-column column-cb check-column">
-                        <?php if ($canManage): ?>
-                            <label class="screen-reader-text" for="cb-select-all-1">Select All</label>
-                            <input id="cb-select-all-1" type="checkbox">
-                        <?php endif; ?>
-                    </td>
-                    <?php foreach ($columns as $key => $column): ?>
-                        <th scope="col" id="<?= BaseFunctions::escape($column, 'attr') ?>" class="manage-column column-name sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
-                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=name&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
-                        </th>
-                    <?php endforeach; ?>
-                </tr>
-                </tfoot>
+                <?php if ($columns !== null): ?>
+                    <tfoot>
+                    <tr>
+                        <td id="cb" class="manage-column column-cb check-column">
+                            <?php if ($canManage): ?>
+                                <label class="screen-reader-text" for="cb-select-all-1">Select All</label>
+                                <input id="cb-select-all-1" type="checkbox">
+                            <?php endif; ?>
+                        </td>
+                        <?php foreach ($columns as $key => $column): ?>
+                            <?php if ($orderBy !== null): ?>
+                                <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
+                                    <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column, 'attr') ?></span><span class="sorting-indicator"></span></a>
+                                </th>
+                            <?php else: ?>
+                                <th scope="col" class="manage-column">
+                                    <span><?= BaseFunctions::escape($column, 'attr') ?></span>
+                                </th>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tr>
+                    </tfoot>
+                <?php endif; ?>
             </table>
         </div>
         <?php
@@ -114,5 +93,44 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
         }
         ?>
     </form>
+    <?php
+}
+
+function mp_ssv_show_table_row(Model $item, bool $canManage)
+{
+    $row = $item->getTableRow();
+    $rowActions = $item->getRowActions();
+    ?>
+    <tr id="field_<?= $item->getId() ?>" class="inactive" data-properties='<?= json_encode($item->getProperties()) ?>'><?php // TODO Fix this ?>
+        <th class="check-column">
+            <?php if ($canManage): ?>
+                <input type="checkbox" name="ids[]" value="<?= $item->getId() ?>">
+            <?php endif; ?>
+        </th>
+        <?php $first = true; ?>
+        <?php foreach ($row as $cell): ?>
+            <td>
+                <?php if ($first): ?>
+                    <string><?= BaseFunctions::escape($cell, 'html') ?></string>
+                    <div class="row-actions">
+                        <?php
+                        if ($canManage && !empty($rowActions)) {
+                            $i = 0;
+                            $last = count($rowActions) - 1;
+                            foreach ($rowActions as $action) {
+                                $isLast = ($i === $last);
+                                ?><span class="<?= BaseFunctions::escape($action['spanClass'], 'attr') ?>"><a href="javascript:void(0)" onclick="<?= BaseFunctions::escape($action['onclick'], 'attr') ?>" class="<?= BaseFunctions::escape($action['linkClass'], 'attr') ?>"><?= BaseFunctions::escape($action['linkText'], 'html') ?></a><?= !$isLast ? ' | ' : '' ?></span><?php
+                                ++$i;
+                            }
+                        }
+                        ?>
+                    </div>
+                    <?php $first = false; ?>
+                <?php else: ?>
+                    <?= BaseFunctions::escape($cell, 'html', ', ') ?>
+                <?php endif; ?>
+            </td>
+        <?php endforeach; ?>
+    </tr>
     <?php
 }

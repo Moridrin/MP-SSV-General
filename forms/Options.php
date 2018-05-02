@@ -68,7 +68,7 @@ abstract class Options
             <h1 class="wp-heading-inline"><span>Site Specific Forms</span><?= current_user_can('manage_site_specific_forms') ? $addNew : '' ?></h1>
             <p>These forms will only be available for <?= get_bloginfo() ?>.</p>
             <?php
-            mp_ssv_show_table(Form::class, $orderBy, $order, current_user_can('manage_site_specific_forms'))
+            mp_ssv_show_table(Form::getTableColumns(), Form::getAll(), $orderBy, $order, current_user_can('manage_site_specific_forms'))
             ?>
         </div>
         <?php
@@ -136,7 +136,7 @@ abstract class Options
         <h1 class="wp-heading-inline"><span>Shared Form Fields</span><?= current_user_can('manage_shared_base_fields') ? $addNew : '' ?></h1>
         <p>These fields will be available for all sites.</p>
         <?php
-        mp_ssv_show_table(SharedField::class, $orderBy, $order, current_user_can('manage_shared_base_fields'));
+        mp_ssv_show_table(SharedField::getTableColumns(), SharedField::getAll(), $orderBy, $order, current_user_can('manage_shared_base_fields'));
     }
 
     /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -161,7 +161,7 @@ abstract class Options
         </h1>
         <p>These fields will only be available for <?= get_bloginfo() ?>.</p>
         <?php
-        mp_ssv_show_table(SiteSpecificField::class, $orderBy, $order, current_user_can('manage_site_specific_base_fields'));
+        mp_ssv_show_table(SiteSpecificField::getTableColumns(), SiteSpecificField::getAll(), $orderBy, $order, current_user_can('manage_site_specific_base_fields'));
     }
 }
 

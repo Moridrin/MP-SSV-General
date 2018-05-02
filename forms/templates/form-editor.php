@@ -80,7 +80,7 @@ function show_form_editor(Form $form)
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>
                                 <div class="inside" style="margin: 0; padding: 0;">
                                     <?php
-                                    show_customized_form_fields_table($form->getFields());
+                                    mp_ssv_show_table(null, $form->getFields(), null);
                                     ?>
                                 </div>
                             </div>
