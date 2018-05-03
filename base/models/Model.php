@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general\base\models;
 
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\exceptions\NotFoundException;
 
 /**
@@ -23,7 +24,7 @@ abstract class Model
         global $wpdb;
         $wpdb->insert(static::getDatabaseTableName(), $data);
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            SSV_Global::addError($wpdb->last_error);
             return null;
         }
         return $wpdb->insert_id;
@@ -73,7 +74,7 @@ abstract class Model
         $table = static::getDatabaseTableName();
         $results = $wpdb->get_results("SELECT * FROM $table WHERE $where ORDER BY $orderBy $order", ARRAY_A);
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            SSV_Global::addError($wpdb->last_error);
         }
         return $results;
     }
@@ -84,7 +85,7 @@ abstract class Model
         $table = static::getDatabaseTableName();
         $row = $wpdb->get_row("SELECT * FROM $table WHERE $where", ARRAY_A);
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            SSV_Global::addError($wpdb->last_error);
         }
         return $row;
     }
@@ -98,7 +99,7 @@ abstract class Model
         $ids = implode(', ', $ids);
         $wpdb->query("DELETE FROM $table WHERE id IN ($ids)");
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            SSV_Global::addError($wpdb->last_error);
             return false;
         }
         return true;
@@ -159,8 +160,8 @@ abstract class Model
             $success = call_user_func([$this, '_afterSave']);
         }
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
-            $_SESSION['SSV']['errors'][] = $wpdb->last_query;
+            SSV_Global::addError($wpdb->last_error);
+            SSV_Global::addError((string)$wpdb->last_query);
             $success = false;
         }
         return $success;
@@ -180,7 +181,7 @@ abstract class Model
             $success = call_user_func([$this, '_afterDelete']);
         }
         if (!empty($wpdb->last_error)) {
-            $_SESSION['SSV']['errors'][] = $wpdb->last_error;
+            SSV_Global::addError($wpdb->last_error);
             $success = false;
         }
         return $success;

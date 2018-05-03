@@ -31,15 +31,15 @@ class User extends \WP_User
     public static function register(string $username, string $password, string $email): ?User
     {
         if (empty($username) || empty($password) || empty($email)) {
-            $_SESSION['SSV']['errors'][] = 'You cannot register without Username, Password and Email.';
+            SSV_Global::addError('You cannot register without Username, Password and Email.');
             return null;
         }
         if (username_exists($username)) {
-            $_SESSION['SSV']['errors'][] = 'This username already exists. Try resetting your password.';
+            SSV_Global::addError('This username already exists. Try resetting your password.');
             return null;
         }
         if (email_exists($email)) {
-            $_SESSION['SSV']['errors'][] = 'This email address already exists. Try resetting your password.';
+            SSV_Global::addError('This email address already exists. Try resetting your password.');
             return null;
         }
 
@@ -49,7 +49,7 @@ class User extends \WP_User
             BaseFunctions::sanitize($email, 'email')
         );
         if ($id instanceof \WP_Error) {
-            $_SESSION['SSV']['errors'][] = $id->get_error_message();
+            SSV_Global::addError($id->get_error_message());
             return null;
         }
         return self::getByID($id);
@@ -87,7 +87,7 @@ class User extends \WP_User
                 $this->user_email = $value;
                 $response         = wp_update_user($this);
                 if ($response instanceof \WP_Error) {
-                    $_SESSION['SSV']['errors'][] = $response->get_error_message();
+                    SSV_Global::addError($response->get_error_message());
                     return false;
                 } else {
                     return true;
@@ -97,7 +97,7 @@ class User extends \WP_User
                 $this->display_name = $value;
                 $response           = wp_update_user($this);
                 if ($response instanceof \WP_Error) {
-                    $_SESSION['SSV']['errors'][] = $response->get_error_message();
+                    SSV_Global::addError($response->get_error_message());
                     return false;
                 } else {
                     return true;
@@ -109,7 +109,7 @@ class User extends \WP_User
                 $this->display_name = $this->first_name . ' ' . $this->last_name;
                 $response           = wp_update_user($this);
                 if ($response instanceof \WP_Error) {
-                    $_SESSION['SSV']['errors'][] = $response->get_error_message();
+                    SSV_Global::addError($response->get_error_message());
                     return false;
                 } else {
                     return true;
@@ -121,7 +121,7 @@ class User extends \WP_User
                 $this->display_name = $this->first_name . ' ' . $this->last_name;
                 $response           = wp_update_user($this);
                 if ($response instanceof \WP_Error) {
-                    $_SESSION['SSV']['errors'][] = $response->get_error_message();
+                    SSV_Global::addError($response->get_error_message());
                     return false;
                 } else {
                     return true;
@@ -134,7 +134,7 @@ class User extends \WP_User
             default:
                 $response = update_user_meta($this->ID, $metaKey, $value);
                 if ($response === false) {
-                    $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to update ' . $metaKey . ' in the user\'s meta data.';
+                    SSV_Global::addError('Something went wrong while trying to update ' . $metaKey . ' in the user\'s meta data.');
                     return false;
                 } else {
                     return true;
@@ -185,11 +185,11 @@ class User extends \WP_User
         if (!in_array($metaKey, $userProfileFields)) {
             $success = delete_user_meta($this->ID, $metaKey);
             if (!$success && !$options['ignore']) {
-                $_SESSION['SSV']['errors'][] = 'Something went wrong while trying to remove ' . $metaKey . ' from the user\'s meta data.';
+                SSV_Global::addError('Something went wrong while trying to remove ' . $metaKey . ' from the user\'s meta data.');
             }
             return $success;
         } elseif (!$options['ignore']) {
-            $_SESSION['SSV']['errors'][] = 'You cannot remove a profile field.';
+            SSV_Global::addError('You cannot remove a profile field.');
         }
         return false;
     }

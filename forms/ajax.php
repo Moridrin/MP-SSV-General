@@ -1,6 +1,7 @@
 <?php
 
 use mp_ssv_general\base\BaseFunctions;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\models\Field;
 use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\FormField;
@@ -42,7 +43,7 @@ function mp_ssv_general_forms_save_field()
             $field = $id !== null ? FormField::findById($id) : null;
             break;
         default:
-            $_SESSION['SSV']['errors'][] = 'Unknown type: '.$type;
+            SSV_Global::addError('Unknown type: '.$type);
             return;
     }
     if ($field instanceof Field) {

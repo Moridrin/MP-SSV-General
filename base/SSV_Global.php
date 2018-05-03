@@ -56,6 +56,11 @@ abstract class SSV_Global
         }
     }
 
+    public static function addError(string $message)
+    {
+        $_SESSION['SSV']['errors'][] = $message;
+    }
+
     public static function getErrors($clear = true)
     {
         ob_start();

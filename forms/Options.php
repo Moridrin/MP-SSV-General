@@ -154,7 +154,7 @@ abstract class Options
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                 SharedField::deleteByIds(BaseFunctions::sanitize($_POST['ids'], 'int'));
             } else {
-                $_SESSION['SSV']['errors'][] = 'Unknown action.';
+                SSV_Global::addError('Unknown action.');
             }
         }
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_name', 'text');
@@ -174,7 +174,7 @@ abstract class Options
             if ($_POST['action'] === 'delete-selected' && !isset($_POST['_inline_edit'])) {
                 SiteSpecificField::deleteByIds(BaseFunctions::sanitize($_POST['ids'], 'int'));
             } else {
-                $_SESSION['SSV']['errors'][] = 'Unknown action.';
+                SSV_Global::addError('Unknown action.');
             }
         }
         $orderBy    = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_name', 'text');

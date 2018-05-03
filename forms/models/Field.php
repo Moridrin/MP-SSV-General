@@ -6,6 +6,7 @@ use DateTime;
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
 use mp_ssv_general\base\models\User;
+use mp_ssv_general\base\SSV_Global;
 use mp_ssv_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
@@ -204,6 +205,10 @@ abstract class Field extends Model
     protected function _beforeSave(): bool
     {
         $this->row['f_properties'] = json_encode($this->row['f_properties']);
+        if ($this->oldName !== $this->row['f_name']) {
+            SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
+            return false;
+        }
         return true;
     }
 
