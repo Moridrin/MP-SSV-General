@@ -291,7 +291,7 @@ abstract class Field extends Model
     protected function _beforeSave(): bool
     {
         $this->row['f_properties'] = json_encode($this->row['f_properties']);
-        if ($this->oldName !== $this->row['f_name']) {
+        if ($this->oldName === null && $this->oldName !== $this->row['f_name']) {
             SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
             return false;
         }
