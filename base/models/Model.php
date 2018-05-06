@@ -56,7 +56,8 @@ abstract class Model
     {
         $row = self::_findRow('id = ' . $id);
         if ($row === null) {
-            throw new NotFoundException('The '.self::class.' with ID '.$id.' could not be found.');
+            $parts = explode('\\', static::class);
+            throw new NotFoundException('The ' . end($parts) . ' with ID ' . $id . ' could not be found.');
         }
         return new static($row);
     }

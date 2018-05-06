@@ -12,14 +12,14 @@ if (!defined('ABSPATH')) {
 class Form extends Model
 {
     #region Class
-    public static function create(string $title, array $fields = []): ?int
+    public static function create(string $title, string $submitText = 'submit', array $fields = []): ?int
     {
-        return parent::_create(['f_title' => $title, 'f_fields' => json_encode($fields)]);
+        return parent::_create(['f_title' => $title, 'f_submitText' => $submitText, 'f_fields' => json_encode($fields)]);
     }
 
     public static function getDummy(): Form
     {
-        return new Form(['id' => -1, 'f_title' => '', 'f_fields' => json_encode([])]);
+        return new Form(['id' => -1, 'f_title' => '', 'f_submitText' => 'Submit', 'f_fields' => json_encode([])]);
     }
 
     public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
@@ -78,19 +78,17 @@ class Form extends Model
 
     protected static function _getDatabaseFields(): array
     {
-        return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
+        return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL', '`f_submitText` VARCHAR(50)'];
     }
     #endregion
 
     #region Instance
-
     public function getTitle(): string
     {
         return $this->row['f_title'];
     }
 
     #region getters & setters
-
     public function getFieldByName(string $name): Field
     {
         return FormField::findByName($name, $this->getId());
@@ -104,7 +102,7 @@ class Form extends Model
 
     public function setSubmitText(string $title): Form
     {
-        $this->row['f_title'] = $title;
+        $this->row['f_submitText'] = $title;
         return $this;
     }
 
@@ -183,6 +181,9 @@ class Form extends Model
     public function __toString(): string
     {
         ob_start();
+        ?>
+        <h2><?= $this->getTitle() ?></h2>
+        <?php
         foreach ($this->getFields() as $field) {
             echo $field;
         }

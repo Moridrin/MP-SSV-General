@@ -52,12 +52,20 @@ function mp_ssv_show_form_editor(Form $form)
                                 </div>
                             </div>
                             <div class="postbox">
+                                <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Customization</span><span class="toggle-indicator" aria-hidden="true"></span></button>
+                                <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Customization</span></h2>
+                                <div class="inside">
+                                    <p class="post-attributes-label-wrapper"><label class="post-attributes-label" for="submitButtonText">Submit button text</label></p>
+                                    <input id="submitButtonText" name="submitButtonText" type="text" value="<?= BaseFunctions::escape($form->getSubmitText(), 'attr') ?>">
+                                </div>
+                            </div>
+                            <div class="postbox">
                                 <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Fields</span><span class="toggle-indicator" aria-hidden="true"></span></button>
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Fields</span></h2>
                                 <div class="inside">
                                     <ul id="fieldsList">
                                         <?php foreach ($fields as $field): ?>
-                                            <li id="baseField_<?= BaseFunctions::escape($field->getName(), 'attr') ?>" class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input" data-list="wordpress">
+                                            <li id="baseField_<?= BaseFunctions::escape($field->getName(), 'attr') ?>" class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input">
                                                 <span><strong><?= BaseFunctions::escape($field->getName(), 'html') ?></strong></span>
                                                 <span style="font-size: 9px;">(<?= $field->getType() ?>)</span>
                                                 <span style="float: right"><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></span>
@@ -71,6 +79,9 @@ function mp_ssv_show_form_editor(Form $form)
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Other</span></h2>
                                 <div class="inside">
                                     <ul id="otherList">
+                                        <li id="decoration" class="baseField" draggable="true" data-type="Decoration">
+                                            <span><strong>Header</strong></span>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -78,7 +89,7 @@ function mp_ssv_show_form_editor(Form $form)
                     </div>
                     <div id="postbox-container-2" class="postbox-container">
                         <div class="meta-box-sortables ui-sortable">
-                            <div id="postform" class="postbox">
+                            <div id="postForm" class="postbox">
                                 <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel: Form</span><span class="toggle-indicator" aria-hidden="true"></span></button>
                                 <h2 class="hndle ui-sortable-handle" style="cursor: pointer;"><span>Form</span></h2>
                                 <div class="inside" style="margin: 0; padding: 0;">

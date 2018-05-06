@@ -4,6 +4,7 @@ namespace mp_ssv_general\forms;
 
 use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\SSV_Global;
+use mp_ssv_general\exceptions\NotFoundException;
 use mp_ssv_general\forms\models\Form;
 use mp_ssv_general\forms\models\FormField;
 use mp_ssv_general\forms\models\SharedField;
@@ -73,10 +74,11 @@ abstract class Options
         <div class="wrap">
             <?php
             if (BaseFunctions::isValidPOST(SSV_Forms::ADMIN_REFERER)) {
-                $formId    = BaseFunctions::sanitize($_POST['formId'], 'int');
-                $formTitle = BaseFunctions::sanitize($_POST['formTitle'], 'text');
+                $formId           = BaseFunctions::sanitize($_POST['formId'], 'int');
+                $formTitle        = BaseFunctions::sanitize($_POST['formTitle'], 'text');
+                $submitButtonText = BaseFunctions::sanitize($_POST['submitButtonText'], 'text');
                 if ($formId === -1) {
-                    $formId = Form::create($formTitle);
+                    $formId = Form::create($formTitle, $submitButtonText);
                 }
                 $fields = [];
                 if (isset($_POST['fields'])) {
@@ -86,14 +88,26 @@ abstract class Options
                         if ($found === null) {
                             FormField::create($field['name'], $field, $formId);
                         } elseif ($found instanceof FormField) {
-                            $found->setProperties($field)->save();
+                            $found
+                                ->setProperties($field)
+                                ->save()
+                            ;
                         } elseif (!$found->equals($field)) {
                             FormField::create($field['name'], $field, $formId);
                         }
                         $fields[] = $field['name'];
                     }
                 }
-                Form::findById($formId)->setTitle($formTitle)->setFields($fields)->save();
+                try {
+                    Form::findById($formId)
+                        ->setTitle($formTitle)
+                        ->setSubmitText($submitButtonText)
+                        ->setFields($fields)
+                        ->save()
+                    ;
+                } catch (NotFoundException $e) {
+                    SSV_Global::addError('Could not save form: Form with ID ' . $formId . ' not found.');
+                }
             }
             $order   = BaseFunctions::sanitize(isset($_GET['order']) ? $_GET['order'] : 'asc', 'text');
             $orderBy = BaseFunctions::sanitize(isset($_GET['orderby']) ? $_GET['orderby'] : 'f_title', 'text');

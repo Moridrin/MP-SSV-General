@@ -189,6 +189,10 @@ abstract class SSV_Forms
         return $content;
     }
 
+    /**
+     * @param $networkEnable
+     * @throws \Exception
+     */
     public static function CLEAN_INSTALL($networkEnable)
     {
         global $wpdb;
@@ -200,6 +204,15 @@ abstract class SSV_Forms
         } else {
             self::cleanInstallBlog();
         }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public static function cleanInstallBlog()
+    {
+        self::cleanupBlog();
+        self::setupForBlog();
     }
 
     public static function filterForms(array $attributes)
