@@ -21,9 +21,19 @@ require_once SSV_Forms::PATH . 'templates/form-editor.php';
 abstract class SSV_Forms
 {
     const PATH = SSV_FORMS_PATH;
-    const URL = SSV_FORMS_URL;
+    const URL  = SSV_FORMS_URL;
 
     const ADMIN_REFERER = 'ssv_forms__admin_referer';
+
+    public static function addSite(int $blogId)
+    {
+        foreach (wp_get_active_network_plugins() as $plugin) {
+            if (preg_match_all('/.*(ssv[a-z-]+).php/', $plugin)) {
+                self::setupForBlog($blogId);
+                return;
+            }
+        }
+    }
 
     public static function setupForBlog(int $blogId = null)
     {
@@ -47,19 +57,30 @@ abstract class SSV_Forms
         }
     }
 
-    public static function addSite(int $blogId)
-    {
-        foreach (wp_get_active_network_plugins() as $plugin) {
-            if (preg_match_all('/.*(ssv[a-z-]+).php/', $plugin)) {
-                self::setupForBlog($blogId);
-                return;
-            }
-        }
-    }
-
     public static function deleteSite(int $blogId)
     {
         self::cleanupBlog($blogId);
+    }
+
+    public static function cleanupBlog(int $blogId = null)
+    {
+        global $wpdb;
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $tableName = SiteSpecificField::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $tableName = FormField::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
+        $tableName = Form::getDatabaseTableName($blogId);
+        $wpdb->query("DROP TABLE $tableName;");
+        if ($wpdb->last_error) {
+            throw new \Exception($wpdb->last_error);
+        }
     }
 
     public static function setup($network_wide)
@@ -75,7 +96,7 @@ abstract class SSV_Forms
     {
         file_put_contents('testlog', var_export($network_wide, true));
         if (is_multisite() && $network_wide) {
-//            SSV_Global::runFunctionOnAllSites([self::class, 'cleanupBlog']); // Don't remove the databases on a netword disable (to keep the data for when a blog still wants to use the data).
+            //            SSV_Global::runFunctionOnAllSites([self::class, 'cleanupBlog']); // Don't remove the databases on a netword disable (to keep the data for when a blog still wants to use the data).
         } else {
             // Check if this is the last SSV plugin to be deactivated.
             self::cleanupBlog();
@@ -142,60 +163,30 @@ abstract class SSV_Forms
     {
         wp_enqueue_script('mp-ssv-forms-manager', SSV_Forms::URL . '/js/forms-manager.js', ['jquery']);
         wp_localize_script('mp-ssv-forms-manager', 'mp_ssv_forms_manager_params', [
-            'urls'       => [
+            'urls'    => [
                 'plugins'  => plugins_url(),
                 'ajax'     => admin_url('admin-ajax.php'),
                 'base'     => get_home_url(),
                 'basePath' => ABSPATH,
             ],
-            'actions'    => [
+            'actions' => [
                 'delete' => 'mp_ssv_general_forms_delete_form',
             ],
-            'formId'     => $_GET['id'] ?? null,
+            'formId'  => $_GET['id'] ?? null,
         ]);
     }
 
     public static function filterContent($content)
     {
-//        $database = SSV_Global::getDatabase();
-//        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
-//        $forms    = $database->get_results("SELECT * FROM $table");
-//        foreach ($forms as $form) {
-//            if (strpos($content, $form->f_tag) !== false) {
-//                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
-//            }
-//        }
+        //        $database = SSV_Global::getDatabase();
+        //        $table    = SSV_Forms::SITE_SPECIFIC_FORMS_TABLE;
+        //        $forms    = $database->get_results("SELECT * FROM $table");
+        //        foreach ($forms as $form) {
+        //            if (strpos($content, $form->f_tag) !== false) {
+        //                $content = str_replace($form->f_tag, self::getFormFieldsHTML($form->f_id), $content);
+        //            }
+        //        }
         return $content;
-    }
-
-    public static function cleanInstallBlog(int $blogId = null)
-    {
-        if ($blogId === null) {
-            $blogId = get_current_blog_id();
-        }
-        self::cleanupBlog($blogId);
-        self::setupForBlog($blogId);
-    }
-
-    public static function cleanupBlog(int $blogId = null)
-    {
-        global $wpdb;
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        $tableName = SiteSpecificField::getDatabaseTableName($blogId);
-        $wpdb->query("DROP TABLE $tableName;");
-        if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
-        }
-        $tableName = FormField::getDatabaseTableName($blogId);
-        $wpdb->query("DROP TABLE $tableName;");
-        if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
-        }
-        $tableName = Form::getDatabaseTableName($blogId);
-        $wpdb->query("DROP TABLE $tableName;");
-        if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
-        }
     }
 
     public static function CLEAN_INSTALL($networkEnable)
@@ -210,6 +201,12 @@ abstract class SSV_Forms
             self::cleanInstallBlog();
         }
     }
+
+    public static function filterForms(array $attributes)
+    {
+        $form = Form::findById($attributes['id']);
+        echo (string)$form;
+    }
 }
 
 register_activation_hook(SSV_FORMS_ACTIVATOR_PLUGIN, [SSV_Forms::class, 'setup']);
@@ -218,3 +215,4 @@ add_action('wpmu_new_blog', [SSV_Forms::class, 'addSite']);
 add_action('delete_blog', [SSV_Forms::class, 'deleteSite']);
 add_action('admin_enqueue_scripts', [SSV_Forms::class, 'enqueueAdminScripts']);
 add_filter('the_content', [SSV_Forms::class, 'filterContent']);
+add_shortcode('ssv-form', [SSV_Forms::class, 'filterForms']);

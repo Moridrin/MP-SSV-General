@@ -44,10 +44,7 @@ function show_checkbox_input_field(Field $field)
             ?>
             <div <?= Field::getElementAttributesString($field, 'div') ?>>
                 <label <?= Field::getElementAttributesString($field, 'title') ?>><?= BaseFunctions::escape($field['title'], 'html') ?><?= $field['required'] ? '*' : '' ?></label>
-                <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape(
-                        $field['defaultValue'],
-                        'html'
-                    ) ?></label>
+                <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/> <label <?= Field::getElementAttributesString($field, 'label', ['for']) ?>><?= BaseFunctions::escape($field['defaultValue'], 'html') ?></label>
             </div>
             <?php
         } else {

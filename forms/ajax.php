@@ -10,12 +10,12 @@ use mp_ssv_general\forms\models\SiteSpecificField;
 
 function mp_ssv_general_forms_save_field()
 {
-    $name = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
+    $name       = BaseFunctions::sanitize($_POST['properties']['name'], 'text');
     $properties = BaseFunctions::sanitize($_POST['properties'], 'text');
-    $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
-    $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
-    $type = $shared ? 'shared' : ($formId === null ? 'siteSpecific' : 'formField');
-    $id = BaseFunctions::sanitize($_POST['id'], 'int');
+    $shared     = BaseFunctions::sanitize($_POST['shared'], 'bool');
+    $formId     = BaseFunctions::sanitize($_POST['formId'], 'int');
+    $type       = $shared ? 'shared' : ($formId === null ? 'siteSpecific' : 'formField');
+    $id         = BaseFunctions::sanitize($_POST['id'], 'int');
     if (!array_key_exists('title', $properties)) {
         $properties['title'] = BaseFunctions::toTitle($name);
     }
@@ -43,15 +43,11 @@ function mp_ssv_general_forms_save_field()
             $field = $id !== null ? FormField::findById($id) : null;
             break;
         default:
-            SSV_Global::addError('Unknown type: '.$type);
+            SSV_Global::addError('Unknown type: ' . $type);
             return;
     }
     if ($field instanceof Field) {
-        $field
-            ->setName($name)
-            ->setProperties($properties)
-            ->save()
-        ;
+        $field->setName($name)->setProperties($properties)->save();
     } else {
         switch ($type) {
             case 'shared':
@@ -72,10 +68,10 @@ add_action('wp_ajax_mp_ssv_general_forms_save_field', 'mp_ssv_general_forms_save
 
 function mp_ssv_general_forms_delete_field()
 {
-    $id = BaseFunctions::sanitize($_POST['id'], 'int');
+    $id     = BaseFunctions::sanitize($_POST['id'], 'int');
     $shared = BaseFunctions::sanitize($_POST['shared'], 'bool');
     $formId = BaseFunctions::sanitize($_POST['formId'], 'int');
-    $type = $shared ? 'shared' : ($formId ? 'formField' : 'siteSpecific');
+    $type   = $shared ? 'shared' : ($formId ? 'formField' : 'siteSpecific');
     switch ($type) {
         case 'shared':
             SharedField::deleteByIds([$id]);

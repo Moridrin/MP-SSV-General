@@ -28,8 +28,9 @@ class Form extends Model
     }
 
     /**
-     * @param int|null $id
-     * @return Form|null
+     * @param int $id
+     * @return Form
+     * @throws \mp_ssv_general\exceptions\NotFoundException
      */
     public static function findById(int $id): Model
     {
@@ -59,55 +60,49 @@ class Form extends Model
     public static function getTableColumns(): array
     {
         return [
-            'id' => 'Tag',
-            'f_title' => 'Title',
+            'id'       => 'Tag',
+            'f_title'  => 'Title',
             'f_fields' => 'Fields',
         ];
     }
 
     public static function getDatabaseTableName(int $blogId = null): string
     {
-        return Database::getPrefixForBlog($blogId).'ssv_forms';
-    }
-
-    protected static function _getDatabaseFields(): array
-    {
-        return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
+        return Database::getPrefixForBlog($blogId) . 'ssv_forms';
     }
 
     public static function getDatabaseCreateQuery(int $blogId = null): string
     {
         return parent::_getDatabaseCreateQuery($blogId);
     }
+
+    protected static function _getDatabaseFields(): array
+    {
+        return ['`f_title` VARCHAR(50)', '`f_fields` TEXT NOT NULL'];
+    }
     #endregion
 
     #region Instance
-    protected function __init(): void
-    {
-        $this->row['f_fields'] = json_decode($this->row['f_fields']);
-    }
 
-    #region getters & setters
     public function getTitle(): string
     {
         return $this->row['f_title'];
     }
 
-    public function getFields(): array
-    {
-        $fields = [];
-        foreach ($this->row['f_fields'] as $fieldName) {
-            $fields[] = Field::findByName($fieldName, $this->getId());
-        }
-        return $fields;
-    }
+    #region getters & setters
 
     public function getFieldByName(string $name): Field
     {
-        return Field::findByName($name, $this->getId());
+        return FormField::findByName($name, $this->getId());
     }
 
     public function setTitle(string $title): Form
+    {
+        $this->row['f_title'] = $title;
+        return $this;
+    }
+
+    public function setSubmitText(string $title): Form
     {
         $this->row['f_title'] = $title;
         return $this;
@@ -125,14 +120,13 @@ class Form extends Model
         return $this;
     }
 
-    #endregion
-
     public function getTableRow(): array
     {
         return [
-            'id' => '[ssv-forms-' . $this->row['id'] . ']',
-            'f_title' => $this->row['f_title'],
-            'f_fields' => $this->row['f_fields'],
+            'id'           => '[ssv-forms-' . $this->row['id'] . ']',
+            'f_title'      => $this->row['f_title'],
+            'f_submitText' => $this->row['f_submitText'],
+            'f_fields'     => $this->row['f_fields'],
         ];
     }
 
@@ -141,28 +135,59 @@ class Form extends Model
         return [
             [
                 'spanClass' => '',
-                'href' => admin_url('admin.php').'?page=ssv_forms&action=edit&id='.$this->getId(),
+                'href'      => admin_url('admin.php') . '?page=ssv_forms&action=edit&id=' . $this->getId(),
                 'linkClass' => 'edit',
-                'linkText' => 'Edit',
+                'linkText'  => 'Edit',
             ],
             [
                 'spanClass' => 'trash',
-                'onclick' => 'formsManager.deleteRow(\'' . $this->getId() . '\')',
+                'onclick'   => 'formsManager.deleteRow(\'' . $this->getId() . '\')',
                 'linkClass' => 'submitdelete',
-                'linkText' => 'Trash',
+                'linkText'  => 'Trash',
             ],
         ];
     }
 
+    #endregion
+
     public function getData(): array
     {
-        return $this->getFields();
+        return $this->row['f_fields'];
+    }
+
+    public function getFields(): array
+    {
+        $fields = [];
+        foreach ($this->row['f_fields'] as $fieldName) {
+            $fields[] = FormField::findByName($fieldName, $this->getId());
+        }
+        return $fields;
+    }
+
+    public function getSubmitText(): string
+    {
+        return $this->row['f_submitText'];
+    }
+
+    protected function __init(): void
+    {
+        $this->row['f_fields'] = json_decode($this->row['f_fields']);
     }
 
     protected function _beforeSave(): bool
     {
         $this->row['f_fields'] = json_encode($this->row['f_fields']);
         return true;
+    }
+
+    public function __toString(): string
+    {
+        ob_start();
+        foreach ($this->getFields() as $field) {
+            echo $field;
+        }
+        ?><input name="submit" type="submit" id="submit" class="submit" value="<?= $this->getSubmitText() ?>"><?php
+        return ob_get_clean();
     }
     #endregion
 }

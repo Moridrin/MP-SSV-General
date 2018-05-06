@@ -16,6 +16,8 @@ if (!defined('ABSPATH')) {
 abstract class Field extends Model
 {
     #region Class
+    private $oldName = null;
+
     public static function create(string $name, array $properties = []): ?int
     {
         return parent::_create(['f_name' => strtolower($name), 'f_properties' => json_encode($properties)]);
@@ -49,7 +51,7 @@ abstract class Field extends Model
         if (empty($names)) {
             return self::_getAll($orderBy, $order, $key);
         } else {
-            $names = implode('\', \'', $names);
+            $names   = implode('\', \'', $names);
             $results = self::_find("f_name NOT IN ('$names')", $orderBy, $order);
             if ($results === null) {
                 return [];
@@ -61,41 +63,14 @@ abstract class Field extends Model
             return $fields;
         }
     }
+    #endregion
 
-    final public static function findByName(string $name, int $formId): ?Field
-    {
-        // Form Field
-        $row = FormField::_findRow('f_name = "' . $name . '" AND form_id = "' . $formId . '"');
-        if ($row !== null) {
-            return new FormField($row);
-        }
-
-        // Site Specific Field
-        $row = SiteSpecificField::_findRow('f_name = "' . $name . '"');
-        if ($row !== null) {
-            return new SiteSpecificField($row);
-        }
-
-        // Shared Field
-        $row = SharedField::_findRow('f_name = "' . $name . '"');
-        if ($row !== null) {
-            return new SharedField($row);
-        }
-
-        // WordPress Field
-        $row = WordPressField::_findRow('f_name = "' . $name . '"');
-        if ($row !== null) {
-            return new WordPressField($row);
-        }
-
-        return null;
-    }
-
+    #region Instance
     public static function getTableColumns(): array
     {
         return [
-            'f_name' => 'Name',
-            'f_properties/type' => 'Input Type',
+            'f_name'             => 'Name',
+            'f_properties/type'  => 'Input Type',
             'f_properties/value' => 'Value',
         ];
     }
@@ -104,40 +79,11 @@ abstract class Field extends Model
     {
         return ['`f_name` VARCHAR(50)', '`f_properties` TEXT NOT NULL'];
     }
-    #endregion
-
-    #region Instance
-    private $oldName = null;
-
-    protected function __init(): void
-    {
-        if (!is_array($this->row['f_properties'])) {
-            $this->row['f_properties'] = json_decode($this->row['f_properties'], true);
-        }
-    }
 
     #region getters & setters
     public function getName(): string
     {
         return $this->row['f_name'];
-    }
-
-    public function getProperties(): array
-    {
-        return $this->row['f_properties'];
-    }
-
-    public function hasProperty(string $key)
-    {
-        return isset($this->row['f_properties'][$key]);
-    }
-
-    public function getProperty(string $key)
-    {
-        if (!isset($this->row['f_properties'][$key])) {
-            $this->row['f_properties'][$key] = null;
-        }
-        return $this->row['f_properties'][$key];
     }
 
     public function setName(string $name): self
@@ -151,24 +97,23 @@ abstract class Field extends Model
         return $this;
     }
 
+    public function setProperty(string $key, $value): self
+    {
+        $this->row['f_properties'][$key] = $value;
+        return $this;
+    }
+
     public function setProperties(array $properties): self
     {
         $this->row['f_properties'] = $properties;
         return $this;
     }
 
-    public function setProperty(string $key, $value): self
-    {
-        $this->row['f_properties'][$key] = $value;
-        return $this;
-    }
-    #endregion
-
     public function getTableRow(): array
     {
         return [
-            'f_name' => $this->row['f_name'],
-            'f_properties/type' => $this->row['f_properties']['type'],
+            'f_name'             => $this->row['f_name'],
+            'f_properties/type'  => $this->row['f_properties']['type'],
             'f_properties/value' => $this->row['f_properties']['value'],
         ];
     }
@@ -178,21 +123,21 @@ abstract class Field extends Model
         return [
             [
                 'spanClass' => 'inline',
-                'onclick' => 'fieldsManager.edit(\'' . $this->getId() . '\')',
+                'onclick'   => 'fieldsManager.edit(\'' . $this->getId() . '\')',
                 'linkClass' => 'editinline',
-                'linkText' => 'Edit',
+                'linkText'  => 'Edit',
             ],
             [
                 'spanClass' => 'inline',
-                'onclick' => 'fieldsManager.customize(\'' . $this->getId() . '\')',
+                'onclick'   => 'fieldsManager.customize(\'' . $this->getId() . '\')',
                 'linkClass' => 'editinline',
-                'linkText' => 'Customize',
+                'linkText'  => 'Customize',
             ],
             [
                 'spanClass' => 'trash',
-                'onclick' => 'fieldsManager.deleteRow(\'' . $this->getId() . '\')',
+                'onclick'   => 'fieldsManager.deleteRow(\'' . $this->getId() . '\')',
                 'linkClass' => 'submitdelete',
-                'linkText' => 'Trash',
+                'linkText'  => 'Trash',
             ],
         ];
     }
@@ -202,87 +147,17 @@ abstract class Field extends Model
         return $this->getProperties();
     }
 
-    protected function _beforeSave(): bool
+    public function getProperties(): array
     {
-        $this->row['f_properties'] = json_encode($this->row['f_properties']);
-        if ($this->oldName !== $this->row['f_name']) {
-            SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
-            return false;
-        }
-        return true;
+        return $this->row['f_properties'];
     }
 
-    protected function _afterSave(): bool
-    {
-        if ($this->oldName !== $this->row['f_name']) {
-            // TODO Rename
-        }
-        return true;
-    }
+    #endregion
 
-    public function __toString(): string
+    public function getElementAttributesString(string $element, array $options = [], string $nameSuffix = null): string
     {
-        switch ($this->row['f_properties']['inputType']) {
-            case 'hidden':
-                return $this->_getHiddenInputFieldHtml();
-            case 'select':
-                /** @noinspection PhpIncludeInspection */
-                require_once SSV_Forms::PATH . 'templates/fields/select.php';
-                show_select_input_field($this);
-                break;
-            case 'checkbox':
-                /** @noinspection PhpIncludeInspection */
-                require_once SSV_Forms::PATH . 'templates/fields/checkbox.php';
-                show_checkbox_input_field($this);
-                break;
-            case 'datetime':
-                /** @noinspection PhpIncludeInspection */
-                require_once SSV_Forms::PATH . 'templates/fields/datetime.php';
-                show_datetime_input_field($this);
-                break;
-            default:
-                /** @noinspection PhpIncludeInspection */
-                require_once SSV_Forms::PATH . 'templates/fields/input.php';
-                show_default_input_field($this);
-                break;
-        }
-    }
-
-    public function equals($object): bool
-    {
-        if (is_array($object)) {
-            foreach ($object as $name => $value) {
-                if (!$this->hasProperty($name) || $this->getProperty($name) !== $value) {
-                    return false;
-                }
-            }
-            return true;
-        } elseif ($object instanceof Field) {
-            foreach ($object->row as $name => $value) {
-                if (!isset($this->row[$name]) || $this->row[$name] !== $value) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private function _getHiddenInputFieldHtml(): string
-    {
-        $this->row['f_properties'] += [
-            'defaultValue' => '',
-        ];
-        if (strtolower($this->row['f_properties']['defaultValue']) === 'now') {
-            $this->row['f_properties']['defaultValue '] = (new DateTime($this->row['f_properties']['defaultValue']))->format('Y-m-d');
-        }
-        $id                = BaseFunctions::escape('input_' . $this->row['f_properties']['name'], 'attr');
-        return '<input '.Field::getElementAttributesString($id, ['type', 'value'], '').'/>';
-    }
-
-    private function getElementAttributesString(string $element, array $options = [], string $nameSuffix = null): string
-    {
-        $properties = $this->row['f_properties'] + [
+        $properties             = $this->getProperties();
+        $properties             += [
             'inputType'      => 'text',
             'classes'        => [],
             'styles'         => [],
@@ -305,10 +180,10 @@ abstract class Field extends Model
         if (in_array('type', $options)) {
             $attributesString .= ' type="' . $properties['inputType'] . '"';
         }
-        if (isset($properties['classes'][$element])) {
+        if (isset($properties['classes'][$element]) && !empty($properties['classes'][$element])) {
             $attributesString .= ' class="' . BaseFunctions::escape($properties['classes'][$element], 'attr', ' ') . '"';
         }
-        if (isset($properties['styles'][$element])) {
+        if (isset($properties['styles'][$element]) && !empty($properties['styles'][$element])) {
             $attributesString .= ' style="' . BaseFunctions::escape($properties['styles'][$element], 'attr', ' ') . '"';
         }
         if ($nameSuffix !== null) {
@@ -340,7 +215,7 @@ abstract class Field extends Model
             $attributesString .= ' size="' . BaseFunctions::escape($properties['size'], 'attr') . '"';
         }
         if (in_array('for', $options)) {
-            $attributesString .= ' for="' . BaseFunctions::escape($properties['formId'] . '_' . 'input_' . $properties['name'], 'attr') . '"';
+            $attributesString .= ' for="' . BaseFunctions::escape($properties['form_id'] . '_' . 'input_' . $properties['name'], 'attr') . '"';
         }
         if (in_array('autocomplete', $options) && !empty($properties['autocomplete'])) {
             $attributesString .= ' autocomplete="' . $properties['autocomplete'] . '"';
@@ -357,8 +232,6 @@ abstract class Field extends Model
         return $attributesString;
     }
 
-    abstract public function getType(): string;
-
     private function _currentUserCanOverride(): bool
     {
         $overrideRights = $this->row['f_properties']['overrideRights'] ?? [];
@@ -368,6 +241,99 @@ abstract class Field extends Model
             }
         }
         return false;
+    }
+
+    public function equals($object): bool
+    {
+        if (is_array($object)) {
+            foreach ($object as $name => $value) {
+                if (!$this->hasProperty($name) || $this->getProperty($name) !== $value) {
+                    return false;
+                }
+            }
+            return true;
+        } elseif ($object instanceof Field) {
+            foreach ($object->row as $name => $value) {
+                if (!isset($this->row[$name]) || $this->row[$name] !== $value) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public function hasProperty(string $key)
+    {
+        return isset($this->row['f_properties'][$key]);
+    }
+
+    public function getProperty(string $key)
+    {
+        if (!isset($this->row['f_properties'][$key])) {
+            $this->row['f_properties'][$key] = null;
+        }
+        return $this->row['f_properties'][$key];
+    }
+
+    abstract public function getType(): string;
+
+    protected function __init(): void
+    {
+        if (!is_array($this->row['f_properties'])) {
+            $this->row['f_properties'] = json_decode($this->row['f_properties'], true);
+        }
+        if (isset($this->row['form_id'])) {
+            $this->row['f_properties']['form_id'] = $this->row['form_id'];
+        }
+    }
+
+    protected function _beforeSave(): bool
+    {
+        $this->row['f_properties'] = json_encode($this->row['f_properties']);
+        if ($this->oldName !== $this->row['f_name']) {
+            SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
+            return false;
+        }
+        return true;
+    }
+
+    public function __toString(): string
+    {
+        ob_start();
+        switch ($this->getProperty('type')) {
+            case 'hidden':
+                return $this->_getHiddenInputFieldHtml();
+            case 'select':
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/select.php';
+                show_select_input_field($this);
+                break;
+            case 'checkbox':
+                mp_ssv_show_checkbox_input_field($this);
+                break;
+            case 'datetime':
+                /** @noinspection PhpIncludeInspection */
+                require_once SSV_Forms::PATH . 'templates/fields/datetime.php';
+                show_datetime_input_field($this);
+                break;
+            default:
+                \mp_ssv_show_default_input_field($this);
+                break;
+        }
+        return ob_get_clean();
+    }
+
+    private function _getHiddenInputFieldHtml(): string
+    {
+        $this->row['f_properties'] += [
+            'defaultValue' => '',
+        ];
+        if (strtolower($this->row['f_properties']['defaultValue']) === 'now') {
+            $this->row['f_properties']['defaultValue '] = (new DateTime($this->row['f_properties']['defaultValue']))->format('Y-m-d');
+        }
+        $id = BaseFunctions::escape('input_' . $this->row['f_properties']['name'], 'attr');
+        return '<input ' . Field::getElementAttributesString($id, ['type', 'value'], '') . '/>';
     }
     #endregion
 }

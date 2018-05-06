@@ -16,3 +16,11 @@ require_once 'models/SharedField.php';
 require_once 'models/SiteSpecificField.php';
 require_once 'models/WordPressField.php';
 require_once 'ajax.php';
+switch (true) {
+    case current_theme_supports('materialize'):
+        require_once 'templates/materialize/materialize.php';
+        break;
+    default:
+        require_once 'templates/base/base.php';
+        break;
+}

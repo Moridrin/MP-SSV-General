@@ -174,7 +174,7 @@ let fieldsManager = {
         getInputField: function (title, name, value, type, events) {
             // console.log(events.onkeydown);
             // if (events.onkeydown === undefined) {
-                events.onkeydown = 'fieldsManager.editor.onKeyDown()';
+            events.onkeydown = 'fieldsManager.editor.onKeyDown()';
             // }
             let eventsString = '';
             for (let [eventName, event] of Object.entries(events)) {

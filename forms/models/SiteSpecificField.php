@@ -23,6 +23,11 @@ class SiteSpecificField extends Field
         return parent::_getAll($orderBy, $order, $key);
     }
 
+    /**
+     * @param int $id
+     * @return Model
+     * @throws \mp_ssv_general\exceptions\NotFoundException
+     */
     public static function findById(int $id): Model
     {
         return parent::_findById($id);
@@ -40,7 +45,7 @@ class SiteSpecificField extends Field
 
     public static function getDatabaseTableName(int $blogId = null): string
     {
-        return Database::getPrefixForBlog($blogId).'ssv_site_specific_fields';
+        return Database::getPrefixForBlog($blogId) . 'ssv_site_specific_fields';
     }
 
     public static function getDatabaseCreateQuery(int $blogId = null): string

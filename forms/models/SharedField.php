@@ -23,6 +23,11 @@ class SharedField extends Field
         return parent::_getAll($orderBy, $order);
     }
 
+    /**
+     * @param int $id
+     * @return SharedField
+     * @throws \mp_ssv_general\exceptions\NotFoundException
+     */
     public static function findById(int $id): Model
     {
         return parent::_findById($id);
@@ -40,7 +45,7 @@ class SharedField extends Field
 
     public static function getDatabaseTableName(int $blogId = null): string
     {
-        return Database::getBasePrefix().'ssv_shared_fields';
+        return Database::getBasePrefix() . 'ssv_shared_fields';
     }
 
     public static function getDatabaseCreateQuery(int $blogId = null): string

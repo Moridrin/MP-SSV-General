@@ -9,12 +9,29 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function show_default_input_field(Field $field)
+function show_datetime_input_field(Field $field)
 {
-    $field    += [
+    $database        = SSV_Global::getDatabase();
+    $field           += [
         'defaultValue' => null,
         'required'     => false,
     ];
+    $table           = SSV_Forms::CUSTOMIZED_FIELDS_TABLE;
+    $name            = $field['name'];
+    $customizedField = $database->get_var("SELECT cf_json FROM $table WHERE cf_bf_id = $formId AND cf_bf_name = '$name'");
+    if ($customizedField !== null) {
+        $field             = json_decode($customizedField, true) + $field;
+        $field['required'] = filter_var($field['required'], FILTER_VALIDATE_BOOLEAN);
+    }
+    $field['inputType'] = 'text';
+    if (!isset($field['classes'])) {
+        $field['classes'] = ['div' => '', 'title' => '', 'input' => 'datetimepicker'];
+    } elseif (strpos($field['classes']['input'], '!datetimepicker') === false) {
+        $field['classes']['input'] = 'datetimepicker';
+    } else {
+        $field['classes']['input'] = str_replace('!datetimepicker', '', $field['classes']['input']);
+        $field['inputType']        = 'datetime'; // TODO also check for date and time (needs customization)
+    }
     if (strtolower($field['defaultValue']) === 'now') {
         $field['defaultValue '] = (new DateTime($field['defaultValue']))->format('Y-m-d');
     }
@@ -24,14 +41,8 @@ function show_default_input_field(Field $field)
         'disabled',
         'checked',
         'required',
-        'autocomplete',
-        'placeholder',
-        'list',
-        'pattern',
     ];
     if (current_theme_supports('materialize')) {
-        $field['classes']['div'][]   = 'input-field';
-        $field['classes']['input'][] = 'validate';
         ?>
         <div <?= Field::getElementAttributesString($field, 'div') ?>>
             <input <?= Field::getElementAttributesString($field, 'input', $inputElementAttributes, '') ?>/>

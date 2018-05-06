@@ -11,18 +11,6 @@
     margin: 0;
 }
 
-/*.formField .inline-actions {*/
-    /*display: block;*/
-/*}*/
-
-/*.formField:hover .inline-actions {*/
-    /*display: inline-block;*/
-/*}*/
-
-#wordPressBaseFieldsList {
-    margin-bottom: 0;
-}
-
 .baseField,
 .formField {
     margin: 0;

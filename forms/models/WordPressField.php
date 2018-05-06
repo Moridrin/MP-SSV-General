@@ -12,53 +12,37 @@ class WordPressField extends Field
 {
     #region Class
     private static $fieldArrays = [
-        'username' => [
-            'id' => 0,
-            'f_name' => 'username',
+        'username'         => [
+            'id'           => 0,
+            'f_name'       => 'username',
             'f_properties' => ['name' => 'username', 'type' => 'text', 'value' => '', 'title' => 'Username'],
         ],
-        'first_name' => [
-            'id' => 0,
-            'f_name' => 'first_name',
+        'first_name'       => [
+            'id'           => 0,
+            'f_name'       => 'first_name',
             'f_properties' => ['name' => 'first_name', 'type' => 'text', 'value' => '', 'title' => 'First Name'],
         ],
-        'last_name' => [
-            'id' => 0,
-            'f_name' => 'last_name',
+        'last_name'        => [
+            'id'           => 0,
+            'f_name'       => 'last_name',
             'f_properties' => ['name' => 'last_name', 'type' => 'text', 'value' => '', 'title' => 'Last Name'],
         ],
-        'email' => [
-            'id' => 0,
-            'f_name' => 'email',
+        'email'            => [
+            'id'           => 0,
+            'f_name'       => 'email',
             'f_properties' => ['name' => 'email', 'type' => 'text', 'value' => '', 'title' => 'Email'],
         ],
-        'password' => [
-            'id' => 0,
-            'f_name' => 'password',
+        'password'         => [
+            'id'           => 0,
+            'f_name'       => 'password',
             'f_properties' => ['name' => 'password', 'type' => 'password', 'value' => '', 'title' => 'Password'],
         ],
         'password_confirm' => [
-            'id' => 0,
-            'f_name' => 'password_confirm',
+            'id'           => 0,
+            'f_name'       => 'password_confirm',
             'f_properties' => ['name' => 'password_confirm', 'type' => 'password', 'value' => '', 'title' => 'Confirm Password'],
         ],
     ];
-
-    /**
-     * @param string $orderBy
-     * @param string $order
-     * @param string $key
-     * @return WordPressField[]
-     */
-    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
-    {
-        $fields = [];
-        foreach (self::$fieldArrays as $fieldArray) {
-            $fieldArray['f_properties'] = json_encode($fieldArray['f_properties']);
-            $fields[$fieldArray[$key]] = new WordPressField($fieldArray);
-        }
-        return $fields;
-    }
 
     public static function getAllExcept(array $except, string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
@@ -73,16 +57,21 @@ class WordPressField extends Field
         return $fields;
     }
 
-    protected static function _findRow(string $where): ?array
+    /**
+     * @param string $orderBy
+     * @param string $order
+     * @param string $key
+     * @return WordPressField[]
+     */
+    public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
-        preg_match('/f_name(.*)/', $where, $matches);
-        preg_match_all('/"(.*?)"/', $matches[1], $values);
-        foreach ($values[1] as $value) {
-            return self::$fieldArrays[$value];
+        $fields = [];
+        foreach (self::$fieldArrays as $fieldArray) {
+            $fieldArray['f_properties'] = json_encode($fieldArray['f_properties']);
+            $fields[$fieldArray[$key]]  = new WordPressField($fieldArray);
         }
-        return null;
+        return $fields;
     }
-
 
     /**
      * @deprecated WordPress Fields are not findable by ID.
@@ -97,7 +86,7 @@ class WordPressField extends Field
 
     /**
      * @deprecated WordPress Fields are not findable by ID.
-     * @param array $ids
+     * @param array  $ids
      * @param string $orderBy
      * @param string $order
      * @return array
@@ -140,9 +129,22 @@ class WordPressField extends Field
     {
         throw new \Exception('There is no database Create Query for the WordPress Fields');
     }
+
+    protected static function _findRow(string $where): ?array
+    {
+        preg_match('/f_name(.*)/', $where, $matches);
+        preg_match_all('/"(.*?)"/', $matches[1], $values);
+        foreach ($values[1] as $value) {
+            if (isset(self::$fieldArrays[$value])) {
+                return self::$fieldArrays[$value];
+            }
+        }
+        return null;
+    }
     #endregion
 
     #region Instance
+
     /**
      * @deprecated WordPress fields cannot be edited.
      * @param string $name
@@ -168,23 +170,32 @@ class WordPressField extends Field
     /**
      * @deprecated WordPress fields cannot be edited.
      * @param string $key
-     * @param $value
+     * @param        $value
      * @return Field
      * @throws \Exception
      */
     public function setProperty(string $key, $value): Field
     {
-        throw new \Exception('Can\'t edit WordPress Fields');
-    }
-
-    protected function _beforeSave(): bool
-    {
-        throw new \Exception('Can\'t edit WordPress Fields');
+        if ($key !== 'form_id') {
+            throw new \Exception('Can\'t edit WordPress Fields');
+        } else {
+            return parent::setProperty($key, $value);
+        }
     }
 
     public function getType(): string
     {
         return 'WordPress';
+    }
+
+    /**
+     * @deprecated WordPress fields cannot be saved.
+     * @return bool
+     * @throws \Exception
+     */
+    protected function _beforeSave(): bool
+    {
+        throw new \Exception('Can\'t save WordPress Fields');
     }
     #endregion
 }

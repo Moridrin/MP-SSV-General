@@ -47,6 +47,11 @@ abstract class Model
 
     abstract public static function findById(int $id): Model;
 
+    /**
+     * @param int $id
+     * @return Model
+     * @throws NotFoundException
+     */
     protected static function _findById(int $id): Model
     {
         $row = self::_findRow('id = ' . $id);

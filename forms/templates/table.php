@@ -13,8 +13,8 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
     if (!is_subclass_of($class, Model::class)) {
         throw new InvalidArgumentException('The class ' . $class . ' is not a subclass of ' . Model::class);
     }
-    $columns = call_user_func([$class, 'getTableColumns']);
-    $items = call_user_func([$class, 'getAll']);
+    $columns  = call_user_func([$class, 'getTableColumns']);
+    $items    = call_user_func([$class, 'getAll']);
     $newOrder = ($order === 'asc' ? 'desc' : 'asc');
     ?>
     <form method="post" action="#">
@@ -42,7 +42,8 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                     </td>
                     <?php foreach ($columns as $key => $column): ?>
                         <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
-                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column, 'attr') ?></span><span class="sorting-indicator"></span></a>
+                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column,
+                                        'attr') ?></span><span class="sorting-indicator"></span></a>
                         </th>
                     <?php endforeach; ?>
                 </tr>
@@ -67,7 +68,7 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                                         <div class="row-actions">
                                             <?php
                                             if ($canManage && !empty($rowActions)) {
-                                                $i = 0;
+                                                $i    = 0;
                                                 $last = count($rowActions) - 1;
                                                 foreach ($rowActions as $action) {
                                                     $isLast = ($i === $last);
