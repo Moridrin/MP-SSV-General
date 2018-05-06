@@ -15,32 +15,32 @@ class WordPressField extends Field
         'username'         => [
             'id'           => 0,
             'f_name'       => 'username',
-            'f_properties' => ['name' => 'username', 'type' => 'text', 'value' => '', 'title' => 'Username'],
+            'f_properties' => ['type' => 'text', 'value' => '', 'title' => 'Username'],
         ],
         'first_name'       => [
             'id'           => 0,
             'f_name'       => 'first_name',
-            'f_properties' => ['name' => 'first_name', 'type' => 'text', 'value' => '', 'title' => 'First Name'],
+            'f_properties' => ['type' => 'text', 'value' => '', 'title' => 'First Name'],
         ],
         'last_name'        => [
             'id'           => 0,
             'f_name'       => 'last_name',
-            'f_properties' => ['name' => 'last_name', 'type' => 'text', 'value' => '', 'title' => 'Last Name'],
+            'f_properties' => ['type' => 'text', 'value' => '', 'title' => 'Last Name'],
         ],
         'email'            => [
             'id'           => 0,
             'f_name'       => 'email',
-            'f_properties' => ['name' => 'email', 'type' => 'text', 'value' => '', 'title' => 'Email'],
+            'f_properties' => ['type' => 'text', 'value' => '', 'title' => 'Email'],
         ],
         'password'         => [
             'id'           => 0,
             'f_name'       => 'password',
-            'f_properties' => ['name' => 'password', 'type' => 'password', 'value' => '', 'title' => 'Password'],
+            'f_properties' => ['type' => 'password', 'value' => '', 'title' => 'Password'],
         ],
         'password_confirm' => [
             'id'           => 0,
             'f_name'       => 'password_confirm',
-            'f_properties' => ['name' => 'password_confirm', 'type' => 'password', 'value' => '', 'title' => 'Confirm Password'],
+            'f_properties' => ['type' => 'password', 'value' => '', 'title' => 'Confirm Password'],
         ],
     ];
 

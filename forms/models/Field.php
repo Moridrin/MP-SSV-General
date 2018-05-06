@@ -93,7 +93,6 @@ abstract class Field extends Model
             $this->oldName = $this->row['f_name'];
         }
         $this->row['f_name'] = $name;
-        $this->setProperty('name', $name);
         return $this;
     }
 
@@ -144,7 +143,7 @@ abstract class Field extends Model
 
     public function getData(): array
     {
-        return $this->getProperties();
+        return $this->getProperties() + ['name' => $this->getName()];
     }
 
     public function getProperties(): array
@@ -176,7 +175,7 @@ abstract class Field extends Model
             'size'           => 1,
         ];
         $currentUserCanOverride = $this->_currentUserCanOverride();
-        $attributesString       = 'id="' . BaseFunctions::escape($properties['form_id'] . '_' . $element . '_' . $properties['name'], 'attr') . '"';
+        $attributesString       = 'id="' . BaseFunctions::escape($properties['form_id'] . '_' . $element . '_' . $this->getName(), 'attr') . '"';
         if (in_array('type', $options)) {
             $attributesString .= ' type="' . $properties['inputType'] . '"';
         }
@@ -187,7 +186,7 @@ abstract class Field extends Model
             $attributesString .= ' style="' . BaseFunctions::escape($properties['styles'][$element], 'attr', ' ') . '"';
         }
         if ($nameSuffix !== null) {
-            $attributesString .= ' name="' . BaseFunctions::escape($properties['name'] . $nameSuffix, 'attr') . '"';
+            $attributesString .= ' name="' . BaseFunctions::escape($this->getName() . $nameSuffix, 'attr') . '"';
         }
         if (!$currentUserCanOverride && in_array('required', $options) && $properties['required']) {
             $attributesString .= $properties['required'] ? 'required="required"' : '';
@@ -199,7 +198,7 @@ abstract class Field extends Model
             $attributesString .= checked($properties['checked'], true, false);
         }
         if (in_array('value', $options)) {
-            $profileValue = User::getCurrent()->getMeta($properties['name']);
+            $profileValue = User::getCurrent()->getMeta($this->getName());
             if (!empty($properties['value'])) {
                 $attributesString .= ' value="' . BaseFunctions::escape($properties['value'], 'attr') . '"';
             } elseif ($properties['profileField'] && !empty($profileValue)) {
@@ -215,7 +214,7 @@ abstract class Field extends Model
             $attributesString .= ' size="' . BaseFunctions::escape($properties['size'], 'attr') . '"';
         }
         if (in_array('for', $options)) {
-            $attributesString .= ' for="' . BaseFunctions::escape($properties['form_id'] . '_' . 'input_' . $properties['name'], 'attr') . '"';
+            $attributesString .= ' for="' . BaseFunctions::escape($properties['form_id'] . '_' . 'input_' . $this->getName(), 'attr') . '"';
         }
         if (in_array('autocomplete', $options) && !empty($properties['autocomplete'])) {
             $attributesString .= ' autocomplete="' . $properties['autocomplete'] . '"';
@@ -290,8 +289,9 @@ abstract class Field extends Model
 
     protected function _beforeSave(): bool
     {
+        unset($this->row['f_properties']['name']);
         $this->row['f_properties'] = json_encode($this->row['f_properties']);
-        if ($this->oldName === null && $this->oldName !== $this->row['f_name']) {
+        if ($this->oldName !== null && $this->oldName !== $this->row['f_name']) {
             SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
             return false;
         }

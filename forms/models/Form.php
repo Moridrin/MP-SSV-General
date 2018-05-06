@@ -121,7 +121,7 @@ class Form extends Model
     public function getTableRow(): array
     {
         return [
-            'id'           => '[ssv-forms-' . $this->row['id'] . ']',
+            'tag'          => '[ssv-form id="' . $this->row['id'] . '"]',
             'f_title'      => $this->row['f_title'],
             'f_submitText' => $this->row['f_submitText'],
             'f_fields'     => $this->row['f_fields'],
