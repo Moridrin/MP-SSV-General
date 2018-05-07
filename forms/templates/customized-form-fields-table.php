@@ -27,11 +27,11 @@ function mp_ssv_show_form_fields_table(array $fields)
                             id="field_<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
                             draggable="true"
                             class="formField"
-                            data-properties="<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>"
+                            data-properties="<?= BaseFunctions::escape(json_encode($field->getData()), 'attr') ?>"
                     >
                         <td>
                             <strong class="fieldName_js"><?= BaseFunctions::escape($field->getProperty('title'), 'html') ?></strong>
-                            <input type="hidden" name="fields[]" value="<?= BaseFunctions::escape(json_encode($field->getProperties()), 'attr') ?>">
+                            <input type="hidden" name="fields[]" value="<?= BaseFunctions::escape(json_encode($field->getData()), 'attr') ?>">
                         </td>
                         <td><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></td>
                         <td>

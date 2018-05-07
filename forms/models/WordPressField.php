@@ -2,6 +2,7 @@
 
 namespace mp_ssv_general\forms\models;
 
+use mp_ssv_general\base\BaseFunctions;
 use mp_ssv_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
@@ -11,7 +12,7 @@ if (!defined('ABSPATH')) {
 class WordPressField extends Field
 {
     #region Class
-    private static $fieldArrays = [
+    private static $fields = [
         'username'         => [
             'id'           => 0,
             'f_name'       => 'username',
@@ -66,9 +67,12 @@ class WordPressField extends Field
     public static function getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'f_name'): array
     {
         $fields = [];
-        foreach (self::$fieldArrays as $fieldArray) {
-            $fieldArray['f_properties'] = json_encode($fieldArray['f_properties']);
-            $fields[$fieldArray[$key]]  = new WordPressField($fieldArray);
+        foreach (self::$fields as $field) {
+            foreach (self::INPUT_ATTRIBUTES as $attribute => $attributeProperties) {
+                $field['f_properties'][$attribute] = BaseFunctions::sanitize($field['f_properties'][$attribute] ?? $attributeProperties['default'], $attributeProperties['type']);
+            }
+            $field['f_properties'] = json_encode($field['f_properties']);
+            $fields[$field[$key]]  = new WordPressField($field);
         }
         return $fields;
     }
@@ -135,8 +139,13 @@ class WordPressField extends Field
         preg_match('/f_name(.*)/', $where, $matches);
         preg_match_all('/"(.*?)"/', $matches[1], $values);
         foreach ($values[1] as $value) {
-            if (isset(self::$fieldArrays[$value])) {
-                return self::$fieldArrays[$value];
+            if (isset(self::$fields[$value])) {
+                $field = self::$fields[$value];
+                foreach (self::INPUT_ATTRIBUTES as $attribute => $attributeProperties) {
+                    $field['f_properties'][$attribute] = BaseFunctions::sanitize($field['f_properties'][$attribute] ?? $attributeProperties['default'], $attributeProperties['type']);
+                }
+                // BaseFunctions::var_export($field, 1);
+                return $field;
             }
         }
         return null;

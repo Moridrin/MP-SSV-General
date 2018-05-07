@@ -18,6 +18,49 @@ abstract class Field extends Model
     #region Class
     private $oldName = null;
 
+    public const INPUT_ATTRIBUTES = [
+        'type'         => [
+            'type'    => 'text',
+            'default' => '',
+        ],
+        'required'     => [
+            'type'    => 'bool',
+            'default' => false,
+        ],
+        'disabled'     => [
+            'type'    => 'bool',
+            'default' => false,
+        ],
+        'checked'      => [
+            'type'    => 'bool',
+            'default' => false,
+        ],
+        'value'        => [
+            'type'    => 'text',
+            'default' => '',
+        ],
+        'multiple'     => [
+            'type'    => 'bool',
+            'default' => false,
+        ],
+        'size'         => [
+            'type'    => 'int',
+            'default' => 1,
+        ],
+        'autocomplete' => [
+            'type'    => 'bool',
+            'default' => true,
+        ],
+        'placeholder'  => [
+            'type'    => 'text',
+            'default' => '',
+        ],
+        'pattern'      => [
+            'type'    => 'text',
+            'default' => '',
+        ],
+    ];
+
     public static function create(string $name, array $properties = []): ?int
     {
         return parent::_create(['f_name' => strtolower($name), 'f_properties' => json_encode($properties)]);
@@ -153,31 +196,31 @@ abstract class Field extends Model
 
     #endregion
 
-    public function getElementAttributesString(string $element, array $options = [], string $nameSuffix = null): string
+    public function getElementAttributesString(string $element, array $attributes = [], string $nameSuffix = null): string
     {
         $properties             = $this->getProperties();
-        $properties             += [
-            'inputType'      => 'text',
-            'classes'        => [],
-            'styles'         => [],
-            'overrideRights' => [],
-            'required'       => false,
-            'disabled'       => false,
-            'checked'        => false,
-            'value'          => null,
-            'autocomplete'   => null,
-            'placeholder'    => null,
-            'list'           => null,
-            'pattern'        => null,
-            'multiple'       => false,
-            'selected'       => false,
-            'profileField'   => true,
-            'size'           => 1,
-        ];
+        // $properties             += [
+        //     'type'      => 'text',
+        //     'classes'        => [],
+        //     'styles'         => [],
+        //     'overrideRights' => [],
+        //     'required'       => false,
+        //     'disabled'       => false,
+        //     'checked'        => false,
+        //     'value'          => null,
+        //     'autocomplete'   => null,
+        //     'placeholder'    => null,
+        //     'list'           => null,
+        //     'pattern'        => null,
+        //     'multiple'       => false,
+        //     'selected'       => false,
+        //     'profileField'   => true,
+        //     'size'           => 1,
+        // ];
         $currentUserCanOverride = $this->_currentUserCanOverride();
         $attributesString       = 'id="' . BaseFunctions::escape($properties['form_id'] . '_' . $element . '_' . $this->getName(), 'attr') . '"';
-        if (in_array('type', $options)) {
-            $attributesString .= ' type="' . $properties['inputType'] . '"';
+        if (in_array('type', $attributes)) {
+            $attributesString .= ' type="' . $properties['type'] . '"';
         }
         if (isset($properties['classes'][$element]) && !empty($properties['classes'][$element])) {
             $attributesString .= ' class="' . BaseFunctions::escape($properties['classes'][$element], 'attr', ' ') . '"';
@@ -188,44 +231,44 @@ abstract class Field extends Model
         if ($nameSuffix !== null) {
             $attributesString .= ' name="' . BaseFunctions::escape($this->getName() . $nameSuffix, 'attr') . '"';
         }
-        if (!$currentUserCanOverride && in_array('required', $options) && $properties['required']) {
+        if (!$currentUserCanOverride && in_array('required', $attributes) && $properties['required']) {
             $attributesString .= $properties['required'] ? 'required="required"' : '';
         }
-        if (!$currentUserCanOverride && in_array('disabled', $options) && $properties['disabled']) {
+        if (!$currentUserCanOverride && in_array('disabled', $attributes) && $properties['disabled']) {
             $attributesString .= disabled($properties['disabled'], true, false);
         }
-        if (in_array('checked', $options) && $properties['checked']) {
+        if (in_array('checked', $attributes) && $properties['checked']) {
             $attributesString .= checked($properties['checked'], true, false);
         }
-        if (in_array('value', $options)) {
+        if (in_array('value', $attributes)) {
             $profileValue = User::getCurrent()->getMeta($this->getName());
             if (!empty($properties['value'])) {
                 $attributesString .= ' value="' . BaseFunctions::escape($properties['value'], 'attr') . '"';
-            } elseif ($properties['profileField'] && !empty($profileValue)) {
+            } elseif (!empty($profileValue)) {
                 $attributesString .= ' value="' . BaseFunctions::escape($profileValue, 'attr') . '"';
             } elseif (!empty($properties['defaultValue'])) {
                 $attributesString .= ' value="' . BaseFunctions::escape($properties['defaultValue'], 'attr') . '"';
             }
         }
-        if (in_array('multiple', $options) && $properties['multiple']) {
+        if (in_array('multiple', $attributes) && $properties['multiple']) {
             $attributesString .= ' multiple="multiple"';
         }
-        if (in_array('size', $options) && $properties['size'] > 1) {
+        if (in_array('size', $attributes) && $properties['size'] > 1) {
             $attributesString .= ' size="' . BaseFunctions::escape($properties['size'], 'attr') . '"';
         }
-        if (in_array('for', $options)) {
+        if (in_array('for', $attributes)) {
             $attributesString .= ' for="' . BaseFunctions::escape($properties['form_id'] . '_' . 'input_' . $this->getName(), 'attr') . '"';
         }
-        if (in_array('autocomplete', $options) && !empty($properties['autocomplete'])) {
+        if (in_array('autocomplete', $attributes) && !empty($properties['autocomplete'])) {
             $attributesString .= ' autocomplete="' . $properties['autocomplete'] . '"';
         }
-        if (in_array('placeholder', $options) && !empty($properties['placeholder'])) {
+        if (in_array('placeholder', $attributes) && !empty($properties['placeholder'])) {
             $attributesString .= ' placeholder="' . $properties['placeholder'] . '"';
         }
-        if (in_array('list', $options) && !empty($properties['list'])) {
+        if (in_array('list', $attributes) && !empty($properties['list'])) {
             $attributesString .= ' list="' . $properties['list'] . '"';
         }
-        if (in_array('pattern', $options) && !empty($properties['pattern'])) {
+        if (in_array('pattern', $attributes) && !empty($properties['pattern'])) {
             $attributesString .= ' pattern="' . $properties['pattern'] . '"';
         }
         return $attributesString;
@@ -267,12 +310,12 @@ abstract class Field extends Model
         return isset($this->row['f_properties'][$key]);
     }
 
-    public function getProperty(string $key)
+    public function getProperty(string $key, string $sanitize = 'text')
     {
         if (!isset($this->row['f_properties'][$key])) {
             $this->row['f_properties'][$key] = null;
         }
-        return $this->row['f_properties'][$key];
+        return BaseFunctions::sanitize($this->row['f_properties'][$key], $sanitize);
     }
 
     abstract public function getType(): string;
@@ -290,6 +333,9 @@ abstract class Field extends Model
     protected function _beforeSave(): bool
     {
         unset($this->row['f_properties']['name']);
+        foreach (self::INPUT_ATTRIBUTES as $attribute => $properties) {
+            $this->row['f_properties'][$attribute] = BaseFunctions::sanitize($this->row['f_properties'][$attribute] ?? $properties['default'], $properties['type']);
+        }
         $this->row['f_properties'] = json_encode($this->row['f_properties']);
         if ($this->oldName !== null && $this->oldName !== $this->row['f_name']) {
             SSV_Global::addError('Cannot change the name of the field.<br/>Changing the name would disconnect the user data.');
@@ -305,9 +351,7 @@ abstract class Field extends Model
             case 'hidden':
                 return $this->_getHiddenInputFieldHtml();
             case 'select':
-                /** @noinspection PhpIncludeInspection */
-                require_once SSV_Forms::PATH . 'templates/fields/select.php';
-                show_select_input_field($this);
+                mp_ssv_show_select_input_field($this);
                 break;
             case 'checkbox':
                 mp_ssv_show_checkbox_input_field($this);

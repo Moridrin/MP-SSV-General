@@ -65,7 +65,7 @@ function mp_ssv_show_form_editor(Form $form)
                                 <div class="inside">
                                     <ul id="fieldsList">
                                         <?php foreach ($fields as $field): ?>
-                                            <li id="baseField_<?= BaseFunctions::escape($field->getName(), 'attr') ?>" class="baseField" draggable="true" data-field='<?= json_encode($field->getProperties()) ?>' data-type="Input">
+                                            <li id="baseField_<?= BaseFunctions::escape($field->getName(), 'attr') ?>" class="baseField" draggable="true" data-field='<?= json_encode($field->getData()) ?>' data-type="Input">
                                                 <span><strong><?= BaseFunctions::escape($field->getName(), 'html') ?></strong></span>
                                                 <span style="font-size: 9px;">(<?= $field->getType() ?>)</span>
                                                 <span style="float: right"><?= BaseFunctions::escape($field->getProperty('type'), 'html') ?></span>

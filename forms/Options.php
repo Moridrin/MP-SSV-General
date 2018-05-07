@@ -69,6 +69,7 @@ abstract class Options
     {
         if (isset($_GET['action']) && $_GET['action'] === 'edit') {
             self::showFormPageEdit();
+            return;
         }
         ?>
         <div class="wrap">
