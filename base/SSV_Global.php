@@ -6,6 +6,9 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/** @noinspection PhpIncludeInspection */
+require_once SSV_Global::PATH . 'templates/table.php';
+
 abstract class SSV_Global
 {
     const PATH = SSV_BASE_PATH;

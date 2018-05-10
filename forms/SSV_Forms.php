@@ -14,8 +14,6 @@ if (!defined('ABSPATH')) {
 }
 
 /** @noinspection PhpIncludeInspection */
-require_once SSV_Forms::PATH . 'templates/table.php';
-/** @noinspection PhpIncludeInspection */
 require_once SSV_Forms::PATH . 'templates/form-editor.php';
 
 abstract class SSV_Forms

@@ -42,8 +42,10 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                     </td>
                     <?php foreach ($columns as $key => $column): ?>
                         <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
-                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span><?= BaseFunctions::escape($column,
-                                        'attr') ?></span><span class="sorting-indicator"></span></a>
+                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>">
+                                <span><?= BaseFunctions::escape($column, 'attr') ?></span>
+                                <span class="sorting-indicator"></span>
+                            </a>
                         </th>
                     <?php endforeach; ?>
                 </tr>
@@ -108,8 +110,11 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                         <?php endif; ?>
                     </td>
                     <?php foreach ($columns as $key => $column): ?>
-                        <th scope="col" id="<?= BaseFunctions::escape($column, 'attr') ?>" class="manage-column column-name sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
-                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=name&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>"><span>Name</span><span class="sorting-indicator"></span></a>
+                        <th scope="col" class="manage-column sortable <?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?> <?= $orderBy === $key ? 'sorted' : '' ?>">
+                            <a href="?page=<?= BaseFunctions::escape($_GET['page'], 'attr') ?>&orderby=<?= $key ?>&order=<?= BaseFunctions::escape(($orderBy === $key ? $newOrder : $order), 'attr') ?>">
+                                <span><?= BaseFunctions::escape($column, 'attr') ?></span>
+                                <span class="sorting-indicator"></span>
+                            </a>
                         </th>
                     <?php endforeach; ?>
                 </tr>
