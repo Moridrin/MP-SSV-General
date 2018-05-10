@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_general\exceptions;
+namespace mp_general\exceptions;
 
 if (!defined('ABSPATH')) {
     exit;

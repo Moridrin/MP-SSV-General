@@ -2,7 +2,7 @@
 
 $currentDir = getcwd();
 chdir(__DIR__ . '/../..');
-define('SSV_FORMS_ACTIVATOR_PLUGIN', getcwd() . DIRECTORY_SEPARATOR . glob('ss?-*.php')[0]);
+define('SSV_FORMS_ACTIVATOR_PLUGIN', getcwd() . DIRECTORY_SEPARATOR . basename(getcwd()) . '.php');
 chdir($currentDir);
 define('SSV_FORMS_PATH', plugin_dir_path(__FILE__));
 define('SSV_FORMS_URL', plugins_url() . '/' . plugin_basename(__DIR__));

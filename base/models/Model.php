@@ -1,9 +1,9 @@
 <?php
 
-namespace mp_ssv_general\base\models;
+namespace mp_general\base\models;
 
-use mp_ssv_general\base\SSV_Global;
-use mp_ssv_general\exceptions\NotFoundException;
+use mp_general\base\SSV_Global;
+use mp_general\exceptions\NotFoundException;
 
 /**
  * Created by PhpStorm.

@@ -1,9 +1,9 @@
 <?php
 
-namespace mp_ssv_general\forms\models;
+namespace mp_general\forms\models;
 
-use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\base\models\Model;
+use mp_general\base\BaseFunctions;
+use mp_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
     exit;

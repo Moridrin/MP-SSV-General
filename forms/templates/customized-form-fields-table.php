@@ -1,7 +1,7 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\forms\models\Field;
+use mp_general\base\BaseFunctions;
+use mp_general\forms\models\Field;
 
 if (!defined('ABSPATH')) {
     exit;

@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_general\base;
+namespace mp_general\base;
 
 if (!defined('ABSPATH')) {
     exit;

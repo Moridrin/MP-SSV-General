@@ -1,6 +1,6 @@
 <?php
 
-namespace mp_ssv_general\base;
+namespace mp_general\base;
 
 use DateTime;
 use Exception;
@@ -34,9 +34,9 @@ abstract class BaseFunctions
      *
      * @return bool
      */
-    public static function isValidPOST(string $adminReferer): bool
+    public static function isValidPOST(?string $adminReferer): bool
     {
-        return $_SERVER['REQUEST_METHOD'] === 'POST' && check_admin_referer($adminReferer);
+        return $_SERVER['REQUEST_METHOD'] === 'POST' && (($adminReferer === null) ?: check_admin_referer($adminReferer));
     }
 
     /**

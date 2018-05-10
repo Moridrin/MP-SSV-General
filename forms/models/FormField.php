@@ -1,9 +1,9 @@
 <?php
 
-namespace mp_ssv_general\forms\models;
+namespace mp_general\forms\models;
 
-use mp_ssv_general\base\Database;
-use mp_ssv_general\base\models\Model;
+use mp_general\base\Database;
+use mp_general\base\models\Model;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -25,7 +25,7 @@ class FormField extends Field
     /**
      * @param int $id
      * @return FormField
-     * @throws \mp_ssv_general\exceptions\NotFoundException
+     * @throws \mp_general\exceptions\NotFoundException
      */
     public static function findById(int $id): Model
     {

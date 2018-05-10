@@ -1,6 +1,6 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
+use mp_general\base\BaseFunctions;
 
 if (!defined('ABSPATH')) {
     exit;

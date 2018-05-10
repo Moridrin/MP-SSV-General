@@ -1,8 +1,8 @@
 <?php
 
-use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\base\models\Model;
-use mp_ssv_general\forms\SSV_Forms;
+use mp_general\base\BaseFunctions;
+use mp_general\base\models\Model;
+use mp_general\forms\SSV_Forms;
 
 if (!defined('ABSPATH')) {
     exit;

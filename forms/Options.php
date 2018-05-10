@@ -1,14 +1,14 @@
 <?php
 
-namespace mp_ssv_general\forms;
+namespace mp_general\forms;
 
-use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\base\SSV_Global;
-use mp_ssv_general\exceptions\NotFoundException;
-use mp_ssv_general\forms\models\Form;
-use mp_ssv_general\forms\models\FormField;
-use mp_ssv_general\forms\models\SharedField;
-use mp_ssv_general\forms\models\SiteSpecificField;
+use mp_general\base\BaseFunctions;
+use mp_general\base\SSV_Global;
+use mp_general\exceptions\NotFoundException;
+use mp_general\forms\models\Form;
+use mp_general\forms\models\FormField;
+use mp_general\forms\models\SharedField;
+use mp_general\forms\models\SiteSpecificField;
 
 if (!defined('ABSPATH')) {
     exit;

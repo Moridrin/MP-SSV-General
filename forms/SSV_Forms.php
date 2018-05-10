@@ -1,13 +1,13 @@
 <?php
 
-namespace mp_ssv_general\forms;
+namespace mp_general\forms;
 
-use mp_ssv_general\base\BaseFunctions;
-use mp_ssv_general\base\SSV_Global;
-use mp_ssv_general\forms\models\Form;
-use mp_ssv_general\forms\models\FormField;
-use mp_ssv_general\forms\models\SharedField;
-use mp_ssv_general\forms\models\SiteSpecificField;
+use mp_general\base\BaseFunctions;
+use mp_general\base\SSV_Global;
+use mp_general\forms\models\Form;
+use mp_general\forms\models\FormField;
+use mp_general\forms\models\SharedField;
+use mp_general\forms\models\SiteSpecificField;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -144,8 +144,8 @@ abstract class SSV_Forms
                 'basePath' => ABSPATH,
             ],
             'actions'    => [
-                'save'   => 'mp_ssv_general_forms_save_field',
-                'delete' => 'mp_ssv_general_forms_delete_field',
+                'save'   => 'mp_general_forms_save_field',
+                'delete' => 'mp_general_forms_delete_field',
             ],
             'isShared'   => $activeTab === 'shared',
             'roles'      => array_keys(get_editable_roles()),
@@ -170,7 +170,7 @@ abstract class SSV_Forms
                 'basePath' => ABSPATH,
             ],
             'actions' => [
-                'delete' => 'mp_ssv_general_forms_delete_form',
+                'delete' => 'mp_general_forms_delete_form',
             ],
             'formId'  => $_GET['id'] ?? null,
         ]);
