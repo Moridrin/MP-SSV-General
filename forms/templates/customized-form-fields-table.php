@@ -24,7 +24,7 @@ function mp_ssv_show_form_fields_table(array $fields)
                 <?php /** @var Field $field */ ?>
                 <?php foreach ($fields as $field): ?>
                     <tr
-                            id="field_<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
+                            id="model_<?= BaseFunctions::escape($field->getName(), 'attr') ?>"
                             draggable="true"
                             class="formField"
                             data-properties="<?= BaseFunctions::escape(json_encode($field->getData()), 'attr') ?>"

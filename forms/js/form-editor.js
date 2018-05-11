@@ -4,7 +4,7 @@ let formEditor = {
         this.closeEditor();
         fieldsManager.editor.current = name;
         fieldsManager.editor.isOpen = true;
-        let tr = document.getElementById('field_' + name);
+        let tr = document.getElementById('model_' + name);
         let properties = JSON.parse(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
         tr.removeAttribute('draggable');
@@ -153,7 +153,7 @@ let formEditor = {
 
     saveCustomization: function () {
         let id = fieldsManager.editor.current;
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         let fieldSpecification = null;
         if (typeof(fieldsManager.fieldSpecifications[properties.type]) === 'undefined') {
@@ -187,7 +187,7 @@ let formEditor = {
             return;
         }
         let id = fieldsManager.editor.current;
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         if (id === null) {
             let container = tr.parentElement;
             generalFunctions.removeElement(tr);
@@ -309,7 +309,7 @@ let formEditor = {
             if (dragElement && dragElement.parentNode === fieldsList) {
                 let field = JSON.parse(dragElement.dataset.field);
                 dropElement = document.createElement('tr');
-                dropElement.setAttribute('id', 'field_' + field.name);
+                dropElement.setAttribute('id', 'model_' + field.name);
                 dropElement.setAttribute('draggable', 'true');
                 dropElement.setAttribute('class', 'formField');
                 dropElement.dataset.properties = dragElement.dataset.field;

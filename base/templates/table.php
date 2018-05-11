@@ -56,7 +56,7 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
                     <?php foreach ($items as $item): ?>
                         <?php $row = $item->getTableRow(); ?>
                         <?php $rowActions = $item->getRowActions(); ?>
-                        <tr id="field_<?= $item->getId() ?>" data-properties='<?= json_encode($item->getData()) ?>'>
+                        <tr id="model_<?= $item->getId() ?>" data-properties='<?= json_encode($item->getData()) ?>'>
                             <th class="check-column">
                                 <?php if ($canManage): ?>
                                     <input type="checkbox" name="ids[]" value="<?= $item->getId() ?>">

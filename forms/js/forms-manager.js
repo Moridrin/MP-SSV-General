@@ -4,7 +4,7 @@ let params = mp_ssv_forms_manager_params;
 let formsManager = {
     deleteRow: function (id) {
         console.log('test');
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         let container = tr.parentElement;
         generalFunctions.removeElement(tr);
         jQuery.post(

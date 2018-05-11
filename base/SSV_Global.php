@@ -100,8 +100,15 @@ abstract class SSV_Global
 
     public static function showAjaxErrors()
     {
-        return function ($output) {
-            $output = json_decode($output, true);
+        return function ($outputString) {
+            if ($outputString) {
+                $output = json_decode($outputString, true);
+                if (!is_array($output)) {
+                    SSV_Global::addError('Task returned with the following unexpected output: ' . var_export($outputString,
+                                                                                                             true));
+                    $output = [];
+                }
+            }
             $output['errors'] = SSV_Global::getErrors() ?: false;
             echo json_encode($output);
             die();

@@ -92,7 +92,6 @@ abstract class SSV_Forms
 
     public static function deactivate($network_wide)
     {
-        file_put_contents('testlog', var_export($network_wide, true));
         if (is_multisite() && $network_wide) {
             //            SSV_Global::runFunctionOnAllSites([self::class, 'cleanupBlog']); // Don't remove the databases on a netword disable (to keep the data for when a blog still wants to use the data).
         } else {

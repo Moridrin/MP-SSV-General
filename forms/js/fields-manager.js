@@ -281,7 +281,7 @@ let fieldsManager = {
         },
 
         addSelectValueContainer: function (options, tags) {
-            let tr = document.getElementById('field_' + this.current);
+            let tr = document.getElementById('model_' + this.current);
             let properties = JSON.parse(tr.dataset.properties);
             let selected = properties.value;
             if (selected === undefined || !Array.isArray(selected)) {
@@ -328,7 +328,7 @@ let fieldsManager = {
             type: 'text',
         };
 
-        tr.setAttribute('id', 'field_' + null);
+        tr.setAttribute('id', 'model_' + null);
         tr.dataset.properties = JSON.stringify(properties);
 
         generalFunctions.removeElement(document.getElementById('no-items'));
@@ -345,7 +345,7 @@ let fieldsManager = {
         this.closeEditor();
         this.editor.current = id;
         this.editor.isOpen = true;
-        let tr = document.getElementById("field_" + id);
+        let tr = document.getElementById("model_" + id);
         console.log(tr.dataset.properties);
         let properties = jQuery.parseJSON(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
@@ -374,7 +374,7 @@ let fieldsManager = {
         ;
         tr.innerHTML = html;
 
-        jQuery('#field_' + id + ' select[name="type"]').select2({
+        jQuery('#model_' + id + ' select[name="type"]').select2({
             tags: true,
         });
         this.typeChanged();
@@ -384,7 +384,7 @@ let fieldsManager = {
         this.closeEditor();
         this.editor.current = id;
         this.editor.isOpen = true;
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
         tr.removeAttribute('draggable');
@@ -528,7 +528,7 @@ let fieldsManager = {
     },
 
     deleteRow: function (id) {
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         let container = tr.parentElement;
         generalFunctions.removeElement(tr);
         if (id !== '') {
@@ -551,7 +551,7 @@ let fieldsManager = {
     },
 
     typeChanged: function () {
-        let type = jQuery('#field_' + this.editor.current + ' select[name=type]').val();
+        let type = jQuery('#model_' + this.editor.current + ' select[name=type]').val();
         if (type === 'role_checkbox') {
             this.editor.switchNameFieldToSelect();
         } else {
@@ -573,7 +573,7 @@ let fieldsManager = {
     },
 
     saveEdit: function () {
-        let tr = document.getElementById('field_' + this.editor.current);
+        let tr = document.getElementById('model_' + this.editor.current);
         let id = this.editor.current;
         let properties = JSON.parse(tr.dataset.properties);
         let $nameInput = tr.querySelector('input[name="name"]');
@@ -607,7 +607,7 @@ let fieldsManager = {
             function (data) {
                 if (generalFunctions.ajaxResponse(data)) {
                     let id = JSON.parse(data)['id'];
-                    tr.setAttribute('id', 'field_' + id);
+                    tr.setAttribute('id', 'model_' + id);
                     fieldsManager.editor.current = id;
                     fieldsManager.closeEditor();
                 }
@@ -617,7 +617,7 @@ let fieldsManager = {
 
     saveCustomization: function () {
         let id = this.editor.current;
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         let fieldSpecification = null;
         if (typeof(fieldsManager.fieldSpecifications[properties.type]) === 'undefined') {
@@ -665,7 +665,7 @@ let fieldsManager = {
             return;
         }
         let id = this.editor.current;
-        let tr = document.getElementById('field_' + id);
+        let tr = document.getElementById('model_' + id);
         if (id === null) {
             let container = tr.parentElement;
             generalFunctions.removeElement(tr);
