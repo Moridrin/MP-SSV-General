@@ -59,9 +59,14 @@ abstract class SSV_Global
         }
     }
 
-    public static function addError(string $message)
+    public static function addError(string $message): void
     {
         $_SESSION['SSV']['errors'][] = $message;
+    }
+
+    public static function hasError(): bool
+    {
+        return !empty($_SESSION['SSV']['errors']);
     }
 
     public static function getErrors($clear = true)
@@ -101,13 +106,14 @@ abstract class SSV_Global
     public static function showAjaxErrors()
     {
         return function ($outputString) {
-            if ($outputString) {
-                $output = json_decode($outputString, true);
-                if (!is_array($output)) {
-                    SSV_Global::addError('Task returned with the following unexpected output: ' . var_export($outputString,
-                                                                                                             true));
-                    $output = [];
-                }
+            if (!self::hasError()) {
+                echo $outputString;
+                die();
+            }
+            $output = json_decode($outputString, true);
+            if (!is_array($output)) {
+                SSV_Global::addError('Task returned with the following unexpected output: ' . var_export($outputString, true));
+                $output = [];
             }
             $output['errors'] = SSV_Global::getErrors() ?: false;
             echo json_encode($output);
