@@ -330,9 +330,9 @@ abstract class BaseFunctions
         if (is_array($value)) {
             foreach ($value as $key => &$item) {
                 if (is_array($sanitationType)) {
-                    self::sanitize($item, $sanitationType[$key]);
+                    $item = self::sanitize($item, $sanitationType[$key]);
                 } else {
-                    self::sanitize($item, $sanitationType);
+                    $item = self::sanitize($item, $sanitationType);
                 }
             }
             if ($implode !== null) {
