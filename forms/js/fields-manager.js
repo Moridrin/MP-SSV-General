@@ -174,7 +174,7 @@ let fieldsManager = {
         getInputField: function (title, name, value, type, events) {
             // console.log(events.onkeydown);
             // if (events.onkeydown === undefined) {
-            events.onkeydown = 'fieldsManager.editor.onKeyDown()';
+            events.onkeydown = 'generalFunctions.editor.onKeyDown()';
             // }
             let eventsString = '';
             for (let [eventName, event] of Object.entries(events)) {
@@ -266,58 +266,6 @@ let fieldsManager = {
                 }
             }
         },
-
-        addTextValueContainer: function (value) {
-            document.getElementById('value_container').innerHTML =
-                '<div class="inline-edit-col">' +
-                '   <label>' +
-                '       <span class="title">Value</span>' +
-                '       <span class="input-text-wrap">' +
-                '            <input type="text" name="value" value="' + value + '" autocomplete="off" data-old-value="' + value + '">' +
-                '       </span>' +
-                '   </label>' +
-                '</div>'
-            ;
-        },
-
-        addSelectValueContainer: function (options, tags) {
-            let tr = document.getElementById('model_' + this.current);
-            let properties = JSON.parse(tr.dataset.properties);
-            let selected = properties.value;
-            if (selected === undefined || !Array.isArray(selected)) {
-                selected = [];
-            }
-            selected.forEach(function (value) {
-                if (options.indexOf(value) === -1) {
-                    options.push(value);
-                }
-            });
-            document.getElementById('value_container').innerHTML = this.getSelectInputField('Options', 'options[]', options, selected, []);
-            jQuery('[name="options[]"]').select2({
-                tags: tags,
-                tokenSeparators: [';']
-            });
-        },
-
-        removeValueContainer: function () {
-            document.getElementById('value_container').innerHTML = '';
-        },
-
-        switchNameFieldToSelect: function () {
-            let container = document.getElementById('name_container');
-            let value = container.querySelector('[name="name"]').value;
-            let newField = document.createElement('div');
-            newField.innerHTML = this.getSelectInputField('Name', 'name', params.roles, value, []);
-            container.parentElement.replaceChild(newField, container);
-        },
-
-        switchNameFieldToInput: function () {
-            let container = document.getElementById('name_container');
-            let value = container.querySelector('[name="name"]').value;
-            let newField = document.createElement('div');
-            newField.innerHTML = this.getInputField('Name', 'name', value, 'text', []);
-            container.parentElement.replaceChild(newField, container);
-        },
     },
 
     addNew: function (containerId) {
@@ -343,8 +291,8 @@ let fieldsManager = {
 
     edit: function (id) {
         this.closeEditor();
-        this.editor.current = id;
-        this.editor.isOpen = true;
+        generalFunctions.editor.current = id;
+        generalFunctions.editor.isOpen = true;
         let tr = document.getElementById("model_" + id);
         console.log(tr.dataset.properties);
         let properties = jQuery.parseJSON(tr.dataset.properties);
@@ -355,12 +303,12 @@ let fieldsManager = {
             '   <fieldset class="inline-edit-col" style="width: 30%;">' +
             '      <legend class="inline-edit-legend" id="edit-type" data-edit-type="edit">Edit Field</legend>'
         ;
-        html += this.editor.getInputField('Name', 'name', properties.name, 'text', []);
+        html += generalFunctions.editor.getInputField('Name', 'name', properties.name, 'text', []);
         html +=
             '   </fieldset>' +
             '   <fieldset class="inline-edit-col" style="width: 30%; margin: 32px 4% 0;">'
         ;
-        html += this.editor.getSelectInputField('Input Type', 'type', params.inputTypes, properties.type, {'onchange': 'fieldsManager.typeChanged()'});
+        html += generalFunctions.editor.getSelectInputField('Input Type', 'type', params.inputTypes, properties.type, {'onchange': 'fieldsManager.typeChanged()'});
         html +=
             '   </fieldset>' +
             '   <fieldset id="value_container" class="inline-edit-col" style="width: 30%; margin-top: 32px;">' +
@@ -382,8 +330,8 @@ let fieldsManager = {
 
     customize: function (id) {
         this.closeEditor();
-        this.editor.current = id;
-        this.editor.isOpen = true;
+        generalFunctions.editor.current = id;
+        generalFunctions.editor.isOpen = true;
         let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
@@ -404,7 +352,7 @@ let fieldsManager = {
             if (properties.title === undefined) {
                 properties.title = '';
             }
-            html += this.editor.getInputField('Title', 'title', properties.title, 'text', []);
+            html += generalFunctions.editor.getInputField('Title', 'title', properties.title, 'text', []);
         }
         if (fieldSpecification.properties.includes('classes')) {
             if (properties.classes === undefined) {
@@ -416,38 +364,38 @@ let fieldsManager = {
                 if (properties.classes[id] === undefined) {
                     properties.classes[id] = '';
                 }
-                html += this.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', []);
             }
         }
         if (fieldSpecification.properties.includes('required')) {
             if (properties.required === undefined) {
                 properties.required = 'false';
             }
-            html += this.editor.getCheckboxInputField('Required', 'required', properties.required, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Required', 'required', properties.required, '', []);
         }
         if (fieldSpecification.properties.includes('placeholder')) {
             if (properties.placeholder === undefined) {
                 properties.placeholder = '';
             }
-            html += this.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', []);
+            html += generalFunctions.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', []);
         }
         if (fieldSpecification.properties.includes('pattern')) {
             if (properties.pattern === undefined) {
                 properties.pattern = '';
             }
-            html += this.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', []);
+            html += generalFunctions.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', []);
         }
         if (fieldSpecification.properties.includes('min')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += this.editor.getInputField('Min', 'min', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Min', 'min', properties.max, 'number', []);
         }
         if (fieldSpecification.properties.includes('size')) {
             if (properties.size === undefined) {
                 properties.size = '';
             }
-            html += this.editor.getInputField('Size', 'size', properties.size, 'number', []);
+            html += generalFunctions.editor.getInputField('Size', 'size', properties.size, 'number', []);
         }
         html +=
             '   </fieldset>' +
@@ -458,11 +406,11 @@ let fieldsManager = {
                 properties.defaultValue = '';
             }
             if (tr.dataset.type === 'select') {
-                html += this.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, []);
+                html += generalFunctions.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, []);
             } else if (tr.dataset.type === 'checkbox') {
-                html += this.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', []);
             } else {
-                html += this.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', []);
             }
         }
         if (fieldSpecification.properties.includes('styles')) {
@@ -475,44 +423,44 @@ let fieldsManager = {
                 if (properties.styles[id] === undefined) {
                     properties.styles[id] = '';
                 }
-                html += this.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', []);
             }
         }
         if (fieldSpecification.properties.includes('autoComplete')) {
             if (properties.autoComplete === undefined) {
                 properties.autoComplete = 'true';
             }
-            html += this.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', []);
         }
         if (fieldSpecification.properties.includes('optionsList')) {
             if (properties.optionsList === undefined) {
                 properties.optionsList = '';
             }
-            html += this.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', []);
+            html += generalFunctions.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', []);
         }
         if (fieldSpecification.properties.includes('step')) {
             if (properties.step === undefined) {
                 properties.step = '';
             }
-            html += this.editor.getInputField('Step', 'step', properties.step, 'number', []);
+            html += generalFunctions.editor.getInputField('Step', 'step', properties.step, 'number', []);
         }
         if (fieldSpecification.properties.includes('max')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += this.editor.getInputField('Max', 'max', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Max', 'max', properties.max, 'number', []);
         }
         if (fieldSpecification.properties.includes('multiple')) {
             if (properties.multiple === undefined) {
                 properties.multiple = '';
             }
-            html += this.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', []);
         }
         if (fieldSpecification.properties.includes('profileField')) {
             if (properties.profileField === undefined) {
                 properties.profileField = 'true';
             }
-            html += this.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', []);
         }
         html +=
             '   </fieldset>' +
@@ -551,20 +499,20 @@ let fieldsManager = {
     },
 
     typeChanged: function () {
-        let type = jQuery('#model_' + this.editor.current + ' select[name=type]').val();
+        let type = jQuery('#model_' + generalFunctions.editor.current + ' select[name=type]').val();
         if (type === 'role_checkbox') {
-            this.editor.switchNameFieldToSelect();
+            fieldsManager.switchNameFieldToSelect();
         } else {
-            this.editor.switchNameFieldToInput();
+            fieldsManager.switchNameFieldToInput();
         }
         if (type === 'hidden') {
-            this.editor.addTextValueContainer('');
+            fieldsManager.addTextValueContainer('');
         } else if (type === 'select') {
-            this.editor.addSelectValueContainer([], true);
+            fieldsManager.addSelectValueContainer([], true);
         } else if (type === 'role_select') {
-            this.editor.addSelectValueContainer(params.roles, false);
+            fieldsManager.addSelectValueContainer(params.roles, false);
         } else {
-            this.editor.removeValueContainer();
+            fieldsManager.removeValueContainer();
         }
     },
 
@@ -573,8 +521,8 @@ let fieldsManager = {
     },
 
     saveEdit: function () {
-        let tr = document.getElementById('model_' + this.editor.current);
-        let id = this.editor.current;
+        let tr = document.getElementById('model_' + generalFunctions.editor.current);
+        let id = generalFunctions.editor.current;
         let properties = JSON.parse(tr.dataset.properties);
         let $nameInput = tr.querySelector('input[name="name"]');
         properties.name = $nameInput.value;
@@ -602,13 +550,13 @@ let fieldsManager = {
                 id: id,
                 name: $nameInput.value,
                 properties: properties,
-                oldName: this.editor.current,
+                oldName: generalFunctions.editor.current,
             },
             function (data) {
                 if (generalFunctions.ajaxResponse(data)) {
                     let id = JSON.parse(data)['id'];
                     tr.setAttribute('id', 'model_' + id);
-                    fieldsManager.editor.current = id;
+                    generalFunctions.editor.current = id;
                     fieldsManager.closeEditor();
                 }
             }
@@ -616,7 +564,7 @@ let fieldsManager = {
     },
 
     saveCustomization: function () {
-        let id = this.editor.current;
+        let id = generalFunctions.editor.current;
         let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         let fieldSpecification = null;
@@ -661,10 +609,10 @@ let fieldsManager = {
     },
 
     closeEditor: function () {
-        if (this.editor.isOpen === false) {
+        if (generalFunctions.editor.isOpen === false) {
             return;
         }
-        let id = this.editor.current;
+        let id = generalFunctions.editor.current;
         let tr = document.getElementById('model_' + id);
         if (id === null) {
             let container = tr.parentElement;
@@ -672,8 +620,8 @@ let fieldsManager = {
             if (container.childElementCount === 0) {
                 container.innerHTML = this.getEmptyRow();
             }
-            this.editor.current = null;
-            this.editor.isOpen = false;
+            generalFunctions.editor.current = null;
+            generalFunctions.editor.isOpen = false;
             return;
         }
         let properties = JSON.parse(tr.dataset.properties);
@@ -696,8 +644,8 @@ let fieldsManager = {
             '<td>' + properties.value + '</td>'
         ;
         tr.setAttribute('class', 'inactive');
-        this.editor.current = null;
-        this.editor.isOpen = false;
+        generalFunctions.editor.current = null;
+        generalFunctions.editor.isOpen = false;
     },
 
     getEmptyRow: function () {
@@ -706,5 +654,57 @@ let fieldsManager = {
             '    <td class="colspanchange" colspan="8">No Items found</td>' +
             '</tr>'
             ;
+    },
+
+    addTextValueContainer: function (value) {
+        document.getElementById('value_container').innerHTML =
+            '<div class="inline-edit-col">' +
+            '   <label>' +
+            '       <span class="title">Value</span>' +
+            '       <span class="input-text-wrap">' +
+            '            <input type="text" name="value" value="' + value + '" autocomplete="off" data-old-value="' + value + '">' +
+            '       </span>' +
+            '   </label>' +
+            '</div>'
+        ;
+    },
+
+    addSelectValueContainer: function (options, tags) {
+        let tr = document.getElementById('model_' + this.current);
+        let properties = JSON.parse(tr.dataset.properties);
+        let selected = properties.value;
+        if (selected === undefined || !Array.isArray(selected)) {
+            selected = [];
+        }
+        selected.forEach(function (value) {
+            if (options.indexOf(value) === -1) {
+                options.push(value);
+            }
+        });
+        document.getElementById('value_container').innerHTML = this.getSelectInputField('Options', 'options[]', options, selected, []);
+        jQuery('[name="options[]"]').select2({
+            tags: tags,
+            tokenSeparators: [';']
+        });
+    },
+
+    removeValueContainer: function () {
+        document.getElementById('value_container').innerHTML = '';
+    },
+
+    switchNameFieldToSelect: function () {
+        let container = document.getElementById('name_container');
+        let value = container.querySelector('[name="name"]').value;
+        let newField = document.createElement('div');
+        newField.innerHTML = this.getSelectInputField('Name', 'name', params.roles, value, []);
+        container.parentElement.replaceChild(newField, container);
+    },
+
+    switchNameFieldToInput: function () {
+        let container = document.getElementById('name_container');
+        let value = container.querySelector('[name="name"]').value;
+        let newField = document.createElement('div');
+        newField.innerHTML = this.getInputField('Name', 'name', value, 'text', []);
+        container.parentElement.replaceChild(newField, container);
     },
 };

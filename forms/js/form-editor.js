@@ -2,8 +2,8 @@
 let formEditor = {
     customize: function (name) {
         this.closeEditor();
-        fieldsManager.editor.current = name;
-        fieldsManager.editor.isOpen = true;
+        generalFunctions.editor.current = name;
+        generalFunctions.editor.isOpen = true;
         let tr = document.getElementById('model_' + name);
         let properties = JSON.parse(tr.dataset.properties);
         tr.setAttribute('class', 'inline-edit-row');
@@ -24,7 +24,7 @@ let formEditor = {
             if (properties.title === undefined) {
                 properties.title = '';
             }
-            html += fieldsManager.editor.getInputField('Title', 'title', properties.title, 'text', []);
+            html += generalFunctions.editor.getInputField('Title', 'title', properties.title, 'text', []);
         }
         if (fieldSpecification.properties.includes('classes')) {
             if (properties.classes === undefined) {
@@ -36,38 +36,38 @@ let formEditor = {
                 if (properties.classes[id] === undefined) {
                     properties.classes[id] = '';
                 }
-                html += fieldsManager.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', []);
             }
         }
         if (fieldSpecification.properties.includes('required')) {
             if (properties.required === undefined) {
                 properties.required = 'false';
             }
-            html += fieldsManager.editor.getCheckboxInputField('Required', 'required', properties.required, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Required', 'required', properties.required, '', []);
         }
         if (fieldSpecification.properties.includes('placeholder')) {
             if (properties.placeholder === undefined) {
                 properties.placeholder = '';
             }
-            html += fieldsManager.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', []);
+            html += generalFunctions.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', []);
         }
         if (fieldSpecification.properties.includes('pattern')) {
             if (properties.pattern === undefined) {
                 properties.pattern = '';
             }
-            html += fieldsManager.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', []);
+            html += generalFunctions.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', []);
         }
         if (fieldSpecification.properties.includes('min')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += fieldsManager.editor.getInputField('Min', 'min', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Min', 'min', properties.max, 'number', []);
         }
         if (fieldSpecification.properties.includes('size')) {
             if (properties.size === undefined) {
                 properties.size = '';
             }
-            html += fieldsManager.editor.getInputField('Size', 'size', properties.size, 'number', []);
+            html += generalFunctions.editor.getInputField('Size', 'size', properties.size, 'number', []);
         }
         html +=
             '   </fieldset>' +
@@ -78,11 +78,11 @@ let formEditor = {
                 properties.defaultValue = '';
             }
             if (tr.dataset.type === 'select') {
-                html += fieldsManager.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, []);
+                html += generalFunctions.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, []);
             } else if (tr.dataset.type === 'checkbox') {
-                html += fieldsManager.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', []);
             } else {
-                html += fieldsManager.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', []);
             }
         }
         if (fieldSpecification.properties.includes('styles')) {
@@ -95,44 +95,44 @@ let formEditor = {
                 if (properties.styles[id] === undefined) {
                     properties.styles[id] = '';
                 }
-                html += fieldsManager.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', []);
             }
         }
         if (fieldSpecification.properties.includes('autoComplete')) {
             if (properties.autoComplete === undefined) {
                 properties.autoComplete = 'true';
             }
-            html += fieldsManager.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', []);
         }
         if (fieldSpecification.properties.includes('optionsList')) {
             if (properties.optionsList === undefined) {
                 properties.optionsList = '';
             }
-            html += fieldsManager.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', []);
+            html += generalFunctions.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', []);
         }
         if (fieldSpecification.properties.includes('step')) {
             if (properties.step === undefined) {
                 properties.step = '';
             }
-            html += fieldsManager.editor.getInputField('Step', 'step', properties.step, 'number', []);
+            html += generalFunctions.editor.getInputField('Step', 'step', properties.step, 'number', []);
         }
         if (fieldSpecification.properties.includes('max')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += fieldsManager.editor.getInputField('Max', 'max', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Max', 'max', properties.max, 'number', []);
         }
         if (fieldSpecification.properties.includes('multiple')) {
             if (properties.multiple === undefined) {
                 properties.multiple = '';
             }
-            html += fieldsManager.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', []);
         }
         if (fieldSpecification.properties.includes('profileField')) {
             if (properties.profileField === undefined) {
                 properties.profileField = 'true';
             }
-            html += fieldsManager.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', []);
         }
         html +=
             '   </fieldset>' +
@@ -152,7 +152,7 @@ let formEditor = {
     },
 
     saveCustomization: function () {
-        let id = fieldsManager.editor.current;
+        let id = generalFunctions.editor.current;
         let tr = document.getElementById('model_' + id);
         let properties = JSON.parse(tr.dataset.properties);
         let fieldSpecification = null;
@@ -183,10 +183,10 @@ let formEditor = {
     },
 
     closeEditor: function () {
-        if (fieldsManager.editor.isOpen === false) {
+        if (generalFunctions.editor.isOpen === false) {
             return;
         }
-        let id = fieldsManager.editor.current;
+        let id = generalFunctions.editor.current;
         let tr = document.getElementById('model_' + id);
         if (id === null) {
             let container = tr.parentElement;
@@ -194,8 +194,8 @@ let formEditor = {
             if (container.childElementCount === 0) {
                 container.innerHTML = fieldsManager.getEmptyRow();
             }
-            fieldsManager.editor.current = null;
-            fieldsManager.editor.isOpen = false;
+            generalFunctions.editor.current = null;
+            generalFunctions.editor.isOpen = false;
             return;
         }
         let properties = JSON.parse(tr.dataset.properties);
@@ -213,8 +213,8 @@ let formEditor = {
         ;
         tr.setAttribute('draggable', 'true');
         tr.setAttribute('class', 'formField');
-        fieldsManager.editor.current = null;
-        fieldsManager.editor.isOpen = false;
+        generalFunctions.editor.current = null;
+        generalFunctions.editor.isOpen = false;
     },
 };
 
