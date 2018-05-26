@@ -67,17 +67,17 @@ abstract class SSV_Forms
         $tableName = SiteSpecificField::getDatabaseTableName($blogId);
         $wpdb->query("DROP TABLE $tableName;");
         if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
+            // throw new \Exception($wpdb->last_error);
         }
         $tableName = FormField::getDatabaseTableName($blogId);
         $wpdb->query("DROP TABLE $tableName;");
         if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
+            // throw new \Exception($wpdb->last_error);
         }
         $tableName = Form::getDatabaseTableName($blogId);
         $wpdb->query("DROP TABLE $tableName;");
         if ($wpdb->last_error) {
-            throw new \Exception($wpdb->last_error);
+            // throw new \Exception($wpdb->last_error);
         }
     }
 
