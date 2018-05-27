@@ -166,108 +166,6 @@ let fieldsManager = {
         },
     },
 
-    editor: {
-
-        current: null,
-        isOpen: false,
-
-        getInputField: function (title, name, value, type, events) {
-            // console.log(events.onkeydown);
-            // if (events.onkeydown === undefined) {
-            events.onkeydown = 'generalFunctions.editor.onKeyDown()';
-            // }
-            let eventsString = '';
-            for (let [eventName, event] of Object.entries(events)) {
-                eventsString += eventName + '="' + event + '" ';
-            }
-            let html =
-                '<label id="' + name + '_container">' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">'
-            ;
-            if (type === 'textarea') {
-                html += '<textarea name="' + name + '">' + value + '</textarea>';
-            } else {
-                html += '<input type="' + type + '" name="' + name + '" value="' + value + '" autocomplete="off" style="width: 100%;" ' + eventsString + '>';
-            }
-            html +=
-                '   </span>' +
-                '</label>'
-            ;
-            return html;
-        },
-
-        getCheckboxInputField: function (title, name, value, description, events) {
-            let checked = (value === true || value === 'true') ? 'checked="checked"' : '';
-            let eventsString = '';
-            for (let [eventName, event] of Object.entries(events)) {
-                eventsString += eventName + '="' + event + '" ';
-            }
-            return '' +
-                '<label>' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">' +
-                '       <input type="checkbox" name="' + name + '" value="true" ' + checked + ' title="' + description + '" ' + eventsString + '>' +
-                '   </span>' +
-                '</label>'
-                ;
-        },
-
-        getSelectInputField: function (title, name, options, values, events) {
-            let multiple = name.endsWith('[]') ? ' multiple="multiple"' : '';
-            let eventsString = '';
-            if (!Array.isArray(values)) {
-                values = [values];
-            }
-            for (let [eventName, event] of Object.entries(events)) {
-                eventsString += eventName + '="' + event + '" ';
-            }
-            let html =
-                '<label>' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">'
-            ;
-            html += '<select name="' + name + '" style="width: 100%;" ' + eventsString + multiple + '>';
-            if (options instanceof Object) {
-                options = Object.values(options);
-            }
-            for (let i = 0; i < options.length; ++i) {
-                if (values.indexOf(options[i]) !== -1) {
-                    html += '<option selected="selected">' + options[i] + '</option>';
-                } else {
-                    html += '<option>' + options[i] + '</option>';
-                }
-            }
-            html += '</select>';
-            html +=
-                '   </span>' +
-                '</label>'
-            ;
-            return html;
-        },
-
-        onKeyDown: function () {
-            let $nameInput = event.path[0];
-            let editType = document.getElementById('edit-type').dataset.editType;
-            if (editType === 'edit') {
-                if (event.keyCode === 13) {
-                    fieldsManager.saveEdit();
-                    event.preventDefault();
-                    return false;
-                } else {
-                    $nameInput.setCustomValidity('');
-                    $nameInput.reportValidity();
-                }
-            } else if (editType === 'customize') {
-                if (event.keyCode === 13) {
-                    fieldsManager.saveCustomization();
-                    event.preventDefault();
-                    return false;
-                }
-            }
-        },
-    },
-
     addNew: function (containerId) {
         let container = document.getElementById(containerId);
         let tr = document.createElement('tr');
@@ -303,12 +201,12 @@ let fieldsManager = {
             '   <fieldset class="inline-edit-col" style="width: 30%;">' +
             '      <legend class="inline-edit-legend" id="edit-type" data-edit-type="edit">Edit Field</legend>'
         ;
-        html += generalFunctions.editor.getInputField('Name', 'name', properties.name, 'text', []);
+        html += generalFunctions.editor.getInputField('Name', 'name', properties.name, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         html +=
             '   </fieldset>' +
             '   <fieldset class="inline-edit-col" style="width: 30%; margin: 32px 4% 0;">'
         ;
-        html += generalFunctions.editor.getSelectInputField('Input Type', 'type', params.inputTypes, properties.type, {'onchange': 'fieldsManager.typeChanged()'});
+        html += generalFunctions.editor.getSelectInputField('Input Type', 'type', params.inputTypes, properties.type, {'onkeydown': 'fieldsManager.onKeyDown()', 'onchange': 'fieldsManager.typeChanged()'});
         html +=
             '   </fieldset>' +
             '   <fieldset id="value_container" class="inline-edit-col" style="width: 30%; margin-top: 32px;">' +
@@ -352,7 +250,7 @@ let fieldsManager = {
             if (properties.title === undefined) {
                 properties.title = '';
             }
-            html += generalFunctions.editor.getInputField('Title', 'title', properties.title, 'text', []);
+            html += generalFunctions.editor.getInputField('Title', 'title', properties.title, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('classes')) {
             if (properties.classes === undefined) {
@@ -364,38 +262,38 @@ let fieldsManager = {
                 if (properties.classes[id] === undefined) {
                     properties.classes[id] = '';
                 }
-                html += generalFunctions.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Classes', id + '_classes', properties.classes[id], 'textarea', {'onkeydown': 'fieldsManager.onKeyDown()'});
             }
         }
         if (fieldSpecification.properties.includes('required')) {
             if (properties.required === undefined) {
                 properties.required = 'false';
             }
-            html += generalFunctions.editor.getCheckboxInputField('Required', 'required', properties.required, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Required', 'required', properties.required, '', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('placeholder')) {
             if (properties.placeholder === undefined) {
                 properties.placeholder = '';
             }
-            html += generalFunctions.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', []);
+            html += generalFunctions.editor.getInputField('Placeholder', 'placeholder', properties.placeholder, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('pattern')) {
             if (properties.pattern === undefined) {
                 properties.pattern = '';
             }
-            html += generalFunctions.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', []);
+            html += generalFunctions.editor.getInputField('Pattern', 'pattern', properties.pattern, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('min')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += generalFunctions.editor.getInputField('Min', 'min', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Min', 'min', properties.max, 'number', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('size')) {
             if (properties.size === undefined) {
                 properties.size = '';
             }
-            html += generalFunctions.editor.getInputField('Size', 'size', properties.size, 'number', []);
+            html += generalFunctions.editor.getInputField('Size', 'size', properties.size, 'number', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         html +=
             '   </fieldset>' +
@@ -406,11 +304,11 @@ let fieldsManager = {
                 properties.defaultValue = '';
             }
             if (tr.dataset.type === 'select') {
-                html += generalFunctions.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, []);
+                html += generalFunctions.editor.getSelectInputField('Default Value', 'defaultValue', JSON.parse(properties.value), properties.defaultValue, {'onkeydown': 'fieldsManager.onKeyDown()'});
             } else if (tr.dataset.type === 'checkbox') {
-                html += generalFunctions.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Label', 'defaultValue', properties.defaultValue, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
             } else {
-                html += generalFunctions.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', []);
+                html += generalFunctions.editor.getInputField('Default Value', 'defaultValue', properties.defaultValue, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
             }
         }
         if (fieldSpecification.properties.includes('styles')) {
@@ -423,44 +321,44 @@ let fieldsManager = {
                 if (properties.styles[id] === undefined) {
                     properties.styles[id] = '';
                 }
-                html += generalFunctions.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', []);
+                html += generalFunctions.editor.getInputField(title + ' Styles', id + '_styles', properties.styles[id], 'textarea', {'onkeydown': 'fieldsManager.onKeyDown()'});
             }
         }
         if (fieldSpecification.properties.includes('autoComplete')) {
             if (properties.autoComplete === undefined) {
                 properties.autoComplete = 'true';
             }
-            html += generalFunctions.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('AutoComplete', 'autoComplete', properties.autoComplete, '', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('optionsList')) {
             if (properties.optionsList === undefined) {
                 properties.optionsList = '';
             }
-            html += generalFunctions.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', []);
+            html += generalFunctions.editor.getInputField('Options List', 'optionsList', properties.optionsList, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('step')) {
             if (properties.step === undefined) {
                 properties.step = '';
             }
-            html += generalFunctions.editor.getInputField('Step', 'step', properties.step, 'number', []);
+            html += generalFunctions.editor.getInputField('Step', 'step', properties.step, 'number', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('max')) {
             if (properties.max === undefined) {
                 properties.max = '';
             }
-            html += generalFunctions.editor.getInputField('Max', 'max', properties.max, 'number', []);
+            html += generalFunctions.editor.getInputField('Max', 'max', properties.max, 'number', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('multiple')) {
             if (properties.multiple === undefined) {
                 properties.multiple = '';
             }
-            html += generalFunctions.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Multiple', 'multiple', properties.multiple, '', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         if (fieldSpecification.properties.includes('profileField')) {
             if (properties.profileField === undefined) {
                 properties.profileField = 'true';
             }
-            html += generalFunctions.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', []);
+            html += generalFunctions.editor.getCheckboxInputField('Profile Field', 'profileField', properties.profileField, '', {'onkeydown': 'fieldsManager.onKeyDown()'});
         }
         html +=
             '   </fieldset>' +
@@ -670,7 +568,7 @@ let fieldsManager = {
     },
 
     addSelectValueContainer: function (options, tags) {
-        let tr = document.getElementById('model_' + this.current);
+        let tr = document.getElementById('model_' + generalFunctions.editor.current);
         let properties = JSON.parse(tr.dataset.properties);
         let selected = properties.value;
         if (selected === undefined || !Array.isArray(selected)) {
@@ -681,7 +579,7 @@ let fieldsManager = {
                 options.push(value);
             }
         });
-        document.getElementById('value_container').innerHTML = this.getSelectInputField('Options', 'options[]', options, selected, []);
+        document.getElementById('value_container').innerHTML = generalFunctions.editor.getSelectInputField('Options', 'options[]', options, selected, {'onkeydown': 'fieldsManager.onKeyDown()'});
         jQuery('[name="options[]"]').select2({
             tags: tags,
             tokenSeparators: [';']
@@ -696,7 +594,7 @@ let fieldsManager = {
         let container = document.getElementById('name_container');
         let value = container.querySelector('[name="name"]').value;
         let newField = document.createElement('div');
-        newField.innerHTML = this.getSelectInputField('Name', 'name', params.roles, value, []);
+        newField.innerHTML = generalFunctions.editor.getSelectInputField('Name', 'name', params.roles, value, {'onkeydown': 'fieldsManager.onKeyDown()'});
         container.parentElement.replaceChild(newField, container);
     },
 
@@ -704,7 +602,24 @@ let fieldsManager = {
         let container = document.getElementById('name_container');
         let value = container.querySelector('[name="name"]').value;
         let newField = document.createElement('div');
-        newField.innerHTML = this.getInputField('Name', 'name', value, 'text', []);
+        newField.innerHTML = generalFunctions.editor.getInputField('Name', 'name', value, 'text', {'onkeydown': 'fieldsManager.onKeyDown()'});
         container.parentElement.replaceChild(newField, container);
+    },
+
+    onKeyDown: function () {
+        let $nameInput = event.path[0];
+        let editType = document.getElementById('edit-type').dataset.editType;
+        if (event.keyCode === 13) {
+            event.preventDefault();
+            if (editType === 'edit') {
+                this.saveEdit();
+            } else {
+                this.saveCustomization();
+            }
+            return false;
+        } else if (editType === 'edit') {
+            $nameInput.setCustomValidity('');
+            $nameInput.reportValidity();
+        }
     },
 };

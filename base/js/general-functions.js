@@ -1,7 +1,4 @@
 // noinspection JSUnusedGlobalSymbols
-/**
- * Created by moridrin on 5-6-17.
- */
 let generalFunctions = {
 
     editor: {
@@ -10,20 +7,20 @@ let generalFunctions = {
         isOpen: false,
 
         getInputField: function (title, name, value, type, events, options) {
+            // Default values for Events
+            if (events === undefined) {
+                events = {};
+            }
+            if (events.onkeydown === undefined) {
+                alert('no onkeydown event specified');
+            }
+
             // Default values for options
             if (options === undefined) {
                 options = {};
             }
             if (options.width === undefined) {
                 options.width = '100%';
-            }
-
-            // Default values for Events
-            if (events === undefined) {
-                events = {};
-            }
-            if (events.onkeydown === undefined) {
-                events.onkeydown = 'generalFunctions.editor.onKeyDown()';
             }
 
             // Events to String
@@ -62,7 +59,23 @@ let generalFunctions = {
             return html;
         },
 
-        getDiceInputField: function (title, name, value) {
+        getDiceInputField: function (title, name, value, events, options) {
+            // Default values for Events
+            if (events === undefined) {
+                events = {};
+            }
+            if (events.onkeydown === undefined) {
+                alert('no onkeydown event specified');
+            }
+
+            // Default values for options
+            if (options === undefined) {
+                options = {};
+            }
+            if (options.width === undefined) {
+                options.width = '100%';
+            }
+
             let values = value.split('D');
             let html =
                 '<label id="' + name + '_container">' +
@@ -74,12 +87,12 @@ let generalFunctions = {
                 '           <div style="display: table-cell;">'
             ;
             html += '<select name="' + name + 'D" style="width: 100%;">';
-            let options = [2, 4, 6, 8, 10, 12, 20, 100];
-            for (let i = 0; i < options.length; ++i) {
-                if (parseInt(values[1]) === options[i]) {
-                    html += '<option selected="selected" value="' + options[i] + '">' + options[i] + '</option>';
+            let diceOptions = [2, 4, 6, 8, 10, 12, 20, 100];
+            for (let i = 0; i < diceOptions.length; ++i) {
+                if (parseInt(values[1]) === diceOptions[i]) {
+                    html += '<option selected="selected" value="' + diceOptions[i] + '">' + diceOptions[i] + '</option>';
                 } else {
-                    html += '<option value="' + options[i] + '">' + options[i] + '</option>';
+                    html += '<option value="' + diceOptions[i] + '">' + diceOptions[i] + '</option>';
                 }
             }
             html += '</select>';
@@ -92,7 +105,23 @@ let generalFunctions = {
             return html;
         },
 
-        getCheckboxInputField: function (title, name, value, description, events) {
+        getCheckboxInputField: function (title, name, value, description, events, options) {
+            // Default values for Events
+            if (events === undefined) {
+                events = {};
+            }
+            if (events.onkeydown === undefined) {
+                alert('no onkeydown event specified');
+            }
+
+            // Default values for options
+            if (options === undefined) {
+                options = {};
+            }
+            if (options.width === undefined) {
+                options.width = '100%';
+            }
+
             let checked = (value === true || value === 'true') ? 'checked="checked"' : '';
             let eventsString = '';
             for (let [eventName, event] of Object.entries(events)) {
@@ -108,7 +137,22 @@ let generalFunctions = {
                 ;
         },
 
-        getSelectInputField: function (title, name, options, values, events) {
+        getSelectInputField: function (title, name, possibleValues, values, events, options) {
+            // Default values for Events
+            if (events === undefined) {
+                events = {};
+            }
+            if (events.onkeydown === undefined) {
+                alert('no onkeydown event specified');
+            }
+
+            // Default values for options
+            if (options === undefined) {
+                options = {};
+            }
+            if (options.width === undefined) {
+                options.width = '100%';
+            }
             let multiple = name.endsWith('[]') ? ' multiple="multiple"' : '';
             let eventsString = '';
             if (!Array.isArray(values)) {
@@ -123,14 +167,14 @@ let generalFunctions = {
                 '   <span class="input-text-wrap">'
             ;
             html += '<select name="' + name + '" style="width: 100%;" ' + eventsString + multiple + '>';
-            if (options instanceof Object) {
-                options = Object.values(options);
+            if (possibleValues instanceof Object) {
+                possibleValues = Object.values(possibleValues);
             }
-            for (let i = 0; i < options.length; ++i) {
-                if (values.indexOf(options[i]) !== -1) {
-                    html += '<option selected="selected">' + options[i] + '</option>';
+            for (let i = 0; i < possibleValues.length; ++i) {
+                if (values.indexOf(possibleValues[i]) !== -1) {
+                    html += '<option selected="selected">' + possibleValues[i] + '</option>';
                 } else {
-                    html += '<option>' + options[i] + '</option>';
+                    html += '<option>' + possibleValues[i] + '</option>';
                 }
             }
             html += '</select>';
@@ -139,37 +183,6 @@ let generalFunctions = {
                 '</label>'
             ;
             return html;
-        },
-
-        onKeyDown: function () {
-            let $nameInput = event.path[0];
-            let editType = document.getElementById('edit-type').dataset.editType;
-            if (editType === 'edit') {
-                if (event.keyCode === 13) {
-                    event.preventDefault();
-                    creatureManager.saveEdit();
-                    return false;
-                } else {
-                    $nameInput.setCustomValidity('');
-                    $nameInput.reportValidity();
-                }
-            }
-        },
-
-        switchNamePlayerToSelect: function () {
-            let container = document.getElementById('name_container');
-            let value = container.querySelector('[name="name"]').value;
-            let newPlayer = document.createElement('div');
-            newPlayer.innerHTML = this.getSelectInputField('Name', 'name', params.roles, value, []);
-            container.parentElement.replaceChild(newPlayer, container);
-        },
-
-        switchNamePlayerToInput: function () {
-            let container = document.getElementById('name_container');
-            let value = container.querySelector('[name="name"]').value;
-            let newPlayer = document.createElement('div');
-            newPlayer.innerHTML = this.getInputField('Name', 'name', value, 'text', {'onkeydown': 'generalFunctions.editor.onKeyDown()'});
-            container.parentElement.replaceChild(newPlayer, container);
         },
     },
 
