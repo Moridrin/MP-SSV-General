@@ -24,5 +24,4 @@ if (!session_id()) {
 if (!class_exists(BaseFunctions::class)) {
     require_once 'base/base.php';
     require_once 'exceptions/exceptions.php';
-    require_once 'forms/forms.php';
 }
