@@ -11,8 +11,9 @@ require_once SSV_Global::PATH . 'templates/table.php';
 
 abstract class SSV_Global
 {
-    const PATH = SSV_BASE_PATH;
-    const URL = SSV_BASE_URL;
+    const PATH          = SSV_BASE_PATH;
+    const URL           = SSV_BASE_URL;
+    const ADMIN_REFERER = 'ssv_global__admin_referer';
 
     public static function enqueueAdminScripts()
     {

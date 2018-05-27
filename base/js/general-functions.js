@@ -76,17 +76,21 @@ let generalFunctions = {
                 options.width = '100%';
             }
 
+            let eventsString = '';
+            for (let [eventName, event] of Object.entries(events)) {
+                eventsString += eventName + '="' + event + '" ';
+            }
             let values = value.split('D');
             let html =
                 '<label id="' + name + '_container">' +
                 '   <span class="title">' + title + '</span>' +
                 '   <span class="input-text-wrap">' +
                 '       <div style="display: table; table-layout: fixed; width: 100%;">' +
-                '           <div style="display: table-cell;"><input type="number" name="' + name + 'A" value="' + values[0] + '" style="width: 100%;" autocomplete="off"></div>' +
+                '           <div style="display: table-cell;"><input type="number" name="' + name + 'A" value="' + values[0] + '" style="width: 100%;" autocomplete="off" ' + eventsString + '></div>' +
                 '           <div style="display: table-cell; width: 25px; text-align: center;">D</div>' +
                 '           <div style="display: table-cell;">'
             ;
-            html += '<select name="' + name + 'D" style="width: 100%;">';
+            html += '<select name="' + name + 'D" style="width: 100%;" ' + eventsString + '>';
             let diceOptions = [2, 4, 6, 8, 10, 12, 20, 100];
             for (let i = 0; i < diceOptions.length; ++i) {
                 if (parseInt(values[1]) === diceOptions[i]) {

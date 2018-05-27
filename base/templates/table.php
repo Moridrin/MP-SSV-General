@@ -2,7 +2,7 @@
 
 use mp_general\base\BaseFunctions;
 use mp_general\base\models\Model;
-use mp_general\forms\SSV_Forms;
+use mp_general\base\SSV_Global;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -123,7 +123,7 @@ function mp_ssv_show_table(string $class, string $orderBy = 'id', string $order 
         </div>
         <?php
         if ($canManage) {
-            echo BaseFunctions::getAdminFormSecurityFields(SSV_Forms::ADMIN_REFERER, false, false);
+            echo BaseFunctions::getAdminFormSecurityFields(SSV_Global::ADMIN_REFERER, false, false);
         }
         ?>
     </form>
