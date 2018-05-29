@@ -60,6 +60,16 @@ abstract class SSV_Global
         }
     }
 
+    public static function addMenuItem(string $pageTitle, string $menuTitle, string $capability = 'manage_options', string $menuSlug, $function = '')
+    {
+        if (!array_key_exists('ssv_settings', $GLOBALS['admin_page_hooks'])) {
+            add_menu_page('SSV Settings',  'SSV Settings', 'edit_posts', 'ssv_settings', '', 'dashicons-feedback');
+            add_submenu_page('ssv_settings', $pageTitle, $menuTitle, $capability, 'ssv_settings', $function);
+        } else {
+            add_submenu_page('ssv_settings', $pageTitle, $menuTitle, $capability, $menuSlug, $function);
+        }
+    }
+
     public static function addError(string $message): void
     {
         $_SESSION['SSV']['errors'][] = $message;
