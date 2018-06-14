@@ -234,7 +234,7 @@ let generalFunctions = {
         }
     },
 
-    ajaxResponse: function (data) {
+    ajaxResponse: function (data, expectHtml) {
         let messageContainer = document.getElementById('messagesContainer');
         try {
             data = JSON.parse(data);
@@ -243,7 +243,9 @@ let generalFunctions = {
                 return false;
             }
         } catch (e) {
-            messageContainer.innerHTML = '<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>';
+            if (!expectHtml) {
+                messageContainer.innerHTML = '<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>';
+            }
         }
         return true;
     },

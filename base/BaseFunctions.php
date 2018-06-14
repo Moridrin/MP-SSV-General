@@ -40,6 +40,75 @@ abstract class BaseFunctions
     }
 
     /**
+     * @param string ...$requiredParams
+     */
+    public static function checkParameters(string ...$requiredParams): void
+    {
+        foreach ($requiredParams as $param) {
+            if (!isset($_REQUEST[$param])) {
+                SSV_Global::addError('The "' . $param . '" parameter isn\'t provided.');
+            }
+        }
+        if (SSV_Global::hasError()) {
+            wp_die(json_encode(['success' => false]));
+        }
+    }
+
+    public static function encodeUnderscoreBase64($itemName): string
+    {
+        if (strpos($itemName, DIRECTORY_SEPARATOR) !== false) {
+            $parts = explode(DIRECTORY_SEPARATOR, $itemName);
+            foreach ($parts as &$pathItemName) {
+                $pathItemName = self::encodeUnderscoreBase64($pathItemName);
+            }
+            return implode(DIRECTORY_SEPARATOR, $parts);
+        }
+        return str_replace('=', '_', base64_encode($itemName));
+    }
+
+    public static function decodeUnderscoreBase64($itemName): string
+    {
+        if (strpos($itemName, DIRECTORY_SEPARATOR) !== false) {
+            $parts = explode(DIRECTORY_SEPARATOR, $itemName);
+            foreach ($parts as &$pathItemName) {
+                $pathItemName = self::decodeUnderscoreBase64($pathItemName);
+            }
+            return implode(DIRECTORY_SEPARATOR, $parts);
+        }
+        return base64_decode(str_replace('_', '=', $itemName), true);
+    }
+
+    public static function getMaxUploadSize()
+    {
+        static $maxSize = null;
+
+        if ($maxSize === null) {
+            // Start with post_max_size.
+            $postMaxSize = self::parseSize(ini_get('post_max_size'));
+            if ($postMaxSize > 0) {
+                $maxSize = $postMaxSize;
+            }
+            $uploadMax = self::parseSize(ini_get('upload_max_filesize'));
+            if ($uploadMax > 0 && $uploadMax < $maxSize) {
+                $maxSize = $uploadMax;
+            }
+        }
+        return $maxSize;
+    }
+
+    private static function parseSize($size)
+    {
+        $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
+        $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
+        if ($unit) {
+            // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
+            return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+        } else {
+            return round($size);
+        }
+    }
+
+    /**
      * This checks if the provided string is a correct IBAN.
      *
      * @param string $iban
@@ -49,100 +118,102 @@ abstract class BaseFunctions
     public static function isValidIBAN(string $iban): bool
     {
         $iban      = strtolower(str_replace(' ', '', $iban));
-        $Countries = array('al' => 28,
-                           'ad' => 24,
-                           'at' => 20,
-                           'az' => 28,
-                           'bh' => 22,
-                           'be' => 16,
-                           'ba' => 20,
-                           'br' => 29,
-                           'bg' => 22,
-                           'cr' => 21,
-                           'hr' => 21,
-                           'cy' => 28,
-                           'cz' => 24,
-                           'dk' => 18,
-                           'do' => 28,
-                           'ee' => 20,
-                           'fo' => 18,
-                           'fi' => 18,
-                           'fr' => 27,
-                           'ge' => 22,
-                           'de' => 22,
-                           'gi' => 23,
-                           'gr' => 27,
-                           'gl' => 18,
-                           'gt' => 28,
-                           'hu' => 28,
-                           'is' => 26,
-                           'ie' => 22,
-                           'il' => 23,
-                           'it' => 27,
-                           'jo' => 30,
-                           'kz' => 20,
-                           'kw' => 30,
-                           'lv' => 21,
-                           'lb' => 28,
-                           'li' => 21,
-                           'lt' => 20,
-                           'lu' => 20,
-                           'mk' => 19,
-                           'mt' => 31,
-                           'mr' => 27,
-                           'mu' => 30,
-                           'mc' => 27,
-                           'md' => 24,
-                           'me' => 22,
-                           'nl' => 18,
-                           'no' => 15,
-                           'pk' => 24,
-                           'ps' => 29,
-                           'pl' => 28,
-                           'pt' => 25,
-                           'qa' => 29,
-                           'ro' => 24,
-                           'sm' => 27,
-                           'sa' => 24,
-                           'rs' => 22,
-                           'sk' => 24,
-                           'si' => 19,
-                           'es' => 24,
-                           'se' => 24,
-                           'ch' => 21,
-                           'tn' => 24,
-                           'tr' => 26,
-                           'ae' => 23,
-                           'gb' => 22,
-                           'vg' => 24,
-        );
-        $Chars     = array('a' => 10,
-                           'b' => 11,
-                           'c' => 12,
-                           'd' => 13,
-                           'e' => 14,
-                           'f' => 15,
-                           'g' => 16,
-                           'h' => 17,
-                           'i' => 18,
-                           'j' => 19,
-                           'k' => 20,
-                           'l' => 21,
-                           'm' => 22,
-                           'n' => 23,
-                           'o' => 24,
-                           'p' => 25,
-                           'q' => 26,
-                           'r' => 27,
-                           's' => 28,
-                           't' => 29,
-                           'u' => 30,
-                           'v' => 31,
-                           'w' => 32,
-                           'x' => 33,
-                           'y' => 34,
-                           'z' => 35,
-        );
+        $Countries = [
+            'al' => 28,
+            'ad' => 24,
+            'at' => 20,
+            'az' => 28,
+            'bh' => 22,
+            'be' => 16,
+            'ba' => 20,
+            'br' => 29,
+            'bg' => 22,
+            'cr' => 21,
+            'hr' => 21,
+            'cy' => 28,
+            'cz' => 24,
+            'dk' => 18,
+            'do' => 28,
+            'ee' => 20,
+            'fo' => 18,
+            'fi' => 18,
+            'fr' => 27,
+            'ge' => 22,
+            'de' => 22,
+            'gi' => 23,
+            'gr' => 27,
+            'gl' => 18,
+            'gt' => 28,
+            'hu' => 28,
+            'is' => 26,
+            'ie' => 22,
+            'il' => 23,
+            'it' => 27,
+            'jo' => 30,
+            'kz' => 20,
+            'kw' => 30,
+            'lv' => 21,
+            'lb' => 28,
+            'li' => 21,
+            'lt' => 20,
+            'lu' => 20,
+            'mk' => 19,
+            'mt' => 31,
+            'mr' => 27,
+            'mu' => 30,
+            'mc' => 27,
+            'md' => 24,
+            'me' => 22,
+            'nl' => 18,
+            'no' => 15,
+            'pk' => 24,
+            'ps' => 29,
+            'pl' => 28,
+            'pt' => 25,
+            'qa' => 29,
+            'ro' => 24,
+            'sm' => 27,
+            'sa' => 24,
+            'rs' => 22,
+            'sk' => 24,
+            'si' => 19,
+            'es' => 24,
+            'se' => 24,
+            'ch' => 21,
+            'tn' => 24,
+            'tr' => 26,
+            'ae' => 23,
+            'gb' => 22,
+            'vg' => 24,
+        ];
+        $Chars     = [
+            'a' => 10,
+            'b' => 11,
+            'c' => 12,
+            'd' => 13,
+            'e' => 14,
+            'f' => 15,
+            'g' => 16,
+            'h' => 17,
+            'i' => 18,
+            'j' => 19,
+            'k' => 20,
+            'l' => 21,
+            'm' => 22,
+            'n' => 23,
+            'o' => 24,
+            'p' => 25,
+            'q' => 26,
+            'r' => 27,
+            's' => 28,
+            't' => 29,
+            'u' => 30,
+            'v' => 31,
+            'w' => 32,
+            'x' => 33,
+            'y' => 34,
+            'z' => 35,
+        ];
 
         if (empty($iban)) {
             return false;
@@ -223,7 +294,7 @@ abstract class BaseFunctions
         if (function_exists('members_get_capabilities')) {
             $capabilities = members_get_capabilities();
         } else {
-            $capabilities = array(
+            $capabilities = [
                 'activate_plugins',
                 'add_users',
                 'create_users',
@@ -277,7 +348,7 @@ abstract class BaseFunctions
                 'upload_files',
                 'manage_events',
                 'manage_event_registrations',
-            );
+            ];
         }
         ?>
         <datalist id="capabilities">
@@ -455,7 +526,7 @@ abstract class BaseFunctions
      */
     public static function var_export($variable, $die = false)
     {
-        if (!$die) {
+        if (!$die && is_admin()) {
             echo '<div style="margin-left: 180px;">';
         }
         if (is_string($variable) && strpos($variable, 'FROM') !== false && strpos($variable, 'WHERE') !== false) {
@@ -522,13 +593,13 @@ abstract class BaseFunctions
         <input type="hidden" id="<?= $name ?>" name="<?= $name ?>" value=""/>
         <!--suppress JSUnusedAssignment -->
         <script>
-            var options = <?= json_encode($selected) ?>;
+            let options = <?= json_encode($selected) ?>;
             document.getElementById('<?= $name ?>').value = options;
 
             function <?= $name ?>_add(val) {
                 options.push(val);
                 document.getElementById('<?= $name ?>').value = options;
-                var option = document.createElement("option");
+                let option = document.createElement("option");
                 option.id = '<?= $name ?>_selected_result_' + val;
                 option.text = val;
                 option.addEventListener("click", function () {
@@ -540,12 +611,12 @@ abstract class BaseFunctions
             }
 
             function <?= $name ?>_remove(val) {
-                var index = options.indexOf(val);
+                let index = options.indexOf(val);
                 if (index > -1) {
                     options.splice(index, 1);
                 }
                 document.getElementById('<?= $name ?>').value = options;
-                var option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
+                let option = document.getElementById('<?= $name ?>_non_selected_result_' + val);
                 option.removeAttribute("disabled");
                 option = document.getElementById('<?= $name ?>_selected_result_' + val);
                 option.parentNode.removeChild(option);
@@ -609,6 +680,16 @@ abstract class BaseFunctions
         return implode('_', $ret);
     }
 
+    public static function toDashCase(string $string): string
+    {
+        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
+        $ret = $matches[0];
+        foreach ($ret as &$match) {
+            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        }
+        return implode('-', $ret);
+    }
+
     public static function toValue(string $string): string
     {
         $string = str_replace(' ', '_', $string);
@@ -643,7 +724,102 @@ abstract class BaseFunctions
         register_setting($group, $name, ['type' => $type]);
     }
 
-    public static function getOption($string)
+    public static function getCurrentUrlWithArguments(array $arguments): string
     {
+        $urlArguments = $_GET;
+        foreach ($arguments as $key => $argument) {
+            $urlArguments[$key] = $argument;
+        }
+        return build_query($urlArguments);
+    }
+
+    /**
+     * @param array $args
+     *
+     * @throws Exception
+     */
+    public static function showCheckbox(array $args)
+    {
+        if (!isset($args['id'])) {
+            throw new Exception('The ID of the element needs to be specified.');
+        }
+        $args += [
+            'description' => '',
+        ];
+        ?>
+        <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
+            <input type="checkbox" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="1" <?= get_option($args['id']) ? 'checked' : '' ?>>
+            <?= $args['description'] ?>
+        </label>
+        <?php
+    }
+
+    /**
+     * @param array $args
+     *
+     * @throws Exception
+     */
+    public static function showTextField(array $args)
+    {
+        if (!isset($args['id'])) {
+            throw new Exception('The ID of the element needs to be specified.');
+        }
+        $args += [
+            'description' => '',
+            'default'     => '',
+        ];
+        ?>
+        <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
+            <input type="text" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="<?= get_option($args['id'], $args['default']) ?>">
+            <br/>
+            <?= $args['description'] ?>
+        </label>
+        <?php
+    }
+
+    /**
+     * @param array $args
+     *
+     * @throws Exception
+     */
+    public static function showTextArea(array $args)
+    {
+        if (!isset($args['id'])) {
+            throw new Exception('The ID of the element needs to be specified.');
+        }
+        $args += [
+            'description' => '',
+            'default'     => '',
+        ];
+        ?>
+        <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
+            <textarea id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"><?= get_option($args['id'], $args['default']) ?></textarea>
+            <br/>
+            <?= $args['description'] ?>
+        </label>
+        <?php
+    }
+
+    /**
+     * @param array $args
+     *
+     * @throws Exception
+     */
+    public static function showColorPicker(array $args)
+    {
+        if (!isset($args['id'])) {
+            throw new Exception('The ID of the element needs to be specified.');
+        }
+        $args += [
+            'description' => '',
+            'default'     => '',
+        ];
+        ?>
+        <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
+            <input type="color" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="<?= get_option($args['id'], $args['default']) ?>">
+            <br/>
+            <?= $args['description'] ?>
+        </label>
+        <?php
     }
 }
