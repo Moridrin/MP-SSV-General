@@ -2,15 +2,24 @@
 
 namespace mp_general\shortcodes;
 
-abstract class PostContent
+abstract class PostContent extends Post
 {
     public static function postContent($attributes, $innerHtml)
     {
-        if (!is_array($attributes)) {
-            return $innerHtml;
+        $post = self::getPost($attributes, $innerHtml);
+        if ($post !== null) {
+            $html = '';
+            if (isset($attributes['header'])) {
+                ob_start();
+                ?><h1><?= \mp_general\base\BaseFunctions::escape($attributes['header'], 'html') ?></h1><?php
+                $html .= ob_get_clean();
+            }
+            $html .= apply_filters('the_content', do_shortcode($post->post_content));
+            return $html;
         }
-        return apply_filters('the_content', get_post($attributes['id'])->post_content);
+        return $innerHtml;
     }
 }
 
 add_shortcode('post-content', [PostContent::class, 'postContent']);
+add_shortcode('pc', [PostContent::class, 'postContent']);

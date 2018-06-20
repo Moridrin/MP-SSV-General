@@ -15,6 +15,20 @@ abstract class SSV_Global
     const URL           = SSV_BASE_URL;
     const ADMIN_REFERER = 'ssv_global__admin_referer';
 
+    public static function setup()
+    {
+        global $wpdb;
+        $tableName = $wpdb->base_prefix . 'ssv_revisions';
+        $wpdb->query("CREATE TABLE $tableName (plugin_file VARCHAR(255), revision int, CONSTRAINT table_name_plugin_file_revision_pk PRIMARY KEY (plugin_file, revision));");
+    }
+
+    public static function revisionInstalled($pluginFile, $revision)
+    {
+        global $wpdb;
+        $tableName = $wpdb->base_prefix . 'ssv_revisions';
+        $wpdb->insert($tableName, ['plugin_file' => $pluginFile, 'revision' => $revision]);
+    }
+
     public static function enqueueAdminScripts()
     {
         // General Functions
@@ -49,7 +63,7 @@ abstract class SSV_Global
         if (is_multisite()) {
             global $wpdb;
             $blogsTable = $wpdb->blogs;
-            $blogIds = $wpdb->get_col("SELECT blog_id FROM $blogsTable WHERE archived = '0' AND spam = '0' AND deleted = '0'");
+            $blogIds    = $wpdb->get_col("SELECT blog_id FROM $blogsTable WHERE archived = '0' AND spam = '0' AND deleted = '0'");
         } else {
             $blogIds = [get_current_blog_id()];
         }
@@ -63,7 +77,7 @@ abstract class SSV_Global
     public static function addMenuItem(string $pageTitle, string $menuTitle, string $menuSlug, $function = '', string $capability = 'manage_options')
     {
         if (!array_key_exists('ssv_settings', $GLOBALS['admin_page_hooks'])) {
-            add_menu_page('SSV Settings',  'SSV Settings', 'edit_posts', 'ssv_settings', '', 'dashicons-feedback');
+            add_menu_page('SSV Settings', 'SSV Settings', 'edit_posts', 'ssv_settings', '', 'dashicons-feedback');
             add_submenu_page('ssv_settings', $pageTitle, $menuTitle, $capability, 'ssv_settings', $function);
         } else {
             add_submenu_page('ssv_settings', $pageTitle, $menuTitle, $capability, $menuSlug, $function);
@@ -133,6 +147,7 @@ abstract class SSV_Global
     }
 }
 
+register_activation_hook(SSV_BASE_ACTIVATOR_PLUGIN, [SSV_Global::class, 'setup']);
 add_action('admin_enqueue_scripts', [SSV_Global::class, 'enqueueAdminScripts']);
 add_action('wp_enqueue_scripts', [SSV_Global::class, 'enqueueScripts']);
 add_action('shutdown', [SSV_Global::class, 'showErrors']);
