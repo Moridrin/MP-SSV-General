@@ -75,22 +75,32 @@ let generalFunctions = {
             if (options.width === undefined) {
                 options.width = '100%';
             }
+            if (options.addition === undefined) {
+                options.addition = false;
+            }
 
             let eventsString = '';
             for (let [eventName, event] of Object.entries(events)) {
                 eventsString += eventName + '="' + event + '" ';
             }
             let values = value.split('D');
+            console.log(values);
+            if (options.addition) {
+                let tmp = values[1].split('+');
+                values[1] = tmp[0];
+                values[2] = tmp[1];
+            }
+            console.log(values);
             let html =
                 '<label id="' + name + '_container">' +
                 '   <span class="title">' + title + '</span>' +
                 '   <span class="input-text-wrap">' +
                 '       <div style="display: table; table-layout: fixed; width: 100%;">' +
-                '           <div style="display: table-cell;"><input type="number" name="' + name + 'A" value="' + values[0] + '" style="width: 100%;" autocomplete="off" ' + eventsString + '></div>' +
+                '           <div style="display: table-cell;"><input type="number" name="' + name + 'C" value="' + values[0] + '" style="width: 100%;" autocomplete="off" ' + eventsString + '></div>' +
                 '           <div style="display: table-cell; width: 25px; text-align: center;">D</div>' +
                 '           <div style="display: table-cell;">'
             ;
-            html += '<select name="' + name + 'D" style="width: 100%;" ' + eventsString + '>';
+            html += '<select name="' + name + 'D" style="width: 100%; vertical-align: top; margin-top: 0;" ' + eventsString + '>';
             let diceOptions = [2, 4, 6, 8, 10, 12, 20, 100];
             for (let i = 0; i < diceOptions.length; ++i) {
                 if (parseInt(values[1]) === diceOptions[i]) {
@@ -99,9 +109,14 @@ let generalFunctions = {
                     html += '<option value="' + diceOptions[i] + '">' + diceOptions[i] + '</option>';
                 }
             }
-            html += '</select>';
+            html += '</select>' +
+                '</div>' +
+                '           <div style="display: table-cell; width: 25px; text-align: center;">+</div>'
+            ;
+            if (options.addition) {
+                html += '<div style="display: table-cell;"><input type="number" name="' + name + 'A" value="' + values[2] + '" style="width: 100%;" autocomplete="off" ' + eventsString + '></div>'
+            }
             html +=
-                '           </div>' +
                 '       </div>' +
                 '   </span>' +
                 '</label>'

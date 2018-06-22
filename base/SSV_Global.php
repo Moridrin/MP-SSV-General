@@ -140,7 +140,8 @@ abstract class SSV_Global
                 SSV_Global::addError('Task returned with the following unexpected output: ' . var_export($outputString, true));
                 $output = [];
             }
-            $output['errors'] = SSV_Global::getErrors() ?: false;
+            $output['errors']  = SSV_Global::getErrors() ?: false;
+            $output['success'] = false;
             echo json_encode($output);
             die();
         };

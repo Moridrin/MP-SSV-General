@@ -2,6 +2,7 @@
 
 namespace mp_general\base\models;
 
+use mp_general\base\BaseFunctions;
 use mp_general\base\SSV_Global;
 use mp_general\exceptions\NotFoundException;
 
@@ -11,7 +12,6 @@ use mp_general\exceptions\NotFoundException;
  * Date: 21-4-18
  * Time: 22:26
  */
-
 abstract class Model
 {
 
@@ -67,7 +67,7 @@ abstract class Model
     protected static function _findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC'): array
     {
         $results = self::_find('id IN (' . implode(', ', $ids) . ')', $orderBy, $order);
-        $items = [];
+        $items   = [];
         foreach ($results as $row) {
             $items[] = new static($row);
         }
@@ -77,7 +77,7 @@ abstract class Model
     protected static function _find(string $where, string $orderBy = 'id', string $order = 'ASC'): ?array
     {
         global $wpdb;
-        $table = static::getDatabaseTableName();
+        $table   = static::getDatabaseTableName();
         $results = $wpdb->get_results("SELECT * FROM $table WHERE $where ORDER BY $orderBy $order", ARRAY_A);
         if (!empty($wpdb->last_error)) {
             SSV_Global::addError($wpdb->last_error);
@@ -89,7 +89,7 @@ abstract class Model
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
-        $row = $wpdb->get_row("SELECT * FROM $table WHERE $where", ARRAY_A);
+        $row   = $wpdb->get_row("SELECT * FROM $table WHERE $where", ARRAY_A);
         if (!empty($wpdb->last_error)) {
             SSV_Global::addError($wpdb->last_error);
         }
@@ -102,7 +102,7 @@ abstract class Model
     {
         global $wpdb;
         $table = static::getDatabaseTableName();
-        $ids = implode(', ', $ids);
+        $ids   = implode(', ', $ids);
         $wpdb->query("DELETE FROM $table WHERE id IN ($ids)");
         if (!empty($wpdb->last_error)) {
             SSV_Global::addError($wpdb->last_error);
@@ -125,7 +125,7 @@ abstract class Model
         $charset_collate = $wpdb->get_charset_collate();
         $tableName = static::getDatabaseTableName($blogId);
         $fields = implode(', ', static::_getDatabaseFields());
-        return 'CREATE TABLE IF NOT EXISTS '.$tableName.' (`id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT, '.$fields.') '.$charset_collate.';';
+        return 'CREATE TABLE IF NOT EXISTS ' . $tableName . ' (`id` BIGINT(20) PRIMARY KEY AUTO_INCREMENT, ' . $fields . ') ' . $charset_collate . ';';
     }
     #endregion
 
@@ -137,6 +137,19 @@ abstract class Model
             call_user_func([$this, '__init']);
         }
     }
+
+    public function __get($name)
+    {
+        $methodName = 'get' . BaseFunctions::toCamelCase($name, true);
+        return call_user_func([$this, $methodName]);
+    }
+
+    public function __isset($name): bool
+    {
+        $methodName = 'get' . BaseFunctions::toCamelCase($name, true);
+        return method_exists($this, $methodName);
+    }
+
 
     public function getId(): int
     {
