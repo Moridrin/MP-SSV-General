@@ -95,15 +95,7 @@ abstract class Field extends Model
             return self::_getAll($orderBy, $order, $key);
         } else {
             $names   = implode('\', \'', $names);
-            $results = self::_find("f_name NOT IN ('$names')", $orderBy, $order);
-            if ($results === null) {
-                return [];
-            }
-            $fields = [];
-            foreach ($results as $row) {
-                $fields[$row['f_name']] = new static($row);
-            }
-            return $fields;
+            return self::_find("f_name NOT IN ('$names')", $orderBy, $order, 'f_name');
         }
     }
     #endregion

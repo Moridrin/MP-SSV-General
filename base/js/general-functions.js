@@ -32,23 +32,11 @@ let generalFunctions = {
             // HTML
             let html =
                 '<label id="' + name + '_container">' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">'
+                '   <span class="title" style="width: 9em;">' + title + '</span>' +
+                '   <span class="input-text-wrap" style="margin-left: 9em;">'
             ;
             if (type === 'textarea') {
                 html += '<textarea name="' + name + '">' + value + '</textarea>';
-            } else if (type === 'dice') {
-                html += '<input type="number" name="' + name + '" value="' + value + '" autocomplete="off" style="width: 50%;" ' + eventsString + '>';
-                html += '' +
-                    '<select name="' + name + '" style="width: 100%;" ' + eventsString + multiple + '>' +
-                    '   <option value="4">4</option>' +
-                    '   <option value="6">6</option>' +
-                    '   <option value="8">8</option>' +
-                    '   <option value="10">10</option>' +
-                    '   <option value="12">12</option>' +
-                    '   <option value="20">20</option>' +
-                    '   <option value="100">100</option>' +
-                    '</select>';
             } else {
                 html += '<input type="' + type + '" name="' + name + '" value="' + value + '" autocomplete="off" style="width: ' + options.width + ';" ' + eventsString + '>';
             }
@@ -84,17 +72,15 @@ let generalFunctions = {
                 eventsString += eventName + '="' + event + '" ';
             }
             let values = value.split('D');
-            console.log(values);
             if (options.addition) {
                 let tmp = values[1].split('+');
                 values[1] = tmp[0];
                 values[2] = tmp[1];
             }
-            console.log(values);
             let html =
                 '<label id="' + name + '_container">' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">' +
+                '   <span class="title" style="width: 9em;">' + title + '</span>' +
+                '   <span class="input-text-wrap" style="margin-left: 9em;">' +
                 '       <div style="display: table; table-layout: fixed; width: 100%;">' +
                 '           <div style="display: table-cell;"><input type="number" name="' + name + 'C" value="' + values[0] + '" style="width: 100%;" autocomplete="off" ' + eventsString + '></div>' +
                 '           <div style="display: table-cell; width: 25px; text-align: center;">D</div>' +
@@ -148,8 +134,8 @@ let generalFunctions = {
             }
             return '' +
                 '<label>' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">' +
+                '   <span class="title" style="width: 9em;">' + title + '</span>' +
+                '   <span class="input-text-wrap" style="margin-left: 9em;">' +
                 '       <input type="checkbox" name="' + name + '" value="true" ' + checked + ' title="' + description + '" ' + eventsString + '>' +
                 '   </span>' +
                 '</label>'
@@ -182,8 +168,8 @@ let generalFunctions = {
             }
             let html =
                 '<label>' +
-                '   <span class="title">' + title + '</span>' +
-                '   <span class="input-text-wrap">'
+                '   <span class="title" style="width: 9em;">' + title + '</span>' +
+                '   <span class="input-text-wrap" style="margin-left: 9em;">'
             ;
             html += '<select name="' + name + '" style="width: 100%;" ' + eventsString + multiple + '>';
             if (possibleValues instanceof Object) {

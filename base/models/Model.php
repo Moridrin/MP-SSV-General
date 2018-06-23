@@ -34,15 +34,7 @@ abstract class Model
 
     protected static function _getAll(string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
-        $results = self::_find("1 = 1", $orderBy, $order);
-        if ($results === null) {
-            return [];
-        }
-        $fields = [];
-        foreach ($results as $row) {
-            $fields[$row[$key]] = new static($row);
-        }
-        return $fields;
+        return self::_find("1 = 1", $orderBy, $order, $key);
     }
 
     abstract public static function findById(int $id): Model;
@@ -66,15 +58,19 @@ abstract class Model
 
     protected static function _findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC'): array
     {
-        $results = self::_find('id IN (' . implode(', ', $ids) . ')', $orderBy, $order);
-        $items   = [];
-        foreach ($results as $row) {
-            $items[] = new static($row);
-        }
-        return $items;
+        return self::_find('id IN (' . implode(', ', $ids) . ')', $orderBy, $order);
     }
 
-    protected static function _find(string $where, string $orderBy = 'id', string $order = 'ASC'): ?array
+    /**
+     * @param string $where
+     * @param string $orderBy
+     * @param string $order
+     *
+     * @param string $key
+     *
+     * @return static[]
+     */
+    protected static function _find(string $where, string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
         global $wpdb;
         $table   = static::getDatabaseTableName();
@@ -82,7 +78,14 @@ abstract class Model
         if (!empty($wpdb->last_error)) {
             SSV_Global::addError($wpdb->last_error);
         }
-        return $results;
+        if ($results === null) {
+            return [];
+        }
+        $fields = [];
+        foreach ($results as $row) {
+            $fields[$row[$key]] = new static($row);
+        }
+        return $fields;
     }
 
     protected static function _findRow(string $where): ?array
