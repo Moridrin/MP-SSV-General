@@ -730,7 +730,7 @@ abstract class BaseFunctions
         foreach ($arguments as $key => $argument) {
             $urlArguments[$key] = $argument;
         }
-        return build_query($urlArguments);
+        return $_SERVER['REDIRECT_URL'] . '?' . build_query($urlArguments);
     }
 
     /**
