@@ -6,15 +6,22 @@ abstract class PostContent extends Post
 {
     public static function postContent($attributes, $innerHtml)
     {
-        $post = self::getPost($attributes, $innerHtml);
-        if ($post !== null) {
+        $postContentPost = self::getPost($attributes, $innerHtml);
+        if ($postContentPost !== null) {
             $html = '';
-            if (isset($attributes['header'])) {
-                ob_start();
-                ?><h1><?= \mp_general\base\BaseFunctions::escape($attributes['header'], 'html') ?></h1><?php
-                $html .= ob_get_clean();
+            if (!isset($attributes['header'])) {
+                $attributes['header'] = $postContentPost->post_title;
             }
-            $html .= apply_filters('the_content', do_shortcode($post->post_content));
+            ob_start();
+            ?><h1><?= \mp_general\base\BaseFunctions::escape($attributes['header'], 'html') ?></h1><?php
+            $html .= ob_get_clean();
+            global $post;
+            $currentPost = $post;
+            $post = $postContentPost;
+            setup_postdata($postContentPost);
+            $html .= apply_filters('the_content', do_shortcode($postContentPost->post_content));
+            $post = $currentPost;
+            setup_postdata($currentPost);
             return $html;
         }
         return $innerHtml;

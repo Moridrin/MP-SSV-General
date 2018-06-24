@@ -730,7 +730,7 @@ abstract class BaseFunctions
         foreach ($arguments as $key => $argument) {
             $urlArguments[$key] = $argument;
         }
-        return $_SERVER['REDIRECT_URL'] . '?' . build_query($urlArguments);
+        return ($_SERVER['REDIRECT_URL'] ?? $_SERVER['PHP_SELF']) . '?' . build_query($urlArguments);
     }
 
     /**
@@ -821,5 +821,16 @@ abstract class BaseFunctions
             <?= $args['description'] ?>
         </label>
         <?php
+    }
+
+    public static function arrayToEnglish($affectedCreaturesHtml)
+    {
+        if (count($affectedCreaturesHtml) > 1) {
+            $lastAffectedCreatureHtml = array_pop($affectedCreaturesHtml);
+            $affectedCreaturesHtml    = implode(', ', $affectedCreaturesHtml);
+            return implode(' and ', array_filter([$affectedCreaturesHtml, $lastAffectedCreatureHtml]));
+        } else {
+            return array_pop($affectedCreaturesHtml);
+        }
     }
 }

@@ -47,6 +47,7 @@ abstract class SSV_Global
 
     public static function enqueueScripts()
     {
+        wp_enqueue_script('mp-ssv-general-functions', self::URL . '/js/general-functions.js', ['jquery']);
         wp_enqueue_script('ssv_global_datetimepicker', self::URL . '/lib/js/jquery.datetimepicker.full.js', ['jquery', 'jquery-ui-datepicker']);
         wp_enqueue_script('ssv_global_datetimepicker_init', self::URL . '/js/datetimepicker-init.js', ['ssv_global_datetimepicker', 'jquery']);
         wp_enqueue_style('ssv_global_datetimepicker_css', self::URL . '/lib/css/jquery.datetimepicker.css');
@@ -112,7 +113,7 @@ abstract class SSV_Global
 
     public static function showErrors()
     {
-        if (!defined('DOING_AJAX') || !DOING_AJAX) {
+        if (is_admin() && (!defined('DOING_AJAX') || !DOING_AJAX)) {
             ?>
             <div id="messagesContainer" class="notice">
                 <?= self::getErrors() ?>

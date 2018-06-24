@@ -15,5 +15,3 @@ abstract class NotFoundShortcode
         }
     }
 }
-
-add_shortcode('post-content', [PostContent::class, 'postContent']);

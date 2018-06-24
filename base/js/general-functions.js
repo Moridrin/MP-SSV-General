@@ -240,12 +240,20 @@ let generalFunctions = {
         try {
             data = JSON.parse(data);
             if (data['errors']) {
-                messageContainer.innerHTML = data['errors']; // TODO Fix possible security risk
+                if (messageContainer !== null) {
+                    messageContainer.innerHTML = data['errors']; // TODO Fix possible security risk
+                } else {
+                    alert(data['errors']);
+                }
                 return false;
             }
         } catch (e) {
             if (!expectHtml) {
-                messageContainer.innerHTML = '<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>';
+                if (messageContainer !== null) {
+                    messageContainer.innerHTML = '<div class="notice notice-warning"><p>The server gave an unexpected response. The last action might not have been performed correctly.</p></div>';
+                } else {
+                    alert('The server gave an unexpected response. The last action might not have been performed correctly.');
+                }
             }
         }
         return true;
