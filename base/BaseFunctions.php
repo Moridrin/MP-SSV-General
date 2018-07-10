@@ -17,9 +17,14 @@ abstract class BaseFunctions
      * This function can be called from anywhere and will redirect the page to the given location.
      *
      * @param string $location is the url where the page should be redirected to.
+     *
+     * @return string
      */
-    public static function redirect(string $location)
+    public static function redirect(string $location = null): string
     {
+        if ($location === null) {
+            $location = self::getCurrentUrlWithArguments([]);
+        }
         ?>
         <script type="text/javascript">
             window.location = "<?= $location ?>";
