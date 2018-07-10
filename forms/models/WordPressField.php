@@ -144,7 +144,6 @@ class WordPressField extends Field
                 foreach (self::INPUT_ATTRIBUTES as $attribute => $attributeProperties) {
                     $field['f_properties'][$attribute] = BaseFunctions::sanitize($field['f_properties'][$attribute] ?? $attributeProperties['default'], $attributeProperties['type']);
                 }
-                // BaseFunctions::var_export($field, 1);
                 return $field;
             }
         }
