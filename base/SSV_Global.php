@@ -19,7 +19,7 @@ abstract class SSV_Global
     {
         global $wpdb;
         $tableName = $wpdb->base_prefix . 'ssv_revisions';
-        $wpdb->query("CREATE TABLE $tableName (plugin_file VARCHAR(255), revision int, CONSTRAINT table_name_plugin_file_revision_pk PRIMARY KEY (plugin_file, revision));");
+        $wpdb->query("CREATE TABLE IF NOT EXISTS $tableName (plugin_file VARCHAR(255), revision int, CONSTRAINT table_name_plugin_file_revision_pk PRIMARY KEY (plugin_file, revision));");
     }
 
     public static function revisionInstalled($pluginFile, $revision)

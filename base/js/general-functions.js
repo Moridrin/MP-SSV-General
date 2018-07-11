@@ -255,7 +255,9 @@ let generalFunctions = {
                     alert('The server gave an unexpected response. The last action might not have been performed correctly.');
                 }
             }
+            return false;
         }
+        messageContainer.innerHTML = '';
         return true;
     },
 };

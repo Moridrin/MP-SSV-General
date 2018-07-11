@@ -58,6 +58,9 @@ abstract class Model
 
     protected static function _findByIds(array $ids, string $orderBy = 'id', string $order = 'ASC', string $key = 'id'): array
     {
+        if (empty($ids)) {
+            return [];
+        }
         return self::_find('id IN (' . implode(', ', $ids) . ')', $orderBy, $order, $key);
     }
 

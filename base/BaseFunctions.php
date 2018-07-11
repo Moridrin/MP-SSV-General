@@ -20,7 +20,7 @@ abstract class BaseFunctions
      *
      * @return string
      */
-    public static function redirect(string $location = null): string
+    public static function redirect(string $location = null): void
     {
         if ($location === null) {
             $location = self::getCurrentUrlWithArguments([]);
@@ -735,7 +735,7 @@ abstract class BaseFunctions
         foreach ($arguments as $key => $argument) {
             $urlArguments[$key] = $argument;
         }
-        return ($_SERVER['REDIRECT_URL'] ?? $_SERVER['PHP_SELF']) . '?' . build_query($urlArguments);
+        return parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH) . '?' . build_query($urlArguments);
     }
 
     /**
