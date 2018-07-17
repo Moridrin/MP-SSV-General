@@ -9,7 +9,7 @@ abstract class ViewRight
         if (!is_array($attributes) || !isset($attributes['right'])) {
             return NotFoundShortcode::notFoundShortcode($innerHtml, 'Right not found');
         }
-        if (!current_user_can($attributes['right'])) {
+        if (!current_user_can($attributes['right']) && !current_user_can('administrator')) {
             if (isset($attributes['placeholder'])) {
                 return $attributes['placeholder'];
             }
@@ -23,7 +23,7 @@ abstract class ViewRight
         if (!is_array($attributes) || !isset($attributes['right'])) {
             return NotFoundShortcode::notFoundShortcode($innerHtml, 'Right not found');
         }
-        if (!current_user_can($attributes['right'])) {
+        if (!current_user_can($attributes['right']) && !current_user_can('administrator')) {
             return trim(do_shortcode($innerHtml));
         }
         return '';
