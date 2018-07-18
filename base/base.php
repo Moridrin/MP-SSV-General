@@ -29,3 +29,15 @@ require_once 'shortcodes/Post.php';
 require_once 'shortcodes/ViewRight.php';
 require_once 'shortcodes/NotFoundShortcode.php';
 require_once 'Revisions/InstallRevision.php';
+
+function ssv_wpautop($content)
+{
+    if (has_shortcode($content, 'timeline')) {
+        return $content;
+    } else {
+        return wpautop($content);
+    }
+}
+
+remove_filter('the_content', 'wpautop');
+add_filter('the_content', 'ssv_wpautop');

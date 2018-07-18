@@ -33,7 +33,3 @@ abstract class ViewRight
 add_shortcode('view-right', [ViewRight::class, 'viewRight']);
 add_shortcode('view-right-sub', [ViewRight::class, 'viewRight']);
 add_shortcode('view-right-placeholder', [ViewRight::class, 'viewRightPlaceholder']);
-remove_filter('the_content', 'wpautop');
-add_filter('the_content', 'wpautop', 12);
-remove_filter('the_content', 'do_shortcode');
-add_filter('the_content', 'do_shortcode', 14);
