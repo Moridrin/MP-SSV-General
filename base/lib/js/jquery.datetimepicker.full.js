@@ -1015,22 +1015,22 @@ var datetimepickerFactory = function ($) {
 				});
 
 			var handleTouchMoved = function (event) {
-				this.touchStartPosition = this.touchStartPosition || event.originalEvent.touches[0]
-				var touchPosition = event.originalEvent.touches[0]
-				var xMovement = Math.abs(this.touchStartPosition.clientX - touchPosition.clientX)
-				var yMovement = Math.abs(this.touchStartPosition.clientY - touchPosition.clientY)
-				var distance = Math.sqrt(xMovement * xMovement + yMovement * yMovement)
+                this.touchStartPosition = this.touchStartPosition || event.originalEvent.touches[0];
+                var touchPosition = event.originalEvent.touches[0];
+                var xMovement = Math.abs(this.touchStartPosition.clientX - touchPosition.clientX);
+                var yMovement = Math.abs(this.touchStartPosition.clientY - touchPosition.clientY);
+                var distance = Math.sqrt(xMovement * xMovement + yMovement * yMovement);
 				if(distance > options.touchMovedThreshold) {
 					this.touchMoved = true;
 				}
-			}
+            };
 
 			month_picker
 				.find('.xdsoft_select')
 				.xdsoftScroller(options)
 				.on('touchstart mousedown.xdsoft', function (event) {
 					this.touchMoved = false;
-					this.touchStartPosition = event.originalEvent.touches[0]
+                    this.touchStartPosition = event.originalEvent.touches[0];
 					event.stopPropagation();
 					event.preventDefault();
 				})
@@ -2296,7 +2296,7 @@ var datetimepickerFactory = function ($) {
 					    var clipboardData = event.clipboardData || event.originalEvent.clipboardData || window.clipboardData,
 						pastedData = clipboardData.getData('text'),
 						val = this.value,
-						pos = this.selectionStart
+                            pos = this.selectionStart;
 
 					    var valueBeforeCursor = val.substr(0, pos);
 					    var valueAfterPaste = val.substr(pos + pastedData.length);
@@ -2349,7 +2349,7 @@ var datetimepickerFactory = function ($) {
 						  var posGreaterThanZero = pos > 0;
 						  var notNumberOrPlaceholder = /[^0-9_]/;
 						  var curPosOnSep = notNumberOrPlaceholder.test(maskValueAtCurPos);
-						  var continueMovingPosition = curPosOnSep && posShorterThanMaskLength && posGreaterThanZero
+                            var continueMovingPosition = curPosOnSep && posShorterThanMaskLength && posGreaterThanZero;
 
 						  // if we hit a real char, stay where we are
 						  if (!continueMovingPosition) break;
@@ -2362,12 +2362,12 @@ var datetimepickerFactory = function ($) {
 
 						if (hasSel) {
 						  // pos might have moved so re-calc length
-						  var selLength = selEnd - pos
+                            var selLength = selEnd - pos;
 
 						  // if we have a selection length we will wipe out entire selection and replace with default template for that range
 						  var defaultBlank = options.mask.replace(/[0-9]/g, '_');
-						  var defaultBlankSelectionReplacement = defaultBlank.substr(pos, selLength); 
-						  var selReplacementRemainder = defaultBlankSelectionReplacement.substr(1) // might be empty
+						  var defaultBlankSelectionReplacement = defaultBlank.substr(pos, selLength);
+                            var selReplacementRemainder = defaultBlankSelectionReplacement.substr(1); // might be empty
 
 						  var valueBeforeSel = val.substr(0, pos);
 						  var insertChars = digit + selReplacementRemainder;
@@ -2550,14 +2550,14 @@ var datetimepickerFactory = function ($) {
 		this.style = style;
 	}
 };
-;(function (factory) {
-	if ( typeof define === 'function' && define.amd ) {
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
 		// AMD. Register as an anonymous module.
 		define(['jquery', 'jquery-mousewheel'], factory);
 	} else if (typeof exports === 'object') {
 		// Node/CommonJS style for Browserify
-		module.exports = factory(require('jquery'));;
-	} else {
+        module.exports = factory(require('jquery'));
+    } else {
 		// Browser globals
 		factory(jQuery);
 	}

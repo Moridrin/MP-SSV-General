@@ -466,9 +466,30 @@ abstract class BaseFunctions
                     $value = sanitize_text_field($value);
                 }
                 break;
+            case 'html':
+                break;
             default:
                 $value = sanitize_text_field($value);
                 break;
+        }
+        return $value;
+    }
+
+    public static function getParameter(string $name, string $type, array $options = [])
+    {
+        $options += [
+            'implode'        => false,
+            'possibleValues' => null,
+        ];
+        $value   = null;
+        if (isset($_GET[$name])) {
+            $value = self::sanitize($_GET[$name], $type, $options['implode']);
+        }
+        if (isset($_POST[$name])) {
+            $value = self::sanitize($_POST[$name], $type, $options['implode']);
+        }
+        if (is_array($options['possibleValues']) && !in_array($value, $options['possibleValues'])) {
+            $value = null;
         }
         return $value;
     }
@@ -828,14 +849,14 @@ abstract class BaseFunctions
         <?php
     }
 
-    public static function arrayToEnglish($affectedCreaturesHtml)
+    public static function arrayToEnglish($affectedCreaturesHtml): string
     {
         if (count($affectedCreaturesHtml) > 1) {
             $lastAffectedCreatureHtml = array_pop($affectedCreaturesHtml);
             $affectedCreaturesHtml    = implode(', ', $affectedCreaturesHtml);
             return implode(' and ', array_filter([$affectedCreaturesHtml, $lastAffectedCreatureHtml]));
         } else {
-            return array_pop($affectedCreaturesHtml);
+            return (string)array_pop($affectedCreaturesHtml);
         }
     }
 }
