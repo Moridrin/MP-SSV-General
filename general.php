@@ -12,15 +12,6 @@ if (WP_DEBUG) {
     error_reporting(E_ALL);
 }
 
-if (!session_id()) {
-    session_start();
-    if (!isset($_SESSION['SSV'])) {
-        $_SESSION['SSV'] = [
-            'errors' => [],
-        ];
-    }
-}
-
 if (!class_exists(BaseFunctions::class)) {
     require_once 'base/base.php';
     require_once 'exceptions/exceptions.php';

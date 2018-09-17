@@ -4,15 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-if (!session_id()) {
-    session_start();
-    if (!isset($_SESSION['SSV'])) {
-        $_SESSION['SSV'] = [
-            'errors' => [],
-        ];
-    }
-}
-
 $currentDir = getcwd();
 chdir(__DIR__ . '/../..');
 define('SSV_BASE_ACTIVATOR_PLUGIN', getcwd() . DIRECTORY_SEPARATOR . basename(getcwd()) . '.php');
@@ -42,3 +33,17 @@ function ssv_wpautop($content)
 
 remove_filter('the_content', 'wpautop');
 add_filter('the_content', 'ssv_wpautop');
+
+function ssv_start_session()
+{
+    do_action('before_session_start');
+    if (!session_id()) {
+        session_start();
+    }
+    if (!isset($_SESSION['SSV'])) {
+        $_SESSION['SSV'] = [
+            'errors' => [],
+        ];
+    }
+}
+add_action('init', 'ssv_start_session', 1);
