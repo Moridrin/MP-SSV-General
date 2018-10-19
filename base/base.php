@@ -14,6 +14,8 @@ define('SSV_BASE_URL', plugins_url() . '/' . plugin_basename(__DIR__));
 require_once 'BaseFunctions.php';
 require_once 'SSV_Global.php';
 require_once 'SSV_Themes.php';
+require_once 'PostType.php';
+require_once 'Taxonomy.php';
 require_once 'models/Model.php';
 require_once 'models/User.php';
 require_once 'models/Database.php';

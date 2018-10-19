@@ -122,7 +122,7 @@ abstract class BaseFunctions
      */
     public static function isValidIBAN(string $iban): bool
     {
-        $iban      = strtolower(str_replace(' ', '', $iban));
+        $iban = strtolower(str_replace(' ', '', $iban));
         $Countries = [
             'al' => 28,
             'ad' => 24,
@@ -191,7 +191,7 @@ abstract class BaseFunctions
             'gb' => 22,
             'vg' => 24,
         ];
-        $Chars     = [
+        $Chars = [
             'a' => 10,
             'b' => 11,
             'c' => 12,
@@ -227,9 +227,9 @@ abstract class BaseFunctions
         try {
             if (strlen($iban) == $Countries[substr($iban, 0, 2)]) {
 
-                $MovedChar      = substr($iban, 4) . substr($iban, 0, 4);
+                $MovedChar = substr($iban, 4) . substr($iban, 0, 4);
                 $MovedCharArray = str_split($MovedChar);
-                $NewString      = '';
+                $NewString = '';
 
                 foreach ($MovedCharArray AS $key => $value) {
                     if (!is_numeric($MovedCharArray[$key])) {
@@ -252,14 +252,17 @@ abstract class BaseFunctions
     }
 
     /**
-     * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
-     * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
-     * @param bool|string $resetButton  set to false if you don't want the reset button to be displayed or give string to set custom button text.
+     * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
+     * @param bool|string $saveButton set to false if you don't want the save button to be displayed or give string to set custom button text.
+     * @param bool|string $resetButton set to false if you don't want the reset button to be displayed or give string to set custom button text.
      *
      * @return string HTML
      */
-    public static function getAdminFormSecurityFields(string $adminReferer, $saveButton = true, $resetButton = false): string
-    {
+    public static function getAdminFormSecurityFields(
+        string $adminReferer,
+        $saveButton = true,
+        $resetButton = false
+    ): string {
         ob_start();
         wp_nonce_field($adminReferer);
         if (is_string($saveButton)) {
@@ -268,14 +271,15 @@ abstract class BaseFunctions
             submit_button();
         }
         if ($resetButton) {
-            ?><input type="submit" name="reset" id="reset" class="button button-primary" value="<?= is_string($resetButton) ? $resetButton : 'Reset to Default' ?>"><?php
+            ?><input type="submit" name="reset" id="reset" class="button button-primary"
+                     value="<?= is_string($resetButton) ? $resetButton : 'Reset to Default' ?>"><?php
         }
         return ob_get_clean();
     }
 
     /**
-     * @param string      $adminReferer should be defined by a constant from the class you want to use this form in.
-     * @param bool|string $saveButton   set to false if you don't want the save button to be displayed or give string to set custom button text.
+     * @param string $adminReferer should be defined by a constant from the class you want to use this form in.
+     * @param bool|string $saveButton set to false if you don't want the save button to be displayed or give string to set custom button text.
      *
      * @return string HTML
      */
@@ -435,15 +439,15 @@ abstract class BaseFunctions
                 break;
             case 'dateTime':
                 $dateTime = DateTime::createFromFormat('Y-m-d H:i', sanitize_text_field($value));
-                $value    = $dateTime ? $dateTime->format('Y-m-d H:i') : '';
+                $value = $dateTime ? $dateTime->format('Y-m-d H:i') : '';
                 break;
             case 'date':
                 $dateTime = DateTime::createFromFormat('Y-m-d', sanitize_text_field($value));
-                $value    = $dateTime ? $dateTime->format('Y-m-d') : '';
+                $value = $dateTime ? $dateTime->format('Y-m-d') : '';
                 break;
             case 'time':
                 $dateTime = DateTime::createFromFormat('H:i', sanitize_text_field($value));
-                $value    = $dateTime ? $dateTime->format('H:i') : '';
+                $value = $dateTime ? $dateTime->format('H:i') : '';
                 break;
             case 'bool':
             case 'boolean':
@@ -478,10 +482,10 @@ abstract class BaseFunctions
     public static function getParameter(string $name, string $type, array $options = [])
     {
         $options += [
-            'implode'        => false,
+            'implode' => false,
             'possibleValues' => null,
         ];
-        $value   = null;
+        $value = null;
         if (isset($_GET[$name])) {
             $value = self::sanitize($_GET[$name], $type, $options['implode']);
         }
@@ -546,7 +550,7 @@ abstract class BaseFunctions
      * This function is for development purposes only and lets the developer print a variable in the PHP formatting to inspect what the variable is set to.
      *
      * @param mixed $variable any variable that you want to be printed.
-     * @param bool  $die      set true if you want to call die() after the print. $die is ignored if $return is true.
+     * @param bool $die set true if you want to call die() after the print. $die is ignored if $return is true.
      *
      * @return mixed|null|string returns the print in string if $return is true, returns null if $return is false, and doesn't return if $die is true.
      */
@@ -570,13 +574,15 @@ abstract class BaseFunctions
             }
             $print = trim($print);
             /** @noinspection HtmlUnknownAttribute */
-            $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print, 1);  // remove prefix
+            $print = preg_replace("|^\\<code\\>\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>|", '', $print,
+                1);  // remove prefix
             $print = preg_replace("|\\</code\\>\$|", '', $print, 1);
             $print = trim($print);
             $print = preg_replace("|\\</span\\>\$|", '', $print, 1);
             $print = trim($print);
             /** @noinspection HtmlUnknownAttribute */
-            $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|", "\$1\$3\$4", $print);
+            $print = preg_replace("|^(\\<span style\\=\"color\\: #[a-fA-F0-9]{0,6}\"\\>)(&lt;\\?php&nbsp;)(.*?)(\\</span\\>)|",
+                "\$1\$3\$4", $print);
             $print .= ';';
         }
         echo $print;
@@ -593,26 +599,32 @@ abstract class BaseFunctions
     public static function getListSelect($name, $options, $selected)
     {
         $selected = self::escape($selected, 'html');
-        $options  = self::escape($options, 'html');
-        $name     = self::escape($name, 'attribute');
+        $options = self::escape($options, 'html');
+        $name = self::escape($name, 'attribute');
         ob_start();
         $optionCount = count($options);
         ?>
         <div style="float:left;margin-right:20px;">
             <label for="non_selected_fields">Available</label>
             <br/>
-            <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+            <select id="non_selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple
+                    title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($options as $option): ?>
-                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>" onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option, $selected) ? 'disabled' : '' ?>><?= $option ?></option>
+                    <option id="<?= $name ?>_non_selected_result_<?= $option ?>"
+                            onClick='<?= $name ?>_add("<?= $option ?>")' value="<?= $option ?>" <?= in_array($option,
+                        $selected) ? 'disabled' : '' ?>><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div style="float:left;margin-right:20px;">
             <label for="selected_fields">Selected</label>
             <br/>
-            <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple title="Columns to Export" style="min-width: 200px;">
+            <select id="selected_fields" size="<?= $optionCount > 25 ? 25 : $optionCount ?>" multiple
+                    title="Columns to Export" style="min-width: 200px;">
                 <?php foreach ($selected as $option): ?>
-                    <option id="<?= $name ?>_selected_result_<?= $option ?>" onClick='<?= $name ?>_remove("<?= $option ?>")' value="<?= $option ?>"><?= $option ?></option>
+                    <option id="<?= $name ?>_selected_result_<?= $option ?>"
+                            onClick='<?= $name ?>_remove("<?= $option ?>")'
+                            value="<?= $option ?>"><?= $option ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -655,11 +667,11 @@ abstract class BaseFunctions
     private static function bcmod($x, $y)
     {
         $take = 5;
-        $mod  = '';
+        $mod = '';
 
         do {
-            $a   = (int)$mod . substr($x, 0, $take);
-            $x   = substr($x, $take);
+            $a = (int)$mod . substr($x, 0, $take);
+            $x = substr($x, $take);
             $mod = $a % $y;
         } while (strlen($x));
 
@@ -696,14 +708,18 @@ abstract class BaseFunctions
         return $string;
     }
 
-    public static function toSnakeCase(string $string): string
+    public static function toSnakeCase(string $string, string $delimiter = '_'): string
     {
-        preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $string, $matches);
-        $ret = $matches[0];
-        foreach ($ret as &$match) {
-            $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+        $value = str_replace(' ', '_', $string);
+        $value = preg_replace('/(.)(?=[A-Z])/', '$1' . $delimiter, $value);
+        while (!isset($count) || $count > 0) {
+            $value = preg_replace('/_(.)_/', '$1' . $delimiter, $value, -1, $count);
         }
-        return implode('_', $ret);
+        unset($count);
+        while (!isset($count) || $count > 0) {
+            $value = preg_replace('/__/', '$1' . $delimiter, $value, -1, $count);
+        }
+        return strtolower($value);
     }
 
     public static function toDashCase(string $string): string
@@ -735,7 +751,8 @@ abstract class BaseFunctions
 
     public static function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== false);
+        return $needle === '' || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle,
+                    $temp) !== false);
     }
 
     public static function registerOption(string $group, string $name, string $type)
@@ -774,7 +791,9 @@ abstract class BaseFunctions
         ];
         ?>
         <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
-            <input type="checkbox" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="1" <?= get_option($args['id']) ? 'checked' : '' ?>>
+            <input type="checkbox" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   value="1" <?= get_option($args['id']) ? 'checked' : '' ?>>
             <?= $args['description'] ?>
         </label>
         <?php
@@ -792,11 +811,13 @@ abstract class BaseFunctions
         }
         $args += [
             'description' => '',
-            'default'     => '',
+            'default' => '',
         ];
         ?>
         <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
-            <input type="text" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="<?= get_option($args['id'], $args['default']) ?>">
+            <input type="text" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   value="<?= get_option($args['id'], $args['default']) ?>">
             <br/>
             <?= $args['description'] ?>
         </label>
@@ -815,11 +836,13 @@ abstract class BaseFunctions
         }
         $args += [
             'description' => '',
-            'default'     => '',
+            'default' => '',
         ];
         ?>
         <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
-            <textarea id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"><?= get_option($args['id'], $args['default']) ?></textarea>
+            <textarea id="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                      name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"><?= get_option($args['id'],
+                    $args['default']) ?></textarea>
             <br/>
             <?= $args['description'] ?>
         </label>
@@ -838,11 +861,13 @@ abstract class BaseFunctions
         }
         $args += [
             'description' => '',
-            'default'     => '',
+            'default' => '',
         ];
         ?>
         <label for="<?= BaseFunctions::escape($args['id'], 'attr') ?>">
-            <input type="color" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>" name="<?= BaseFunctions::escape($args['id'], 'attr') ?>" value="<?= get_option($args['id'], $args['default']) ?>">
+            <input type="color" id="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   name="<?= BaseFunctions::escape($args['id'], 'attr') ?>"
+                   value="<?= get_option($args['id'], $args['default']) ?>">
             <br/>
             <?= $args['description'] ?>
         </label>
@@ -853,7 +878,7 @@ abstract class BaseFunctions
     {
         if (count($affectedCreaturesHtml) > 1) {
             $lastAffectedCreatureHtml = array_pop($affectedCreaturesHtml);
-            $affectedCreaturesHtml    = implode(', ', $affectedCreaturesHtml);
+            $affectedCreaturesHtml = implode(', ', $affectedCreaturesHtml);
             return implode(' and ', array_filter([$affectedCreaturesHtml, $lastAffectedCreatureHtml]));
         } else {
             return (string)array_pop($affectedCreaturesHtml);
